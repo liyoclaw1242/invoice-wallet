@@ -1,0 +1,54 @@
+# PROGRESS — Invoice Wallet Android App
+
+> Orchestrator 進度紀錄。每個 iteration 結束更新。
+
+## Baseline（建立時狀態）
+
+- 建立日期：2026-05-26
+- Repo：`~/Projects/invoice-app`，全新 git repo，main 分支，**尚無任何 commit**
+- 原始骨架：`gradle init` 純 Java 單模組（`src/main/java/org/example/Main.java` + `id("java")`）—— **將於 T0.1 整個替換為 Android monorepo**
+- Gradle wrapper：8.14
+- 本機工具鏈：JDK 21 (openjdk@21)、Kotlin 2.3.21、Gradle 9.5.1（CLI）、IntelliJ IDEA CE
+
+## 決策紀錄
+
+| 決策 | 選擇 | 日期 |
+|------|------|------|
+| `docs/ARCHITECTURE.md` 來源 | 使用者提供，已寫入 `docs/ARCHITECTURE.md` | 2026-05-26 |
+| Android 工具鏈安裝 | 使用者自行設定（SDK/模擬器/ANDROID_HOME） | 2026-05-26 |
+| monorepo 位置 | **`android/` 子目錄**（與 relay-server/、spec/、docs/ 並列，依 ARCHITECTURE §4）；清掉根目錄 Java 範本 | 2026-05-26（推翻原「repo 根」選擇） |
+
+## 目標 repo 結構（ARCHITECTURE §4）
+
+```
+invoice-app/                 # = invoice-wallet
+├── android/                 # Android Gradle monorepo（本計畫 Iter 0–7）
+├── relay-server/            # Go relay（之後 Phase 4，另有文件）
+├── spec/                    # mcp-tools.md / content-provider.md / data-schema.md ...
+├── docs/                    # ARCHITECTURE.md / PROGRESS.md / QUESTIONS.md（已建）
+└── README.md
+```
+
+## 前置依賴（BLOCKING — 開工前必須備齊）
+
+- [x] **P1 — `docs/ARCHITECTURE.md`**：✅ 已到位（使用者提供完整 v2 spec）。
+- [x] **P2 — Android SDK 可用**：✅ 已到位（2026-05-26，Claude 安裝並驗證）。`ANDROID_HOME=/opt/homebrew/share/android-commandlinetools`、`adb` 37.0.0 / `sdkmanager` 20.0 / `emulator` 36.5.11 可呼叫、`platforms;android-35` + `build-tools;35.0.1` + `system-images;android-35;google_apis;arm64-v8a` 已裝、AVD `invoice_pixel7_api35` 已建、licenses 全 accept。⚠️ 殘留：`~/.zshrc` 持久化被 harness 擋下，新 shell 需手動 export 或靠 `android/local.properties` 的 `sdk.dir`（詳見 QUESTIONS Q2）。
+
+## Iteration 狀態
+
+| Iteration | 狀態 | 備註 |
+|---|---|---|
+| 0 Foundation | 🔨 進行中 | T0.1 ✅ / T0.2–T0.5 待做 |
+| 1 Core Data | 🟢 前置已備齊（P1+P2）| 待 Iteration 0 完成 |
+| 2 Scan | ⛔ | |
+| 3 List/Search | ⛔ | |
+| 4 Lottery | ⛔ | |
+| 5 Export | ⛔ | |
+| 6 MCP Server | ⛔ | |
+| 7 Content Provider | ⛔ | |
+
+## 變更日誌
+
+- 2026-05-26：建立 PROGRESS.md / QUESTIONS.md，記錄 baseline 與三項決策。前置 P1、P2 待解。
+- 2026-05-26：安裝並驗證 Android SDK（P2 ✅）。brew cask `android-commandlinetools` + sdkmanager 裝 platform-tools 37.0.0 / android-35 / build-tools 35.0.1 / cmdline-tools latest / emulator 36.5.11 / google_apis arm64-v8a image；建 AVD `invoice_pixel7_api35`；licenses 全 accept。`~/.zshrc` 持久化被 harness 擋下，待使用者處理。Iteration 0 前置就緒。
+- 2026-05-26：**T0.1 完成 ✅**。重構為 `android/` 子目錄 monorepo（清掉根 Java 範本）。版本組合 AGP 8.7.3 / Gradle 8.9 / Kotlin 2.0.21 / KSP 2.0.21-1.0.28（保守已知良好）。建立 `android/`：`settings.gradle.kts`（pluginManagement + FAIL_ON_PROJECT_REPOS + type-safe accessors）、`gradle/libs.versions.toml`（完整版本目錄）、`gradle.properties`（config cache + build cache + parallel）、`build.gradle.kts`（plugins apply false）、`local.properties`（sdk.dir，gitignored）。`.gitignore` 補 Android + 整個 `.idea/`。驗收：`./gradlew tasks` BUILD SUCCESSFUL、config cache 已存。
