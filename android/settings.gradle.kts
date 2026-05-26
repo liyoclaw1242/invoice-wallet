@@ -1,7 +1,6 @@
 pluginManagement {
     // build-logic supplies the convention plugins consumed by every module.
-    // Enabled in T0.2 once build-logic exists.
-    // includeBuild("build-logic")
+    includeBuild("build-logic")
     repositories {
         google {
             content {
