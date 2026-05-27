@@ -58,22 +58,15 @@ fun CameraQrScanner(onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit,
                     )
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
+                    .also {
+                        it.setAnalyzer(analysisExecutor, QrCodeAnalyzer { left, right -> currentOnQr(left, right) })
+                    }
                 provider.unbindAll()
-                val camera = provider.bindToLifecycle(
+                provider.bindToLifecycle(
                     lifecycleOwner,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     preview,
                     analysis,
-                )
-                // Wire ML Kit auto-zoom to the camera now that we have CameraControl.
-                val maxZoom = camera.cameraInfo.zoomState.value?.maxZoomRatio ?: 1f
-                analysis.setAnalyzer(
-                    analysisExecutor,
-                    QrCodeAnalyzer(
-                        maxZoomRatio = maxZoom,
-                        applyZoom = { ratio -> camera.cameraControl.setZoomRatio(ratio) },
-                        onInvoiceQr = { left, right -> currentOnQr(left, right) },
-                    ),
                 )
             }, ContextCompat.getMainExecutor(context))
             previewView
