@@ -65,6 +65,26 @@ func (m *Manager) Connected() bool {
 	return m.conn != nil
 }
 
+// WaitConnected blocks until a phone connects or ctx is done, returning whether a
+// connection became available. Used after an FCM wake to let the phone reconnect.
+func (m *Manager) WaitConnected(ctx context.Context) bool {
+	if m.Connected() {
+		return true
+	}
+	ticker := time.NewTicker(50 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return false
+		case <-ticker.C:
+			if m.Connected() {
+				return true
+			}
+		}
+	}
+}
+
 // Serve registers conn as the active phone and reads responses until the socket
 // closes. Blocks until the read loop ends; callers run it in a goroutine.
 func (m *Manager) Serve(conn Conn) {
