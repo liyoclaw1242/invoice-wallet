@@ -41,7 +41,7 @@ invoice-app/                 # = invoice-wallet
 |---|---|---|
 | 0 Foundation | ✅ 完成 | T0.1–T0.5 + T0.3b 全綠；CI 待 GitHub remote 才能實跑 |
 | 1 Core Data | ✅ 完成 | T1.1–T1.5 全綠（model→DB→DAO→Repository，加密 + 雙層測試）|
-| 2 Scan | 🔨 進行中 | T2.1 QR 解析器 ✅ T2.4 ScanViewModel ✅ / T2.2 OCR、T2.3 CameraX、T2.5 UI 待做 |
+| 2 Scan | 🔨 進行中 | T2.1 解析器 ✅ T2.4 ViewModel ✅ T2.5 確認 UI ✅ / T2.2 OCR、T2.3 CameraX(相機) 待做 |
 | 3 List/Search | ⛔ | |
 | 4 Lottery | ⛔ | |
 | 5 Export | ⛔ | |
