@@ -13,6 +13,7 @@ import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.database.repository.LotteryRepository
 import tw.invoicewallet.core.model.Invoice
 import tw.invoicewallet.core.model.LotteryNumber
+import tw.invoicewallet.core.model.LotteryStatus
 import javax.inject.Inject
 
 data class InvoiceLotteryResult(val invoice: Invoice, val result: LotteryResult)
@@ -53,6 +54,7 @@ class LotteryViewModel @Inject constructor(
                 val numbers = lotteryRepository.getByPeriod(invoice.issuePeriod)
                 val result = numbers?.let { LotteryMatcher.match(invoice, it) }
                     ?: LotteryResult.NotApplicable
+                persist(invoice, result)
                 InvoiceLotteryResult(invoice, result)
             }
 
@@ -61,6 +63,20 @@ class LotteryViewModel @Inject constructor(
                 latestNumbers = lotteryRepository.latest(),
                 results = results,
             )
+        }
+    }
+
+    /** Writes the checked result back to the invoice so the list badge reflects it.
+     *  Leaves CLAIMED untouched and NotApplicable (undrawn) unchanged; only writes on change. */
+    private suspend fun persist(invoice: Invoice, result: LotteryResult) {
+        if (invoice.lotteryStatus == LotteryStatus.CLAIMED) return
+        val (status, prize) = when (result) {
+            is LotteryResult.Won -> LotteryStatus.CHECKED_WON to result.prize.amountTwd
+            LotteryResult.NoPrize -> LotteryStatus.CHECKED_NO_PRIZE to null
+            LotteryResult.NotApplicable -> return
+        }
+        if (invoice.lotteryStatus != status || invoice.lotteryPrize != prize) {
+            invoiceRepository.upsert(invoice.copy(lotteryStatus = status, lotteryPrize = prize))
         }
     }
 }
