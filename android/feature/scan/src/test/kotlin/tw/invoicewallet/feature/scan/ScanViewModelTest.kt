@@ -15,6 +15,7 @@ import tw.invoicewallet.core.model.Invoice
 import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.core.testing.MainDispatcherExtension
+import tw.invoicewallet.feature.scan.merchant.MerchantDirectory
 import tw.invoicewallet.feature.scan.ocr.RecognizedText
 import tw.invoicewallet.feature.scan.recognition.InvoiceRecognizer
 import tw.invoicewallet.feature.scan.recognition.RecognitionResult
@@ -28,9 +29,11 @@ class ScanViewModelTest {
     private val fixedNow = Instant.parse("2026-05-27T00:00:00Z")
     private val repository = FakeInvoiceRepository()
     private val recognizer = FakeInvoiceRecognizer()
+    private val merchantDirectory = FakeMerchantDirectory(mapOf("90650686" to "瑪可希維"))
     private val viewModel = ScanViewModel(
         invoiceRepository = repository,
         recognizer = recognizer,
+        merchantDirectory = merchantDirectory,
         clock = object : Clock {
             override fun now(): Instant = fixedNow
         },
@@ -49,6 +52,8 @@ class ScanViewModelTest {
             detected.draft.invoiceNumber shouldBe "ZP46105854"
             detected.draft.totalAmount shouldBe 232
             detected.draft.merchantTaxId shouldBe "90650686"
+            // store name auto-filled from the seller tax ID via the directory
+            detected.draft.merchantName shouldBe "瑪可希維"
             detected.draft.source shouldBe InvoiceSource.QR_CODE
         }
     }
@@ -149,6 +154,10 @@ class ScanViewModelTest {
 
     private class FakeInvoiceRecognizer(var result: RecognitionResult = RecognitionResult()) : InvoiceRecognizer {
         override suspend fun recognize(image: Uri): RecognitionResult = result
+    }
+
+    private class FakeMerchantDirectory(private val names: Map<String, String>) : MerchantDirectory {
+        override suspend fun nameFor(taxId: String): String? = names[taxId]
     }
 
     private companion object {

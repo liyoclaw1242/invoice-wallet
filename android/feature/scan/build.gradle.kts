@@ -38,10 +38,21 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.core.ktx)
 
+    // Ktor client: look up a store name from its public business tax ID (the only network use).
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.serialization.json)
+
     // Fixtures (real e-invoice QR payloads) are loaded as JSON in the parser tests.
     testImplementation(libs.kotlinx.serialization.json)
     // Shared test infra (MainDispatcherExtension) for ViewModel tests.
     testImplementation(project(":core:testing"))
+
+    // Ktor MockEngine drives the merchant-lookup parsing tests deterministically (no network).
+    testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.ktor.client.content.negotiation)
 
     // Instrumented tests (e.g. ML Kit recognition against a real photo on a device).
     androidTestImplementation(libs.androidx.test.ext.junit)

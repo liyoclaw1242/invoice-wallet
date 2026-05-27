@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.feature.scan.merchant.MerchantDirectory
 import tw.invoicewallet.feature.scan.ocr.InvoiceFieldExtractor
 import tw.invoicewallet.feature.scan.qr.EInvoiceQrException
 import tw.invoicewallet.feature.scan.qr.EInvoiceQrParser
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class ScanViewModel @Inject constructor(
     private val invoiceRepository: InvoiceRepository,
     private val recognizer: InvoiceRecognizer,
+    private val merchantDirectory: MerchantDirectory,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -37,7 +39,7 @@ class ScanViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = ScanState.Recognizing
             _state.value = try {
-                val draft = buildDraft(recognizer.recognize(image))
+                val draft = buildDraft(recognizer.recognize(image))?.let { withMerchantName(it) }
                 draft?.let { ScanState.Detected(it) }
                     ?: ScanState.Error("這張照片裡找不到發票資訊，可改用手動輸入。")
             } catch (e: Exception) {
@@ -48,11 +50,13 @@ class ScanViewModel @Inject constructor(
 
     /** A QR string was entered/detected directly; parse it into an editable draft. */
     fun onQrDetected(leftQr: String, rightBytes: ByteArray?) {
-        _state.value = try {
-            val parsed = EInvoiceQrParser.parse(leftQr, rightBytes)
-            ScanState.Detected(parsed.toDraftInvoice(id = newId(), now = clock.now()))
-        } catch (e: EInvoiceQrException) {
-            ScanState.Error(e.message ?: "無法解析發票 QR code")
+        viewModelScope.launch {
+            _state.value = try {
+                val parsed = EInvoiceQrParser.parse(leftQr, rightBytes)
+                ScanState.Detected(withMerchantName(parsed.toDraftInvoice(id = newId(), now = clock.now())))
+            } catch (e: EInvoiceQrException) {
+                ScanState.Error(e.message ?: "無法解析發票 QR code")
+            }
         }
     }
 
@@ -78,6 +82,14 @@ class ScanViewModel @Inject constructor(
                 ?.let { return it.toDraftInvoice(id = newId(), now = now) }
         }
         return fieldExtractor.extract(result.ocr).toDraftInvoice(id = newId(), now = now)
+    }
+
+    /** Looks up the store name from the seller tax ID when the draft has no name yet. */
+    private suspend fun withMerchantName(draft: Invoice): Invoice {
+        val taxId = draft.merchantTaxId
+        if (draft.merchantName.isNotBlank() || taxId.isNullOrBlank()) return draft
+        val name = merchantDirectory.nameFor(taxId)
+        return if (name.isNullOrBlank()) draft else draft.copy(merchantName = name)
     }
 
     private fun newId(): String = UUID.randomUUID().toString()
