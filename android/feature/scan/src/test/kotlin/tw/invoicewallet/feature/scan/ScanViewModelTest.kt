@@ -41,21 +41,17 @@ class ScanViewModelTest {
 
     @Test
     fun `onQrDetected with a valid QR moves to Detected with a QR-sourced draft`() = runTest {
-        viewModel.state.test {
-            awaitItem() shouldBe ScanState.Idle
+        viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null)
 
-            viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null)
-
-            val detected = awaitItem()
-            detected.shouldBeInstanceOf<ScanState.Detected>()
-            detected.draft.id.isNotBlank() shouldBe true
-            detected.draft.invoiceNumber shouldBe "ZP46105854"
-            detected.draft.totalAmount shouldBe 232
-            detected.draft.merchantTaxId shouldBe "90650686"
-            // store name auto-filled from the seller tax ID via the directory
-            detected.draft.merchantName shouldBe "瑪可希維"
-            detected.draft.source shouldBe InvoiceSource.QR_CODE
-        }
+        val detected = viewModel.state.value
+        detected.shouldBeInstanceOf<ScanState.Detected>()
+        detected.draft.id.isNotBlank() shouldBe true
+        detected.draft.invoiceNumber shouldBe "ZP46105854"
+        detected.draft.totalAmount shouldBe 232
+        detected.draft.merchantTaxId shouldBe "90650686"
+        // store name auto-filled from the seller tax ID via the directory
+        detected.draft.merchantName shouldBe "瑪可希維"
+        detected.draft.source shouldBe InvoiceSource.QR_CODE
     }
 
     @Test
@@ -74,13 +70,9 @@ class ScanViewModelTest {
 
     @Test
     fun `onQrDetected with a malformed QR moves to Error`() = runTest {
-        viewModel.state.test {
-            awaitItem() shouldBe ScanState.Idle
+        viewModel.onQrDetected("too-short", rightBytes = null)
 
-            viewModel.onQrDetected("too-short", rightBytes = null)
-
-            awaitItem().shouldBeInstanceOf<ScanState.Error>()
-        }
+        viewModel.state.value.shouldBeInstanceOf<ScanState.Error>()
     }
 
     @Test

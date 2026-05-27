@@ -51,6 +51,7 @@ class ScanViewModel @Inject constructor(
     /** A QR string was entered/detected directly; parse it into an editable draft. */
     fun onQrDetected(leftQr: String, rightBytes: ByteArray?) {
         viewModelScope.launch {
+            _state.value = ScanState.Recognizing
             _state.value = try {
                 val parsed = EInvoiceQrParser.parse(leftQr, rightBytes)
                 ScanState.Detected(withMerchantName(parsed.toDraftInvoice(id = newId(), now = clock.now())))
