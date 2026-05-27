@@ -42,7 +42,9 @@ class SettingsViewModel @Inject constructor(
 
     fun setThemeMode(mode: ThemeMode) = viewModelScope.launch { settingsRepository.setThemeMode(mode) }
 
-    fun setDefaultScanMode(mode: DefaultScanMode) = viewModelScope.launch { settingsRepository.setDefaultScanMode(mode) }
+    fun setDefaultScanMode(mode: DefaultScanMode) = viewModelScope.launch {
+        settingsRepository.setDefaultScanMode(mode)
+    }
 
     fun setCarrierCode(code: String) {
         carrierCodeStore.set(code)
