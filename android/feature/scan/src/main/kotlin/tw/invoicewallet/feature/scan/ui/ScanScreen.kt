@@ -2,7 +2,6 @@ package tw.invoicewallet.feature.scan.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,8 +10,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,15 +31,14 @@ import tw.invoicewallet.core.model.formattedNumber
 import tw.invoicewallet.feature.scan.ScanState
 
 /**
- * Stateless scan screen. Renders the [ScanState] and hoists all actions to the
- * caller. The camera preview belongs in [ScanState.Idle] (T2.3); until then Idle
- * accepts a pasted QR string so the flow is exercisable.
+ * Stateless scan screen. Renders the [ScanState] and hoists all actions to the caller.
+ * The live camera preview is supplied by the app via [cameraContent]; QR codes are
+ * detected in real time, so the user normally just points the camera and confirms.
  */
 @Composable
 fun ScanScreen(
     state: ScanState,
     onPickImage: () -> Unit,
-    onParse: (String) -> Unit,
     onConfirm: (Invoice) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
@@ -47,13 +46,13 @@ fun ScanScreen(
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         when (state) {
-            ScanState.Idle -> IdleContent(onPickImage, onParse, cameraContent)
+            ScanState.Idle -> IdleContent(onPickImage, cameraContent)
             ScanState.Recognizing -> RecognizingContent()
             is ScanState.Detected -> ConfirmContent(state.draft, onConfirm, onCancel)
             is ScanState.Saved -> ResultContent(
                 tag = "scan-saved",
-                title = "已儲存",
-                detail = "發票已存入加密錢包（${state.invoiceId}）",
+                title = "✅ 已儲存",
+                detail = "發票已存入加密錢包",
                 actionLabel = "再掃一張",
                 onAction = onCancel,
             )
@@ -70,36 +69,24 @@ fun ScanScreen(
 }
 
 @Composable
-private fun IdleContent(onPickImage: () -> Unit, onParse: (String) -> Unit, cameraContent: @Composable () -> Unit) {
-    val scroll = rememberScrollState()
-    var raw by remember { mutableStateOf("") }
+private fun IdleContent(onPickImage: () -> Unit, cameraContent: @Composable () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(scroll).testTag("scan-idle"),
+        modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState()).testTag("scan-idle"),
         verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("掃描發票", style = MaterialTheme.typography.headlineMedium)
-        Text("把鏡頭對準發票上的 QR code，會自動辨識。", style = MaterialTheme.typography.bodyMedium)
-        // Live camera preview (provided by the app; QR is detected in real time).
+        Text("把鏡頭對準發票的 QR code", style = MaterialTheme.typography.titleMedium)
+        Text(
+            "對準後會自動辨識，店名也會自動帶入。",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         cameraContent()
-        HorizontalDivider()
-        Button(
+        OutlinedButton(
             onClick = onPickImage,
             modifier = Modifier.fillMaxWidth().testTag("pick-image-button"),
         ) {
             Text("改從相簿選擇照片")
-        }
-        Text("或手動貼上電子發票左碼 QR 字串：", style = MaterialTheme.typography.bodySmall)
-        OutlinedTextField(
-            value = raw,
-            onValueChange = { raw = it },
-            label = { Text("發票左碼 QR 字串") },
-            modifier = Modifier.fillMaxWidth().testTag("qr-input"),
-        )
-        TextButton(
-            onClick = { onParse(raw.trim()) },
-            modifier = Modifier.testTag("parse-button"),
-        ) {
-            Text("解析")
         }
     }
 }
@@ -109,6 +96,7 @@ private fun RecognizingContent() {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp).testTag("scan-recognizing"),
         verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CircularProgressIndicator()
         Text("辨識中…", style = MaterialTheme.typography.bodyLarge)
@@ -125,43 +113,43 @@ private fun ConfirmContent(draft: Invoice, onConfirm: (Invoice) -> Unit, onCance
             .testTag("scan-detected"),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("確認發票資料", style = MaterialTheme.typography.headlineMedium)
-        ReadOnlyField("發票號碼", draft.formattedNumber())
-        ReadOnlyField("開立日期", draft.issueDate.toString())
-        ReadOnlyField("賣方統編", draft.merchantTaxId ?: "—")
+        Text("確認發票資料", style = MaterialTheme.typography.headlineSmall)
         OutlinedTextField(
             value = merchantName,
             onValueChange = { merchantName = it },
             label = { Text("商店名稱") },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth().testTag("field-merchant"),
         )
         OutlinedTextField(
             value = totalText,
             onValueChange = { totalText = it.filter(Char::isDigit) },
-            label = { Text("總金額") },
+            label = { Text("總金額 (NT$)") },
+            singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth().testTag("field-total"),
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ReadOnlyField("發票號碼", draft.formattedNumber())
+        ReadOnlyField("開立日期", draft.issueDate.toString())
+        ReadOnlyField("賣方統編", draft.merchantTaxId ?: "—")
+        Button(
+            onClick = {
+                onConfirm(
+                    draft.copy(
+                        merchantName = merchantName,
+                        totalAmount = totalText.toIntOrNull() ?: draft.totalAmount,
+                    ),
+                )
+            },
+            modifier = Modifier.fillMaxWidth().testTag("confirm-button"),
         ) {
-            Button(
-                onClick = {
-                    onConfirm(
-                        draft.copy(
-                            merchantName = merchantName,
-                            totalAmount = totalText.toIntOrNull() ?: draft.totalAmount,
-                        ),
-                    )
-                },
-                modifier = Modifier.testTag("confirm-button"),
-            ) {
-                Text("確認儲存")
-            }
-            TextButton(onClick = onCancel, modifier = Modifier.testTag("cancel-button")) {
-                Text("取消")
-            }
+            Text("確認儲存")
+        }
+        TextButton(
+            onClick = onCancel,
+            modifier = Modifier.fillMaxWidth().testTag("cancel-button"),
+        ) {
+            Text("取消")
         }
     }
 }
@@ -169,7 +157,7 @@ private fun ConfirmContent(draft: Invoice, onConfirm: (Invoice) -> Unit, onCance
 @Composable
 private fun ReadOnlyField(label: String, value: String) {
     Column {
-        Text(label, style = MaterialTheme.typography.labelMedium)
+        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }
@@ -179,10 +167,11 @@ private fun ResultContent(tag: String, title: String, detail: String, actionLabe
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp).testTag(tag),
         verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(title, style = MaterialTheme.typography.headlineMedium)
         Text(detail, style = MaterialTheme.typography.bodyMedium)
-        Button(onClick = onAction, modifier = Modifier.testTag("result-action")) {
+        Button(onClick = onAction, modifier = Modifier.fillMaxWidth().testTag("result-action")) {
             Text(actionLabel)
         }
     }

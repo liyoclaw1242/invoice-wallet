@@ -132,7 +132,6 @@ private fun ScanRoute(onBack: () -> Unit, defaultScanMode: DefaultScanMode) {
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
                 )
             },
-            onParse = { viewModel.onQrDetected(it, rightBytes = null) },
             onConfirm = viewModel::onUserConfirm,
             onCancel = viewModel::onCancel,
             modifier = Modifier.padding(padding),
