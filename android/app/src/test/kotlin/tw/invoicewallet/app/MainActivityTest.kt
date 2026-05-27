@@ -34,6 +34,6 @@ class MainActivityTest {
             }
         }
 
-        composeRule.onNodeWithText("Invoice Wallet").assertIsDisplayed()
+        composeRule.onNodeWithText("發票錢包").assertIsDisplayed()
     }
 }

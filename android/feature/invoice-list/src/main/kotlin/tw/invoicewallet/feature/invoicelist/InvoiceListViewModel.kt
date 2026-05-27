@@ -8,19 +8,28 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.LotteryStatus
 import javax.inject.Inject
 
-/** Live, searchable list of saved invoices (newest first, per the repository order). */
+/** Live, searchable list of saved invoices with a this-month spending summary. */
 @HiltViewModel
-class InvoiceListViewModel @Inject constructor(repository: InvoiceRepository) : ViewModel() {
+class InvoiceListViewModel @Inject constructor(repository: InvoiceRepository, private val clock: Clock) : ViewModel() {
 
     private val query = MutableStateFlow("")
+    private val timeZone = TimeZone.currentSystemDefault()
 
     val uiState: StateFlow<InvoiceListUiState> =
         combine(repository.observeAll(), query) { invoices, q ->
-            InvoiceListUiState(invoices = invoices.filter { it.matches(q) }, query = q)
+            InvoiceListUiState(
+                invoices = invoices.filter { it.matches(q) },
+                query = q,
+                summary = summarize(invoices),
+            )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
@@ -29,6 +38,19 @@ class InvoiceListViewModel @Inject constructor(repository: InvoiceRepository) : 
 
     fun onQueryChange(value: String) {
         query.value = value
+    }
+
+    private fun summarize(all: List<Invoice>): InvoiceSummary {
+        val today = clock.now().toLocalDateTime(timeZone).date
+        val thisMonth = all.filter { it.issueDate.year == today.year && it.issueDate.monthNumber == today.monthNumber }
+        return InvoiceSummary(
+            year = today.year,
+            month = today.monthNumber,
+            monthTotal = thisMonth.sumOf { it.totalAmount },
+            monthCount = thisMonth.size,
+            pendingLotteryCount = all.count { it.lotteryStatus == LotteryStatus.PENDING },
+            totalCount = all.size,
+        )
     }
 
     private fun Invoice.matches(q: String): Boolean {
@@ -43,4 +65,18 @@ class InvoiceListViewModel @Inject constructor(repository: InvoiceRepository) : 
     }
 }
 
-data class InvoiceListUiState(val invoices: List<Invoice> = emptyList(), val query: String = "")
+/** Headline numbers shown above the list. */
+data class InvoiceSummary(
+    val year: Int = 0,
+    val month: Int = 0,
+    val monthTotal: Int = 0,
+    val monthCount: Int = 0,
+    val pendingLotteryCount: Int = 0,
+    val totalCount: Int = 0,
+)
+
+data class InvoiceListUiState(
+    val invoices: List<Invoice> = emptyList(),
+    val query: String = "",
+    val summary: InvoiceSummary = InvoiceSummary(),
+)
