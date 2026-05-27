@@ -1,8 +1,11 @@
 package tw.invoicewallet.feature.scan.camera
 
+import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
@@ -40,6 +43,19 @@ fun CameraQrScanner(onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit,
                     it.surfaceProvider = previewView.surfaceProvider
                 }
                 val analysis = ImageAnalysis.Builder()
+                    // Dense e-invoice QR codes need resolution: 640x480 (the default) often
+                    // can't resolve the right code. Target 1280x720, falling back to the
+                    // nearest higher-then-lower option the device supports.
+                    .setResolutionSelector(
+                        ResolutionSelector.Builder()
+                            .setResolutionStrategy(
+                                ResolutionStrategy(
+                                    Size(1280, 720),
+                                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
+                                ),
+                            )
+                            .build(),
+                    )
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
                     .also {
