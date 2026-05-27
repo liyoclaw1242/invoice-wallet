@@ -11,8 +11,11 @@ import tw.invoicewallet.core.database.DatabasePassphraseProvider
 import tw.invoicewallet.core.database.InvoiceWalletDatabase
 import tw.invoicewallet.core.database.buildEncryptedDatabase
 import tw.invoicewallet.core.database.dao.InvoiceDao
+import tw.invoicewallet.core.database.dao.LotteryNumberDao
 import tw.invoicewallet.core.database.repository.InvoiceRepository
+import tw.invoicewallet.core.database.repository.LotteryRepository
 import tw.invoicewallet.core.database.repository.RoomInvoiceRepository
+import tw.invoicewallet.core.database.repository.RoomLotteryRepository
 import javax.inject.Singleton
 
 /** Wires the SQLCipher-encrypted database and repositories into the Hilt graph. */
@@ -36,6 +39,9 @@ object DatabaseModule {
     fun provideInvoiceDao(database: InvoiceWalletDatabase): InvoiceDao = database.invoiceDao()
 
     @Provides
+    fun provideLotteryNumberDao(database: InvoiceWalletDatabase): LotteryNumberDao = database.lotteryNumberDao()
+
+    @Provides
     @Singleton
     fun provideClock(): Clock = Clock.System
 
@@ -43,4 +49,9 @@ object DatabaseModule {
     @Singleton
     fun provideInvoiceRepository(invoiceDao: InvoiceDao, clock: Clock): InvoiceRepository =
         RoomInvoiceRepository(invoiceDao, clock)
+
+    @Provides
+    @Singleton
+    fun provideLotteryRepository(lotteryNumberDao: LotteryNumberDao): LotteryRepository =
+        RoomLotteryRepository(lotteryNumberDao)
 }

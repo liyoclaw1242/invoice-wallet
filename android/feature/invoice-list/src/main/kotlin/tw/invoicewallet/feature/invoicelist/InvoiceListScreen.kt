@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,6 +33,7 @@ import tw.invoicewallet.core.model.formattedNumber
 fun InvoiceListRoute(
     onScanClick: () -> Unit,
     onInvoiceClick: (String) -> Unit,
+    onLotteryClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: InvoiceListViewModel = hiltViewModel(),
 ) {
@@ -41,6 +43,7 @@ fun InvoiceListRoute(
         onQueryChange = viewModel::onQueryChange,
         onScanClick = onScanClick,
         onInvoiceClick = onInvoiceClick,
+        onLotteryClick = onLotteryClick,
         modifier = modifier,
     )
 }
@@ -53,10 +56,18 @@ fun InvoiceListScreen(
     onScanClick: () -> Unit,
     onInvoiceClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onLotteryClick: () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text("Invoice Wallet") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Invoice Wallet") },
+                actions = {
+                    TextButton(onClick = onLotteryClick, modifier = Modifier.testTag("lottery-action")) { Text("對獎") }
+                },
+            )
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onScanClick,
