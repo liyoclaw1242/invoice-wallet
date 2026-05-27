@@ -78,6 +78,21 @@ func TestExchangeRejectsExpiredCode(t *testing.T) {
 	}
 }
 
+func TestClientCredentialsIssuesValidToken(t *testing.T) {
+	p := New(nil)
+	id := p.Register(nil)
+	tok, exp, err := p.IssueToken(id)
+	if err != nil || tok == "" || exp <= 0 {
+		t.Fatalf("issue: %v tok=%q exp=%d", err, tok, exp)
+	}
+	if !p.Validate(tok) {
+		t.Fatal("token should validate")
+	}
+	if _, _, err := p.IssueToken("ghost"); err != ErrUnknownClient {
+		t.Fatalf("want ErrUnknownClient, got %v", err)
+	}
+}
+
 func TestValidateRejectsUnknownAndExpired(t *testing.T) {
 	now := time.Now()
 	p := New(func() time.Time { return now })

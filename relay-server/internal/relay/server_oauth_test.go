@@ -49,6 +49,27 @@ func TestAuthServerMetadataAdvertisesEndpoints(t *testing.T) {
 	}
 }
 
+func TestClientCredentialsTokenFlow(t *testing.T) {
+	srv := newTestServer(t)
+	// Register, then exchange via client_credentials (Claude's non-interactive grant).
+	regRec := req(t, srv, http.MethodPost, "/register", "application/json",
+		`{"redirect_uris":["https://client.example/cb"]}`)
+	var reg map[string]any
+	_ = json.Unmarshal(regRec.Body.Bytes(), &reg)
+	clientID, _ := reg["client_id"].(string)
+
+	form := url.Values{"grant_type": {"client_credentials"}, "client_id": {clientID}}
+	tokRec := req(t, srv, http.MethodPost, "/token", "application/x-www-form-urlencoded", form.Encode())
+	if tokRec.Code != http.StatusOK {
+		t.Fatalf("token: want 200, got %d (%s)", tokRec.Code, tokRec.Body.String())
+	}
+	var tok map[string]any
+	_ = json.Unmarshal(tokRec.Body.Bytes(), &tok)
+	if tok["access_token"] == nil {
+		t.Fatalf("no access_token: %v", tok)
+	}
+}
+
 func TestOAuthFullHTTPFlowYieldsToken(t *testing.T) {
 	srv := newTestServer(t)
 	redirect := "https://client.example/cb"

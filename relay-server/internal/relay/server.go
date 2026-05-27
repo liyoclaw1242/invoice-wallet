@@ -241,7 +241,7 @@ func (s *Server) handleAuthServerMeta(w http.ResponseWriter, r *http.Request) {
 		"token_endpoint":                        base + "/token",
 		"registration_endpoint":                 base + "/register",
 		"response_types_supported":              []string{"code"},
-		"grant_types_supported":                 []string{"authorization_code"},
+		"grant_types_supported":                 []string{"authorization_code", "client_credentials"},
 		"code_challenge_methods_supported":      []string{"S256"},
 		"token_endpoint_auth_methods_supported": []string{"none"},
 	})
@@ -288,10 +288,25 @@ func (s *Server) handleToken(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_request"})
 		return
 	}
-	token, expiresIn, err := s.oauth.Exchange(
-		r.PostFormValue("code"), r.PostFormValue("code_verifier"),
-		r.PostFormValue("client_id"), r.PostFormValue("redirect_uri"),
+	grant := r.PostFormValue("grant_type")
+	if os.Getenv("RELAY_LOG_REQUESTS") == "1" {
+		log.Printf("[token] grant_type=%q client_id=%q", grant, r.PostFormValue("client_id"))
+	}
+
+	var (
+		token     string
+		expiresIn int
+		err       error
 	)
+	switch grant {
+	case "client_credentials":
+		token, expiresIn, err = s.oauth.IssueToken(r.PostFormValue("client_id"))
+	default: // authorization_code
+		token, expiresIn, err = s.oauth.Exchange(
+			r.PostFormValue("code"), r.PostFormValue("code_verifier"),
+			r.PostFormValue("client_id"), r.PostFormValue("redirect_uri"),
+		)
+	}
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_grant"})
 		return

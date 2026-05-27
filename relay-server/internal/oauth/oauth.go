@@ -119,6 +119,22 @@ func (p *Provider) Exchange(code, codeVerifier, clientID, redirectURI string) (s
 	return token, int(tokenTTL.Seconds()), nil
 }
 
+// IssueToken grants an access token directly (client_credentials grant) for a
+// registered client — Claude's connector uses this non-interactive 2-legged flow
+// instead of the browser authorization-code path.
+func (p *Provider) IssueToken(clientID string) (string, int, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if clientID != "" {
+		if _, ok := p.clients[clientID]; !ok {
+			return "", 0, ErrUnknownClient
+		}
+	}
+	token := config.RandomURLToken(32)
+	p.tokens[token] = p.now().Add(tokenTTL)
+	return token, int(tokenTTL.Seconds()), nil
+}
+
 // Validate reports whether token is a live access token.
 func (p *Provider) Validate(token string) bool {
 	if token == "" {
