@@ -76,6 +76,19 @@ class ScanViewModelTest {
     }
 
     @Test
+    fun `onQrDetected with a valid left but unreadable right falls back to the left code`() = runTest {
+        // ** prefix + an invalid UTF-8 byte → strict right-code decode fails; the
+        // invoice must still be recognised from the left code alone.
+        val badRight = byteArrayOf(0x2A, 0x2A, 0xFF.toByte())
+
+        viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = badRight)
+
+        val state = viewModel.state.value
+        state.shouldBeInstanceOf<ScanState.Detected>()
+        state.draft.invoiceNumber shouldBe "ZP46105854"
+    }
+
+    @Test
     fun `onCancel returns to Idle`() = runTest {
         viewModel.onQrDetected("too-short", rightBytes = null)
 

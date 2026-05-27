@@ -53,13 +53,20 @@ class ScanViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = ScanState.Recognizing
             _state.value = try {
-                val parsed = EInvoiceQrParser.parse(leftQr, rightBytes)
+                val parsed = parseTolerant(leftQr, rightBytes)
                 ScanState.Detected(withMerchantName(parsed.toDraftInvoice(id = newId(), now = clock.now())))
             } catch (e: EInvoiceQrException) {
                 ScanState.Error(e.message ?: "無法解析發票 QR code")
             }
         }
     }
+
+    /** Parses the left code, using the right code when it is sound. A faint/partial
+     *  right code must not lose the whole invoice — fall back to the left code alone
+     *  (header, total, and the left item are still correct). */
+    private fun parseTolerant(leftQr: String, rightBytes: ByteArray?) =
+        runCatching { EInvoiceQrParser.parse(leftQr, rightBytes) }
+            .getOrElse { EInvoiceQrParser.parse(leftQr, null) }
 
     /** The user accepted (and possibly edited) the draft — persist it. */
     fun onUserConfirm(invoice: Invoice) {
@@ -78,7 +85,7 @@ class ScanViewModel @Inject constructor(
     private fun buildDraft(result: RecognitionResult): Invoice? {
         val now = clock.now()
         result.qrLeft?.let { left ->
-            runCatching { EInvoiceQrParser.parse(left, result.qrRightBytes) }
+            runCatching { parseTolerant(left, result.qrRightBytes) }
                 .getOrNull()
                 ?.let { return it.toDraftInvoice(id = newId(), now = now) }
         }
