@@ -41,8 +41,8 @@ invoice-app/                 # = invoice-wallet
 |---|---|---|
 | 0 Foundation | ✅ 完成 | T0.1–T0.5 + T0.3b 全綠；CI 待 GitHub remote 才能實跑 |
 | 1 Core Data | ✅ 完成 | T1.1–T1.5 全綠（model→DB→DAO→Repository，加密 + 雙層測試）|
-| 2 Scan | 🟢 功能完成（裝置實測中）| T2.1 解析器 ✅ T2.2 OCR ✅ T2.3 即時相機掃描 ✅ T2.4 ViewModel ✅ T2.5 UI ✅ + 統編→店名 自動查詢(Phase 2) ✅；真實掃描/查詢效果由使用者在 Mi MIX 2 實測 |
-| 3 List/Search | ⛔ | |
+| 2 Scan | ✅ 完成 | T2.1–T2.5 + 即時相機 + 統編→店名；**Mi MIX 2 實機驗證**：掃描→辨識→店名(三家正確)→存加密 DB |
+| 3 List/Search | 🔨 進行中 | T3.1 清單 VM、T3.3 清單/搜尋 UI、T3.2 詳情 VM、T3.4 詳情 UI |
 | 4 Lottery | ⛔ | |
 | 5 Export | ⛔ | |
 | 6 MCP Server | ⛔ | |
@@ -51,6 +51,7 @@ invoice-app/                 # = invoice-wallet
 ## 變更日誌
 
 - 2026-05-27：**T0.3b 完成 ✅**。instrumented smoke `HomeScreenSmokeTest` 在 emulator `invoice_pixel7_api35` 跑 `connectedDebugAndroidTest` 通過。修：androidTest APK 打包衝突（JUnit5 jar 重複 META-INF/LICENSE.md，因 :core:testing 以 api 匯出 jupiter 流入 androidTest）→ `configureKotlinAndroid` 加 `packaging.resources.excludes`（LICENSE*/NOTICE*/AL2.0/LGPL2.1）。Iteration 0 完整收尾；instrumented 測試管線端到端驗證（Iteration 1 DB/DAO 測試會用）。
+- 2026-05-27：**Iteration 2 收掉 ✅**。店名解析修正（g0v 三種登記版面：公司`data.公司名稱`/商業`data.商業名稱`/稅籍巢狀`data.財政部.營業人名稱`）後，使用者在 Mi MIX 2 實測三家統編（七里香/瑪可希維/士豐）店名皆正確帶入。掃描主線實機全綠。
 - 2026-05-27：**T2.3 即時相機已由使用者實機驗證 ✅**（Mi MIX 2：鏡頭對發票 QR → 自動偵測 → 跳確認畫面）。**Phase 2（統編→店名 自動查詢）完成**：使用者選「自動線上查」。`MerchantDirectory`/`CachingMerchantDirectory`（記憶體快取，同統編一 session 查一次，失敗靜默回 null）+ `GovMerchantNameSource`（Ktor + OkHttp 打 g0v `company.g0v.ronny.tw` 公開商業登記，容錯解析 公司名稱/name/營業人名稱）。`ScanViewModel` 注入 `MerchantDirectory`，建好 draft 後若店名空+有賣方統編 → 自動查填；`onQrDetected` 改非同步以容網路查詢。Hilt `ScanModule` 提供 HttpClient(OkHttp, 6s timeout)/source/directory。`INTERNET` 權限（App 首個對外連線；僅送出公開統編）。測試：Ktor MockEngine 驗解析(3)+ cache 行為(2)+ ViewModel 自動填店名。驗收：`check assembleDebug` 綠、APK 裝上 Mi MIX 2 啟動無 crash。⚠️ g0v API 對各統編的實際命中率由使用者實測；查無/離線則店名留白。
 - 2026-05-27：**T2.3 設定（程式/建置/安裝驗證；即時掃描實效待裝置實測）**。ML Kit（`com.google.mlkit:barcode-scanning` + `text-recognition-chinese`，**bundled 模型、全本機零連網**）。`InvoiceRecognizer` 介面 + `MlKitInvoiceRecognizer`（相簿影像 → QR 分類[左碼 rawValue / 右碼 rawBytes 0x2a2a] + 中文 OCR → `RecognizedText`）。CameraX 即時掃描：`QrCodeAnalyzer`（ImageAnalysis 即時偵測 e-invoice QR，偵測到左碼即發一次）+ `CameraQrScanner` Composable（Preview + 綁 lifecycle）。`ScanViewModel.onImageSelected`（QR 優先、OCR fallback `ExtractedFields.toDraftInvoice`）；live QR 走既有 `onQrDetected`。Hilt `ScanModule` 提供 recognizer。UI：Idle 加相機預覽插槽（:app 注入）+ 相簿選圖 + 貼上備援 + `Recognizing` 載入態；`:app` 處理 CAMERA 權限 + PickVisualMedia。:feature:scan 補 `testInstrumentationRunner`。驗收：`check assembleDebug` 綠、APK `adb install` 至實機 Mi MIX 2(Android 9) 並啟動無 crash。⚠️ 即時相機對真發票的辨識效果只能由使用者在裝置上實測（模擬器相機無法掃）；ML Kit instrumented smoke 因實機裝測試 APK 逾時未跑成。**統編→店名 自動線上查詢（Phase 2）尚未做**。
 - 2026-05-27：**T2.2 完成 ✅**。`InvoiceFieldExtractor`（純邏輯，**不依賴 ML Kit**，吃 `RecognizedText`=辨識文字行；ML Kit `Text`→`RecognizedText` 留待 T2.3）。抽：發票號碼 `[A-Z]{2}[-\s]?\d{8}`（有/無分隔→信心 0.95/0.75）、日期（西元 20xx 優先、民國年月日 CJK、民國分隔 /.- ；自動 +1911）、總額（總計/總金額/應收/合計 優先序，去逗號取最大數）。`ExtractedField<T>` 帶 confidence、`lowConfidenceFields(threshold=0.8)` 供 UI 標示。TDD 9 測試（代表性 fixtures：證明聯/收銀機版面 + 日期/金額變體）。驗收：`:feature:scan:testDebugUnitTest`（共 19）綠 + `check` 綠。註：手機可用需 T2.3 接 ML Kit 影像輸入；真實 OCR 文字之後可擴充 fixtures。
