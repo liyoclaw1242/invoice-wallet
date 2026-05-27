@@ -40,7 +40,7 @@ invoice-app/                 # = invoice-wallet
 | Iteration | 狀態 | 備註 |
 |---|---|---|
 | 0 Foundation | ✅ 完成 | T0.1–T0.5 + T0.3b 全綠；CI 待 GitHub remote 才能實跑 |
-| 1 Core Data | 🔨 進行中 | T1.1 ✅ T1.2 ✅ / T1.3 DAOs(平行 subagent)、T1.4/T1.5 待做 |
+| 1 Core Data | 🔨 進行中 | T1.1 ✅ T1.2 ✅ T1.3 ✅ / T1.4 介面、T1.5 Repo 實作 待做 |
 | 2 Scan | ⛔ | |
 | 3 List/Search | ⛔ | |
 | 4 Lottery | ⛔ | |
@@ -51,6 +51,7 @@ invoice-app/                 # = invoice-wallet
 ## 變更日誌
 
 - 2026-05-27：**T0.3b 完成 ✅**。instrumented smoke `HomeScreenSmokeTest` 在 emulator `invoice_pixel7_api35` 跑 `connectedDebugAndroidTest` 通過。修：androidTest APK 打包衝突（JUnit5 jar 重複 META-INF/LICENSE.md，因 :core:testing 以 api 匯出 jupiter 流入 androidTest）→ `configureKotlinAndroid` 加 `packaging.resources.excludes`（LICENSE*/NOTICE*/AL2.0/LGPL2.1）。Iteration 0 完整收尾；instrumented 測試管線端到端驗證（Iteration 1 DB/DAO 測試會用）。
+- 2026-05-27：**T1.3 完成 ✅（orchestrator 序列做，非 subagent）**。決定：4 個 DAO 共用 `:core:database` 模組 + DB 類別 + 單一模擬器，平行 subagent 協調成本高於效益（計畫 §2.4 亦警告），改由 orchestrator 序列 TDD。`InvoiceDao`（insert/upsert/getById/findByInvoiceNumber/observeAll(Flow)/observeByDateRange/findByMerchant/search/softDelete）、`InvoiceItemDao`、`LotteryNumberDao`、`AuthGrantDao`、`QueryAuditLogDao`，全 wire 進 DB。androidTest in-memory Room 共 22 測試（含 InvoiceDao 6：unique 衝突拋例外、日期區間降冪、softDelete 排除、Turbine 觀察 Flow）。驗收：`:core:database:connectedDebugAndroidTest` 22 綠（emulator）、`./gradlew check` 綠。
 - 2026-05-27：**T1.2 完成 ✅**。`:core:database` android library（room + test + ktlint conventions），依賴 `:core:model`。分 3 phase 在模擬器驗證：
   - **Phase 1**：5 個 Room `@Entity`（對應 §5.1，enum 存 name 字串）+ `Converters`（Instant↔Long、LocalDate↔ISO、List<String>↔JSON）+ entity↔domain `Mappers` + placeholder `InvoiceDao`（T1.3a 擴充）+ `InvoiceWalletDatabase`(v1, exportSchema)。InvoiceWalletDatabaseTest in-memory round-trip 綠。
   - **Phase 2**：SQLCipher（`net.zetetic:sqlcipher-android` + `SupportOpenHelperFactory`，`System.loadLibrary("sqlcipher")` 單次載入）+ `DatabasePassphraseProvider`（EncryptedSharedPreferences / Android Keystore master key，32-byte 隨機 passphrase）+ `buildEncryptedDatabase()`。EncryptionTest：正確金鑰可讀、**錯誤金鑰開不了**。
