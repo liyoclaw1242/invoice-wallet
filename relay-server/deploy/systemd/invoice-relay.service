@@ -1,0 +1,16 @@
+[Unit]
+Description=Invoice Wallet Relay Server
+After=network.target
+
+[Service]
+Type=simple
+User=relay
+ExecStart=/usr/local/bin/invoice-relay
+Restart=on-failure
+RestartSec=5
+WorkingDirectory=/var/lib/invoice-relay
+Environment="RELAY_DATA_DIR=/var/lib/invoice-relay"
+Environment="RELAY_PORT=8080"
+
+[Install]
+WantedBy=multi-user.target

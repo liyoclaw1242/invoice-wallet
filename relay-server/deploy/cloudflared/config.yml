@@ -1,0 +1,8 @@
+# /etc/cloudflared/config.yml  (ARCHITECTURE §9.3)
+# Replace <tunnel-id> and the hostname with your own.
+tunnel: <tunnel-id>
+credentials-file: /root/.cloudflared/<tunnel-id>.json
+ingress:
+  - hostname: relay.yourdomain.tw
+    service: http://localhost:8080
+  - service: http_status:404
