@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>tw.invoicewallet.relay</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/liyoclaw/Projects/invoice-app/relay-server/invoice-relay</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>RELAY_DATA_DIR</key>
+        <string>/Users/liyoclaw/Projects/invoice-app/relay-server/.data</string>
+        <key>RELAY_PUBLIC_URL</key>
+        <string>https://relay.yourdomain.tw</string>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>/Users/liyoclaw/Projects/invoice-app/relay-server</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/liyoclaw/Projects/invoice-app/relay-server/.data/relay.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/liyoclaw/Projects/invoice-app/relay-server/.data/relay.log</string>
+</dict>
+</plist>
