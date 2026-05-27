@@ -41,7 +41,7 @@ invoice-app/                 # = invoice-wallet
 |---|---|---|
 | 0 Foundation | ✅ 完成 | T0.1–T0.5 + T0.3b 全綠；CI 待 GitHub remote 才能實跑 |
 | 1 Core Data | ✅ 完成 | T1.1–T1.5 全綠（model→DB→DAO→Repository，加密 + 雙層測試）|
-| 2 Scan | 🔨 進行中 | T2.1 QR 解析器 ✅ / T2.2 OCR、T2.3 CameraX、T2.4 ViewModel、T2.5 UI 待做 |
+| 2 Scan | 🔨 進行中 | T2.1 QR 解析器 ✅ T2.4 ScanViewModel ✅ / T2.2 OCR、T2.3 CameraX、T2.5 UI 待做 |
 | 3 List/Search | ⛔ | |
 | 4 Lottery | ⛔ | |
 | 5 Export | ⛔ | |
@@ -51,6 +51,7 @@ invoice-app/                 # = invoice-wallet
 ## 變更日誌
 
 - 2026-05-27：**T0.3b 完成 ✅**。instrumented smoke `HomeScreenSmokeTest` 在 emulator `invoice_pixel7_api35` 跑 `connectedDebugAndroidTest` 通過。修：androidTest APK 打包衝突（JUnit5 jar 重複 META-INF/LICENSE.md，因 :core:testing 以 api 匯出 jupiter 流入 androidTest）→ `configureKotlinAndroid` 加 `packaging.resources.excludes`（LICENSE*/NOTICE*/AL2.0/LGPL2.1）。Iteration 0 完整收尾；instrumented 測試管線端到端驗證（Iteration 1 DB/DAO 測試會用）。
+- 2026-05-27：**T2.4 完成 ✅（提前於 T2.2/T2.3，因不卡 OCR 素材/相機）**。`ScanViewModel`（plain ViewModel，constructor 注入 InvoiceRepository + Clock + idGenerator）：`onQrDetected(left,rightBytes)`→`EInvoiceQrParser`→`ParsedInvoice.toDraftInvoice`（source=QR_CODE、issuePeriod 由日期推算雙月期別、tax=total−untaxed、merchantName 空待 OCR/手填）→`Detected(draft)`；`onUserConfirm(invoice)`→`viewModelScope` 內 `repository.upsert`→`Saved(id)`；malformed→`Error`；`onCancel`→`Idle`。OCR 路徑(`onOcrResult`)留待 T2.2。測試：Turbine 觀 StateFlow + FakeInvoiceRepository + MainDispatcherExtension（4 測試）。形成「掃 QR→確認→存進加密 DB」垂直切片。驗收：`:feature:scan:testDebugUnitTest`（含 parser 共 7）綠 + `check` 綠。
 - 2026-05-27：**T2.1 完成 ✅（Iteration 2 開始）**。`:feature:scan` android library（純 Kotlin 解析器）。`EInvoiceQrParser`：左碼前 53 字元固定欄（字軌/民國日期→ISO/隨機碼/未稅hex/含稅hex/買方/賣方），AES 變長 → 以 `*` 自用區定位編碼旗標與品項（非固定偏移）；右碼依**編碼旗標**（UTF-8/Big5，不假設）strict-decode bytes 後拆品項；買方 00000000→null、hex 大小寫不敏感、不過度驗證。malformed 拋 `EInvoiceQrException`。測試載入 `src/test/resources/einvoice-qr-fixtures.json`（**3 張真實發票** + 5 malformed）驅動，全綠。⚠️ fixtures 為真實資料，依使用者指示 commit。
 - 2026-05-27：**T1.4 + T1.5 完成 ✅ → Iteration 1 收掉**。Repository 介面 + Room 實作放 `:core:database`（計畫允許）。T1.4 介面：`InvoiceRepository`（upsert/getById/observeAll/queryByDateRange/softDelete/search）、`LotteryRepository`、`AuthGrantRepository`（含 audit），回傳 domain model（不漏持久化型別）。T1.5 實作：`RoomInvoiceRepository`/`RoomLotteryRepository`/`RoomAuthGrantRepository`，包 DAO + entity↔domain mapper；softDelete/revoke 注入 `kotlinx.datetime.Clock`（預設 System，測試用固定 clock）。雙層測試：(1) src/test JVM 單元測試用手寫 fake DAO（7 測試：upsert/getById 映射、softDelete 用 clock、日期區間、revoke、audit count）；(2) androidTest 真 Room 整合測試（3 repo round-trip）。驗收：`:core:database:testDebugUnitTest` 7 綠 + `connectedDebugAndroidTest` 25 綠 + `./gradlew check` 綠。決定同 T1.3：orchestrator 序列做（共用模組/模擬器）。
 - 2026-05-27：**T1.3 完成 ✅（orchestrator 序列做，非 subagent）**。決定：4 個 DAO 共用 `:core:database` 模組 + DB 類別 + 單一模擬器，平行 subagent 協調成本高於效益（計畫 §2.4 亦警告），改由 orchestrator 序列 TDD。`InvoiceDao`（insert/upsert/getById/findByInvoiceNumber/observeAll(Flow)/observeByDateRange/findByMerchant/search/softDelete）、`InvoiceItemDao`、`LotteryNumberDao`、`AuthGrantDao`、`QueryAuditLogDao`，全 wire 進 DB。androidTest in-memory Room 共 22 測試（含 InvoiceDao 6：unique 衝突拋例外、日期區間降冪、softDelete 排除、Turbine 觀察 Flow）。驗收：`:core:database:connectedDebugAndroidTest` 22 綠（emulator）、`./gradlew check` 綠。
