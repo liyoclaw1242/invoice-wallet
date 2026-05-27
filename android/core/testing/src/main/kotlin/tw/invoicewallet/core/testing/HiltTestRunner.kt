@@ -13,13 +13,10 @@ import androidx.test.runner.AndroidJUnitRunner
  * *consuming* module's androidTest compilation, not here.
  */
 class HiltTestRunner : AndroidJUnitRunner() {
-    override fun newApplication(
-        cl: ClassLoader?,
-        className: String?,
-        context: Context?,
-    ): Application = super.newApplication(
-        cl,
-        "dagger.hilt.android.testing.HiltTestApplication",
-        context,
-    )
+    override fun newApplication(cl: ClassLoader?, className: String?, context: Context?): Application =
+        super.newApplication(
+            cl,
+            "dagger.hilt.android.testing.HiltTestApplication",
+            context,
+        )
 }

@@ -16,9 +16,9 @@ import org.junit.jupiter.api.extension.ExtensionContext
  * virtual time. Register with `@RegisterExtension`.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainDispatcherExtension(
-    val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
-) : BeforeEachCallback, AfterEachCallback {
+class MainDispatcherExtension(val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()) :
+    BeforeEachCallback,
+    AfterEachCallback {
 
     override fun beforeEach(context: ExtensionContext?) {
         Dispatchers.setMain(testDispatcher)

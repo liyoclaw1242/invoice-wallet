@@ -30,6 +30,7 @@ dependencies {
     compileOnly(libs.hilt.gradle.plugin)
     compileOnly(libs.room.gradle.plugin)
     compileOnly(libs.compose.compiler.gradle.plugin)
+    compileOnly(libs.ktlint.gradle.plugin)
 }
 
 gradlePlugin {
@@ -57,6 +58,10 @@ gradlePlugin {
         register("kotlinJvmTest") {
             id = "app.convention.kotlin.jvm.test"
             implementationClass = "KotlinJvmTestConventionPlugin"
+        }
+        register("ktlint") {
+            id = "app.convention.ktlint"
+            implementationClass = "KtlintConventionPlugin"
         }
     }
 }
