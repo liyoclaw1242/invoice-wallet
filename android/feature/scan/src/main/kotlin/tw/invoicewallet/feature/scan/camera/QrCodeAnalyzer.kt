@@ -6,6 +6,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.ZoomSuggestionOptions
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 
@@ -18,11 +19,30 @@ import com.google.mlkit.vision.common.InputImage
  * scan. Same left/right classification as [MlKitInvoiceRecognizer].
  */
 @OptIn(ExperimentalGetImage::class)
-class QrCodeAnalyzer(private val onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit) :
-    ImageAnalysis.Analyzer {
+class QrCodeAnalyzer(
+    maxZoomRatio: Float = 1f,
+    private val applyZoom: (Float) -> Unit = {},
+    private val onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit,
+) : ImageAnalysis.Analyzer {
 
     private val scanner = BarcodeScanning.getClient(
-        BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build(),
+        BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+            .apply {
+                // Auto-zoom: when ML Kit sees a small/dense code, it asks the camera to
+                // zoom in so the code resolves. Only useful if the camera can zoom.
+                if (maxZoomRatio > 1f) {
+                    setZoomSuggestionOptions(
+                        ZoomSuggestionOptions.Builder { ratio ->
+                            applyZoom(ratio)
+                            true
+                        }
+                            .setMaxSupportedZoomRatio(maxZoomRatio)
+                            .build(),
+                    )
+                }
+            }
+            .build(),
     )
 
     @Volatile

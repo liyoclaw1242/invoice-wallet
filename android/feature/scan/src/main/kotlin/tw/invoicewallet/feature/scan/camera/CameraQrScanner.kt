@@ -44,13 +44,13 @@ fun CameraQrScanner(onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit,
                 }
                 val analysis = ImageAnalysis.Builder()
                     // Dense e-invoice QR codes need resolution: 640x480 (the default) often
-                    // can't resolve the right code. Target 1280x720, falling back to the
+                    // can't resolve the right code. Target 1920x1080, falling back to the
                     // nearest higher-then-lower option the device supports.
                     .setResolutionSelector(
                         ResolutionSelector.Builder()
                             .setResolutionStrategy(
                                 ResolutionStrategy(
-                                    Size(1280, 720),
+                                    Size(1920, 1080),
                                     ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
                                 ),
                             )
@@ -58,15 +58,22 @@ fun CameraQrScanner(onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit,
                     )
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
-                    .also {
-                        it.setAnalyzer(analysisExecutor, QrCodeAnalyzer { left, right -> currentOnQr(left, right) })
-                    }
                 provider.unbindAll()
-                provider.bindToLifecycle(
+                val camera = provider.bindToLifecycle(
                     lifecycleOwner,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     preview,
                     analysis,
+                )
+                // Wire ML Kit auto-zoom to the camera now that we have CameraControl.
+                val maxZoom = camera.cameraInfo.zoomState.value?.maxZoomRatio ?: 1f
+                analysis.setAnalyzer(
+                    analysisExecutor,
+                    QrCodeAnalyzer(
+                        maxZoomRatio = maxZoom,
+                        applyZoom = { ratio -> camera.cameraControl.setZoomRatio(ratio) },
+                        onInvoiceQr = { left, right -> currentOnQr(left, right) },
+                    ),
                 )
             }, ContextCompat.getMainExecutor(context))
             previewView
