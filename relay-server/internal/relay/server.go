@@ -10,12 +10,14 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/liyoclaw/invoice-relay/internal/config"
+	"github.com/liyoclaw/invoice-relay/internal/oauth"
 	"github.com/liyoclaw/invoice-relay/internal/pairing"
 	"github.com/liyoclaw/invoice-relay/internal/session"
 	"github.com/liyoclaw/invoice-relay/internal/storage"
@@ -37,6 +39,7 @@ type Server struct {
 	waker       transport.Waker
 	wakeTimeout time.Duration
 	upgrader    websocket.Upgrader
+	oauth       *oauth.Provider
 }
 
 // New builds a Server from its configuration and store.
@@ -50,6 +53,7 @@ func New(cfg config.Config, store storage.Store) *Server {
 		wakeTimeout: wakeConnectTimeout,
 		// Auth is the Bearer device_secret, so the WS origin is not a trust boundary.
 		upgrader: websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }},
+		oauth:    oauth.New(nil),
 	}
 }
 
@@ -77,6 +81,15 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST "+base+"/{$}", s.handleMCP)
 	mux.HandleFunc("GET "+base, s.handleMCPGet)
 	mux.HandleFunc("GET "+base+"/{$}", s.handleMCPGet)
+	// OAuth 2.1 (Claude's connector mandates the handshake; ARCHITECTURE §7 secret URL
+	// remains the real gate, auth auto-approves for the single user).
+	mux.HandleFunc("GET /.well-known/oauth-protected-resource", s.handleProtectedResourceMeta)
+	mux.HandleFunc("GET /.well-known/oauth-protected-resource/{rest...}", s.handleProtectedResourceMeta)
+	mux.HandleFunc("GET /.well-known/oauth-authorization-server", s.handleAuthServerMeta)
+	mux.HandleFunc("GET /.well-known/oauth-authorization-server/{rest...}", s.handleAuthServerMeta)
+	mux.HandleFunc("POST /register", s.handleRegister)
+	mux.HandleFunc("GET /authorize", s.handleAuthorize)
+	mux.HandleFunc("POST /token", s.handleToken)
 	// Metadata-only request log (diagnostic): set RELAY_LOG_REQUESTS=1 to enable.
 	if os.Getenv("RELAY_LOG_REQUESTS") == "1" {
 		return logRequests(mux)
@@ -109,6 +122,12 @@ func (s *Server) handleMCPGet(w http.ResponseWriter, _ *http.Request) {
 // phone (waking it if needed) and returns the phone's response as JSON or SSE. Pure
 // notifications get 202 with no body; `initialize` responses carry an Mcp-Session-Id.
 func (s *Server) handleMCP(w http.ResponseWriter, r *http.Request) {
+	if !s.oauth.Validate(bearerToken(r)) {
+		w.Header().Set("WWW-Authenticate",
+			`Bearer resource_metadata="`+baseURL(r)+`/.well-known/oauth-protected-resource"`)
+		writeError(w, http.StatusUnauthorized, "missing or invalid access token")
+		return
+	}
 	body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "read error")
@@ -194,6 +213,94 @@ func writeSSE(w http.ResponseWriter, payload []byte) {
 	if f, ok := w.(http.Flusher); ok {
 		f.Flush()
 	}
+}
+
+// --- OAuth 2.1 endpoints (minimal, single-user, auto-approving) ---
+
+func baseURL(r *http.Request) string {
+	scheme := r.Header.Get("X-Forwarded-Proto")
+	if scheme == "" {
+		scheme = "https"
+	}
+	return scheme + "://" + r.Host
+}
+
+func (s *Server) handleProtectedResourceMeta(w http.ResponseWriter, r *http.Request) {
+	base := baseURL(r)
+	writeJSON(w, http.StatusOK, map[string]any{
+		"resource":              base + "/mcp-" + s.cfg.MCPSecret + "/",
+		"authorization_servers": []string{base},
+	})
+}
+
+func (s *Server) handleAuthServerMeta(w http.ResponseWriter, r *http.Request) {
+	base := baseURL(r)
+	writeJSON(w, http.StatusOK, map[string]any{
+		"issuer":                                base,
+		"authorization_endpoint":                base + "/authorize",
+		"token_endpoint":                        base + "/token",
+		"registration_endpoint":                 base + "/register",
+		"response_types_supported":              []string{"code"},
+		"grant_types_supported":                 []string{"authorization_code"},
+		"code_challenge_methods_supported":      []string{"S256"},
+		"token_endpoint_auth_methods_supported": []string{"none"},
+	})
+}
+
+func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		RedirectURIs []string `json:"redirect_uris"`
+	}
+	_ = json.NewDecoder(r.Body).Decode(&req) // tolerate empty/partial bodies
+	clientID := s.oauth.Register(req.RedirectURIs)
+	writeJSON(w, http.StatusCreated, map[string]any{
+		"client_id":                  clientID,
+		"redirect_uris":              req.RedirectURIs,
+		"token_endpoint_auth_method": "none",
+		"grant_types":                []string{"authorization_code"},
+		"response_types":             []string{"code"},
+	})
+}
+
+func (s *Server) handleAuthorize(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	redirectURI := q.Get("redirect_uri")
+	code, err := s.oauth.Authorize(
+		q.Get("client_id"), redirectURI, q.Get("code_challenge"), q.Get("code_challenge_method"),
+	)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	sep := "?"
+	if strings.Contains(redirectURI, "?") {
+		sep = "&"
+	}
+	location := redirectURI + sep + "code=" + url.QueryEscape(code)
+	if state := q.Get("state"); state != "" {
+		location += "&state=" + url.QueryEscape(state)
+	}
+	http.Redirect(w, r, location, http.StatusFound)
+}
+
+func (s *Server) handleToken(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_request"})
+		return
+	}
+	token, expiresIn, err := s.oauth.Exchange(
+		r.PostFormValue("code"), r.PostFormValue("code_verifier"),
+		r.PostFormValue("client_id"), r.PostFormValue("redirect_uri"),
+	)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_grant"})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"access_token": token,
+		"token_type":   "Bearer",
+		"expires_in":   expiresIn,
+	})
 }
 
 func (s *Server) audit(event, tool string, success bool, errMsg string) {

@@ -24,6 +24,61 @@ func (w *recordingWaker) Wake(context.Context, string) error {
 
 func mcpPath(srv *Server) string { return "/mcp-" + srv.cfg.MCPSecret + "/" }
 
+// mintToken runs the in-process OAuth flow to obtain a valid access token.
+func mintToken(t *testing.T, srv *Server) string {
+	t.Helper()
+	id := srv.oauth.Register([]string{"https://client/cb"})
+	code, err := srv.oauth.Authorize(id, "https://client/cb", "", "")
+	if err != nil {
+		t.Fatalf("authorize: %v", err)
+	}
+	token, _, err := srv.oauth.Exchange(code, "", id, "https://client/cb")
+	if err != nil {
+		t.Fatalf("exchange: %v", err)
+	}
+	return token
+}
+
+// echoPhone dials a phone WebSocket that answers every request with a fixed result.
+func echoPhone(t *testing.T, srv *Server, ts *httptest.Server, secret, payload string) *websocket.Conn {
+	t.Helper()
+	conn, _, err := websocket.DefaultDialer.Dial(wsURL(ts.URL), http.Header{"Authorization": {"Bearer " + secret}})
+	if err != nil {
+		t.Fatalf("dial: %v", err)
+	}
+	go func() {
+		for {
+			var env session.Envelope
+			if conn.ReadJSON(&env) != nil {
+				return
+			}
+			_ = conn.WriteJSON(session.Envelope{
+				Type: session.TypeResponse, RequestID: env.RequestID, Status: "ok",
+				Payload: json.RawMessage(payload),
+			})
+		}
+	}()
+	waitFor(t, func() bool { return srv.Sessions().Connected() })
+	return conn
+}
+
+func postMCP(t *testing.T, ts *httptest.Server, srv *Server, token, accept, body string) *http.Response {
+	t.Helper()
+	req, _ := http.NewRequest(http.MethodPost, ts.URL+mcpPath(srv), strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+	if accept != "" {
+		req.Header.Set("Accept", accept)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("post: %v", err)
+	}
+	return resp
+}
+
 func TestMCPWrongSecretIs404(t *testing.T) {
 	srv := newTestServer(t)
 	pairDevice(t, srv)
@@ -33,39 +88,28 @@ func TestMCPWrongSecretIs404(t *testing.T) {
 	}
 }
 
+func TestMCPWithoutTokenIs401(t *testing.T) {
+	srv := newTestServer(t)
+	pairDevice(t, srv)
+	rec := do(t, srv, http.MethodPost, mcpPath(srv), "", `{"jsonrpc":"2.0","method":"tools/list","id":1}`)
+	if rec.Code != http.StatusUnauthorized {
+		t.Fatalf("want 401, got %d", rec.Code)
+	}
+	if !strings.Contains(rec.Header().Get("WWW-Authenticate"), "resource_metadata=") {
+		t.Fatalf("expected WWW-Authenticate with resource_metadata, got %q", rec.Header().Get("WWW-Authenticate"))
+	}
+}
+
 func TestMCPForwardsToConnectedPhone(t *testing.T) {
 	srv := newTestServer(t)
 	secret := pairDevice(t, srv)
+	token := mintToken(t, srv)
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
-
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL(ts.URL), http.Header{"Authorization": {"Bearer " + secret}})
-	if err != nil {
-		t.Fatalf("dial: %v", err)
-	}
+	conn := echoPhone(t, srv, ts, secret, `{"jsonrpc":"2.0","id":1,"result":{"tools":["list_invoices"]}}`)
 	defer conn.Close()
-	// Stand-in phone echoes a result for whatever it receives.
-	go func() {
-		for {
-			var env session.Envelope
-			if conn.ReadJSON(&env) != nil {
-				return
-			}
-			_ = conn.WriteJSON(session.Envelope{
-				Type:      session.TypeResponse,
-				RequestID: env.RequestID,
-				Status:    "ok",
-				Payload:   json.RawMessage(`{"jsonrpc":"2.0","id":1,"result":{"tools":["list_invoices"]}}`),
-			})
-		}
-	}()
-	waitFor(t, func() bool { return srv.Sessions().Connected() })
 
-	resp, err := http.Post(ts.URL+mcpPath(srv), "application/json",
-		strings.NewReader(`{"jsonrpc":"2.0","method":"tools/list","id":1}`))
-	if err != nil {
-		t.Fatalf("post: %v", err)
-	}
+	resp := postMCP(t, ts, srv, token, "", `{"jsonrpc":"2.0","method":"tools/list","id":1}`)
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK || !strings.Contains(string(body), "list_invoices") {
@@ -80,16 +124,17 @@ func TestMCPGetReturns405(t *testing.T) {
 	}
 }
 
-func TestMCPNotificationReturns202WithoutPhone(t *testing.T) {
+func TestMCPNotificationReturns202(t *testing.T) {
 	srv := newTestServer(t)
-	pairDevice(t, srv) // device paired but no WS connected
+	pairDevice(t, srv)
+	token := mintToken(t, srv)
 	body := `{"jsonrpc":"2.0","method":"notifications/initialized"}`
 	// Slash and no-slash both route to the handler and ack without blocking on the phone.
-	if rec := do(t, srv, http.MethodPost, mcpPath(srv), "", body); rec.Code != http.StatusAccepted {
+	if rec := do(t, srv, http.MethodPost, mcpPath(srv), token, body); rec.Code != http.StatusAccepted {
 		t.Fatalf("slash: want 202, got %d", rec.Code)
 	}
 	noSlash := "/mcp-" + srv.cfg.MCPSecret
-	if rec := do(t, srv, http.MethodPost, noSlash, "", body); rec.Code != http.StatusAccepted {
+	if rec := do(t, srv, http.MethodPost, noSlash, token, body); rec.Code != http.StatusAccepted {
 		t.Fatalf("no-slash: want 202, got %d", rec.Code)
 	}
 }
@@ -97,35 +142,14 @@ func TestMCPNotificationReturns202WithoutPhone(t *testing.T) {
 func TestMCPInitializeSetsSessionIdAndSSE(t *testing.T) {
 	srv := newTestServer(t)
 	secret := pairDevice(t, srv)
+	token := mintToken(t, srv)
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL(ts.URL), http.Header{"Authorization": {"Bearer " + secret}})
-	if err != nil {
-		t.Fatalf("dial: %v", err)
-	}
+	conn := echoPhone(t, srv, ts, secret, `{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05"}}`)
 	defer conn.Close()
-	go func() {
-		for {
-			var env session.Envelope
-			if conn.ReadJSON(&env) != nil {
-				return
-			}
-			_ = conn.WriteJSON(session.Envelope{
-				Type:      session.TypeResponse,
-				RequestID: env.RequestID,
-				Status:    "ok",
-				Payload:   json.RawMessage(`{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05"}}`),
-			})
-		}
-	}()
-	waitFor(t, func() bool { return srv.Sessions().Connected() })
 
 	// JSON path: initialize → 200 + Mcp-Session-Id header.
-	resp, err := http.Post(ts.URL+mcpPath(srv), "application/json",
-		strings.NewReader(`{"jsonrpc":"2.0","method":"initialize","id":1}`))
-	if err != nil {
-		t.Fatalf("post: %v", err)
-	}
+	resp := postMCP(t, ts, srv, token, "", `{"jsonrpc":"2.0","method":"initialize","id":1}`)
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("want 200, got %d", resp.StatusCode)
@@ -135,13 +159,7 @@ func TestMCPInitializeSetsSessionIdAndSSE(t *testing.T) {
 	}
 
 	// SSE path: Accept text/event-stream → event-stream body.
-	req, _ := http.NewRequest(http.MethodPost, ts.URL+mcpPath(srv),
-		strings.NewReader(`{"jsonrpc":"2.0","method":"tools/list","id":2}`))
-	req.Header.Set("Accept", "text/event-stream")
-	sse, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatalf("sse post: %v", err)
-	}
+	sse := postMCP(t, ts, srv, token, "text/event-stream", `{"jsonrpc":"2.0","method":"tools/list","id":2}`)
 	defer sse.Body.Close()
 	if ct := sse.Header.Get("Content-Type"); !strings.HasPrefix(ct, "text/event-stream") {
 		t.Fatalf("want event-stream, got %q", ct)
@@ -158,8 +176,9 @@ func TestMCPWakesPhoneWhenDisconnected(t *testing.T) {
 	waker := &recordingWaker{}
 	srv.SetWaker(waker)
 	pairDevice(t, srv) // device exists, but no WS connected
+	token := mintToken(t, srv)
 
-	rec := do(t, srv, http.MethodPost, mcpPath(srv), "", `{"jsonrpc":"2.0","method":"tools/list","id":1}`)
+	rec := do(t, srv, http.MethodPost, mcpPath(srv), token, `{"jsonrpc":"2.0","method":"tools/list","id":1}`)
 	if rec.Code != http.StatusServiceUnavailable {
 		t.Fatalf("want 503, got %d", rec.Code)
 	}
