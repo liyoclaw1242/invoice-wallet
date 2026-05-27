@@ -25,6 +25,7 @@ room = "2.6.1"
 androidxSqlite = "2.4.0"
 sqlcipher = "4.6.1"
 androidxSecurityCrypto = "1.1.0-alpha06"
+androidxDatastore = "1.1.1"
 
 # --- Camera ---
 cameraX = "1.4.1"
@@ -91,6 +92,7 @@ room-testing = { group = "androidx.room", name = "room-testing", version.ref = "
 androidx-sqlite-ktx = { group = "androidx.sqlite", name = "sqlite-ktx", version.ref = "androidxSqlite" }
 sqlcipher-android = { group = "net.zetetic", name = "sqlcipher-android", version.ref = "sqlcipher" }
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "androidxSecurityCrypto" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidxDatastore" }
 
 # CameraX — live preview + frame analysis for real-time QR scanning.
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraX" }
