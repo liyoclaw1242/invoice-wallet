@@ -15,6 +15,14 @@ android {
     }
 }
 
+// zxing-cpp:android is built with a newer Kotlin; allow our 2.0.x compiler to read its
+// metadata (stdlib stays forward-compatible at runtime).
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xskip-metadata-version-check")
+    }
+}
+
 dependencies {
     // Domain models + the InvoiceRepository interface (the impl is wired via DI at app level).
     implementation(project(":core:model"))
@@ -29,6 +37,8 @@ dependencies {
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.mlkit.text.recognition.chinese)
     implementation(libs.kotlinx.coroutines.play.services)
+    // Stronger QR decoder for hard/skewed thermal-print invoices (tryHarder/rotate/invert).
+    implementation(libs.zxing.cpp.android)
 
     // CameraX live preview + analysis for real-time QR scanning.
     implementation(libs.androidx.camera.core)

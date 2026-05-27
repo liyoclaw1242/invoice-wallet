@@ -1,6 +1,7 @@
 package tw.invoicewallet.feature.scan.recognition
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -8,16 +9,16 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import tw.invoicewallet.feature.scan.ocr.RecognizedText
 
 /**
- * On-device recognition via ML Kit: QR barcode scanning + Chinese OCR. Runs entirely
- * locally — the image never leaves the phone.
- *
- * For a gallery photo we try the image as-is first, then a high-contrast binarized
- * variant: thermal-printed e-invoice QR codes are faint/dense and often only decode
- * after binarization — the same trick desktop decoders need on these receipts.
+ * On-device recognition: QR via zxing-cpp (robust to faint/skewed thermal-print codes),
+ * with an ML Kit barcode fallback, plus ML Kit Chinese OCR. Runs entirely locally — the
+ * image never leaves the phone. For a hard photo we also try a binarized variant, the
+ * trick these dense receipt codes need to decode at all.
  */
 class MlKitInvoiceRecognizer(private val context: Context) : InvoiceRecognizer {
 
@@ -27,6 +28,7 @@ class MlKitInvoiceRecognizer(private val context: Context) : InvoiceRecognizer {
             .build(),
     )
     private val textRecognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+    private val zxing = ZxingDecoder()
 
     override suspend fun recognize(image: Uri): RecognitionResult {
         val bitmap = ImagePreprocess.loadBitmap(context, image)
@@ -34,21 +36,30 @@ class MlKitInvoiceRecognizer(private val context: Context) : InvoiceRecognizer {
 
         var qrLeft: String? = null
         var qrRight: ByteArray? = null
-
-        // Pass 1: the photo as captured.
-        scanInput(InputImage.fromBitmap(bitmap, 0)).let { (l, r) ->
-            qrLeft = l
-            qrRight = r
+        fun merge(found: Pair<String?, ByteArray?>) {
+            if (qrLeft == null) qrLeft = found.first
+            if (qrRight == null) qrRight = found.second
         }
+        fun missing() = qrLeft == null || qrRight == null
 
-        // Pass 2: binarized — recovers faint/dense codes the raw image misses.
-        if (qrLeft == null || qrRight == null) {
-            val binarized = ImagePreprocess.binarize(bitmap)
-            scanInput(InputImage.fromBitmap(binarized, 0)).let { (l, r) ->
-                if (qrLeft == null) qrLeft = l
-                if (qrRight == null) qrRight = r
+        // CPU-bound decoding off the main thread. zxing-cpp first (strongest), then a
+        // binarized variant, then ML Kit barcode as a second engine.
+        withContext(Dispatchers.Default) {
+            var binarized: Bitmap? = null
+            try {
+                merge(zxing.scan(bitmap))
+                if (missing()) {
+                    binarized = ImagePreprocess.binarize(bitmap)
+                    merge(zxing.scan(binarized))
+                }
+                if (missing()) merge(scanInput(InputImage.fromBitmap(bitmap, 0)))
+                if (missing()) {
+                    val bw = binarized ?: ImagePreprocess.binarize(bitmap).also { binarized = it }
+                    merge(scanInput(InputImage.fromBitmap(bw, 0)))
+                }
+            } finally {
+                binarized?.recycle()
             }
-            binarized.recycle()
         }
 
         val text = textRecognizer.process(InputImage.fromBitmap(bitmap, 0)).await()

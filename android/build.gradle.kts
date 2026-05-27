@@ -13,3 +13,15 @@ plugins {
     alias(libs.plugins.room) apply false
     alias(libs.plugins.ktlint) apply false
 }
+
+// zxing-cpp:android pulls a newer kotlin-stdlib (2.2.x) transitively; pin it to our
+// compiler's version so the whole graph compiles against one consistent stdlib.
+subprojects {
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.jetbrains.kotlin" && requested.name.startsWith("kotlin-stdlib")) {
+                useVersion(libs.versions.kotlin.get())
+            }
+        }
+    }
+}
