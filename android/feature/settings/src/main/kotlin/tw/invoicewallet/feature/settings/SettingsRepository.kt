@@ -11,4 +11,8 @@ interface SettingsRepository {
     suspend fun setDefaultScanMode(mode: DefaultScanMode)
 
     suspend fun setOnboardingCompleted(completed: Boolean)
+
+    suspend fun setMcpEnabled(enabled: Boolean)
+
+    suspend fun setMcpLanMode(lanMode: Boolean)
 }

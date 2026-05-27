@@ -20,6 +20,9 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.cio)
 
+    // Keystore-backed storage for the Bearer token.
+    implementation(libs.androidx.security.crypto)
+
     testImplementation(project(":core:testing"))
     testImplementation(libs.ktor.server.test.host)
 }

@@ -16,6 +16,8 @@ class DataStoreSettingsRepository(private val dataStore: DataStore<Preferences>)
             themeMode = prefs[Keys.THEME].toThemeMode(),
             defaultScanMode = prefs[Keys.SCAN].toScanMode(),
             onboardingCompleted = prefs[Keys.ONBOARDED] ?: false,
+            mcpEnabled = prefs[Keys.MCP_ENABLED] ?: false,
+            mcpLanMode = prefs[Keys.MCP_LAN] ?: false,
         )
     }
 
@@ -31,6 +33,14 @@ class DataStoreSettingsRepository(private val dataStore: DataStore<Preferences>)
         dataStore.edit { it[Keys.ONBOARDED] = completed }
     }
 
+    override suspend fun setMcpEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.MCP_ENABLED] = enabled }
+    }
+
+    override suspend fun setMcpLanMode(lanMode: Boolean) {
+        dataStore.edit { it[Keys.MCP_LAN] = lanMode }
+    }
+
     private fun String?.toThemeMode(): ThemeMode =
         this?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() } ?: ThemeMode.SYSTEM
 
@@ -41,5 +51,7 @@ class DataStoreSettingsRepository(private val dataStore: DataStore<Preferences>)
         val THEME = stringPreferencesKey("theme_mode")
         val SCAN = stringPreferencesKey("default_scan_mode")
         val ONBOARDED = booleanPreferencesKey("onboarding_completed")
+        val MCP_ENABLED = booleanPreferencesKey("mcp_enabled")
+        val MCP_LAN = booleanPreferencesKey("mcp_lan_mode")
     }
 }

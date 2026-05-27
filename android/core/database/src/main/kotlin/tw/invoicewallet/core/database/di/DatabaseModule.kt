@@ -10,10 +10,14 @@ import kotlinx.datetime.Clock
 import tw.invoicewallet.core.database.DatabasePassphraseProvider
 import tw.invoicewallet.core.database.InvoiceWalletDatabase
 import tw.invoicewallet.core.database.buildEncryptedDatabase
+import tw.invoicewallet.core.database.dao.AuthGrantDao
 import tw.invoicewallet.core.database.dao.InvoiceDao
 import tw.invoicewallet.core.database.dao.LotteryNumberDao
+import tw.invoicewallet.core.database.dao.QueryAuditLogDao
+import tw.invoicewallet.core.database.repository.AuthGrantRepository
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.database.repository.LotteryRepository
+import tw.invoicewallet.core.database.repository.RoomAuthGrantRepository
 import tw.invoicewallet.core.database.repository.RoomInvoiceRepository
 import tw.invoicewallet.core.database.repository.RoomLotteryRepository
 import javax.inject.Singleton
@@ -42,6 +46,12 @@ object DatabaseModule {
     fun provideLotteryNumberDao(database: InvoiceWalletDatabase): LotteryNumberDao = database.lotteryNumberDao()
 
     @Provides
+    fun provideAuthGrantDao(database: InvoiceWalletDatabase): AuthGrantDao = database.authGrantDao()
+
+    @Provides
+    fun provideQueryAuditLogDao(database: InvoiceWalletDatabase): QueryAuditLogDao = database.queryAuditLogDao()
+
+    @Provides
     @Singleton
     fun provideClock(): Clock = Clock.System
 
@@ -54,4 +64,12 @@ object DatabaseModule {
     @Singleton
     fun provideLotteryRepository(lotteryNumberDao: LotteryNumberDao): LotteryRepository =
         RoomLotteryRepository(lotteryNumberDao)
+
+    @Provides
+    @Singleton
+    fun provideAuthGrantRepository(
+        authGrantDao: AuthGrantDao,
+        queryAuditLogDao: QueryAuditLogDao,
+        clock: Clock,
+    ): AuthGrantRepository = RoomAuthGrantRepository(authGrantDao, queryAuditLogDao, clock)
 }

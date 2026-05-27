@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:database"))
     implementation(project(":feature:export"))
+    implementation(project(":data-source:mcp-server"))
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)

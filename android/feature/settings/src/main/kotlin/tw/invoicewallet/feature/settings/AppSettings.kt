@@ -11,4 +11,6 @@ data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val defaultScanMode: DefaultScanMode = DefaultScanMode.CAMERA,
     val onboardingCompleted: Boolean = false,
+    val mcpEnabled: Boolean = false,
+    val mcpLanMode: Boolean = false,
 )

@@ -17,6 +17,7 @@ import tw.invoicewallet.core.model.Invoice
 import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.core.testing.MainDispatcherExtension
+import tw.invoicewallet.datasource.mcpserver.McpServerControls
 import tw.invoicewallet.feature.export.ExportFormat
 
 class SettingsViewModelTest {
@@ -31,6 +32,7 @@ class SettingsViewModelTest {
             settingsRepository = FakeSettingsRepository(AppSettings(themeMode = ThemeMode.DARK)),
             carrierCodeStore = FakeCarrierCodeStore("/ABC123"),
             invoiceRepository = FakeInvoiceRepository(),
+            mcpServer = FakeMcpServerControls(),
         )
         vm.uiState.test {
             val state = awaitItem()
@@ -41,7 +43,12 @@ class SettingsViewModelTest {
 
     @Test
     fun `changing theme propagates to state`() = runTest {
-        val vm = SettingsViewModel(FakeSettingsRepository(), FakeCarrierCodeStore(), FakeInvoiceRepository())
+        val vm = SettingsViewModel(
+            FakeSettingsRepository(),
+            FakeCarrierCodeStore(),
+            FakeInvoiceRepository(),
+            FakeMcpServerControls(),
+        )
         vm.uiState.test {
             awaitItem().themeMode shouldBe ThemeMode.SYSTEM
             vm.setThemeMode(ThemeMode.LIGHT)
@@ -52,7 +59,7 @@ class SettingsViewModelTest {
     @Test
     fun `setting and clearing the carrier code persists and updates state`() = runTest {
         val store = FakeCarrierCodeStore()
-        val vm = SettingsViewModel(FakeSettingsRepository(), store, FakeInvoiceRepository())
+        val vm = SettingsViewModel(FakeSettingsRepository(), store, FakeInvoiceRepository(), FakeMcpServerControls())
         vm.uiState.test {
             awaitItem().carrierCode shouldBe ""
             vm.setCarrierCode("/XYZ.+9")
@@ -65,11 +72,29 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `mcp toggle and token regeneration flow through state`() = runTest {
+        val vm = SettingsViewModel(
+            FakeSettingsRepository(),
+            FakeCarrierCodeStore(),
+            FakeInvoiceRepository(),
+            FakeMcpServerControls(),
+        )
+        vm.uiState.test {
+            awaitItem().mcpToken shouldBe "tok-1"
+            vm.setMcpEnabled(true)
+            awaitItem().mcpEnabled shouldBe true
+            vm.regenerateMcpToken()
+            awaitItem().mcpToken shouldBe "tok-2"
+        }
+    }
+
+    @Test
     fun `buildExport serialises all invoices in the chosen format`() = runTest {
         val vm = SettingsViewModel(
             FakeSettingsRepository(),
             FakeCarrierCodeStore(),
             FakeInvoiceRepository(listOf(invoice("全聯福利中心"))),
+            FakeMcpServerControls(),
         )
         vm.buildExport(ExportFormat.JSON) shouldContain "全聯福利中心"
         vm.buildExport(ExportFormat.CSV) shouldContain "全聯福利中心"
@@ -108,6 +133,17 @@ private class FakeSettingsRepository(initial: AppSettings = AppSettings()) : Set
     override suspend fun setDefaultScanMode(mode: DefaultScanMode) = state.update { it.copy(defaultScanMode = mode) }
     override suspend fun setOnboardingCompleted(completed: Boolean) =
         state.update { it.copy(onboardingCompleted = completed) }
+    override suspend fun setMcpEnabled(enabled: Boolean) = state.update { it.copy(mcpEnabled = enabled) }
+    override suspend fun setMcpLanMode(lanMode: Boolean) = state.update { it.copy(mcpLanMode = lanMode) }
+}
+
+private class FakeMcpServerControls(private var token: String = "tok-1") : McpServerControls {
+    override val isRunning: Boolean = false
+    override fun token(): String = token
+    override fun regenerateToken(): String {
+        token = "tok-2"
+        return token
+    }
 }
 
 private class FakeCarrierCodeStore(private var value: String? = null) : CarrierCodeStore {

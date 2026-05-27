@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -28,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -71,6 +74,9 @@ fun SettingsRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
                 ExportFormat.CSV -> csvLauncher.launch("invoices.${format.extension}")
             }
         },
+        onMcpEnabledChange = viewModel::setMcpEnabled,
+        onMcpLanModeChange = viewModel::setMcpLanMode,
+        onRegenerateToken = viewModel::regenerateMcpToken,
         onBack = onBack,
         modifier = modifier,
     )
@@ -87,6 +93,9 @@ fun SettingsScreen(
     onExport: (ExportFormat) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onMcpEnabledChange: (Boolean) -> Unit = {},
+    onMcpLanModeChange: (Boolean) -> Unit = {},
+    onRegenerateToken: () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
@@ -163,6 +172,52 @@ fun SettingsScreen(
                         onClick = { onExport(ExportFormat.CSV) },
                         modifier = Modifier.testTag("export-CSV"),
                     ) { Text("匯出 CSV") }
+                }
+            }
+
+            Section("AI 連線（本機 MCP）") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("啟用本機 MCP 伺服器")
+                    Switch(
+                        checked = uiState.mcpEnabled,
+                        onCheckedChange = onMcpEnabledChange,
+                        modifier = Modifier.testTag("mcp-enable"),
+                    )
+                }
+                if (uiState.mcpEnabled) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("允許區域網路連線 (0.0.0.0)")
+                        Switch(
+                            checked = uiState.mcpLanMode,
+                            onCheckedChange = onMcpLanModeChange,
+                            modifier = Modifier.testTag("mcp-lan"),
+                        )
+                    }
+                    Text("Bearer Token（複製到 Claude Desktop connector）", style = MaterialTheme.typography.bodySmall)
+                    SelectionContainer {
+                        Text(
+                            uiState.mcpToken,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.testTag("mcp-token"),
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = onRegenerateToken,
+                        modifier = Modifier.testTag("mcp-regenerate"),
+                    ) { Text("重新產生 Token") }
+                    Text(
+                        "PC 連線：adb reverse tcp:7777 tcp:7777，再將 connector 指向 http://localhost:7777/mcp。" +
+                            "發票資料留在手機，僅在你授權的工具呼叫時被讀取。",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
                 }
             }
         }
