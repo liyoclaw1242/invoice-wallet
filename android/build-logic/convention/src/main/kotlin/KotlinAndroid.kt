@@ -26,6 +26,15 @@ internal fun Project.configureKotlinAndroid(
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
         }
+        packaging {
+            resources {
+                // JUnit 5 / coroutines jars ship duplicate licence metadata that
+                // collides when packaged into the (instrumented) test APK.
+                excludes += "/META-INF/{AL2.0,LGPL2.1}"
+                excludes += "/META-INF/LICENSE*"
+                excludes += "/META-INF/NOTICE*"
+            }
+        }
     }
 
     extensions.configure<KotlinAndroidProjectExtension> {
