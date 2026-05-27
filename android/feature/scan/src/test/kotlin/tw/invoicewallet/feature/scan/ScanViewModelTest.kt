@@ -27,7 +27,6 @@ class ScanViewModelTest {
         clock = object : Clock {
             override fun now(): Instant = fixedNow
         },
-        idGenerator = { "fixed-id" },
     )
 
     @Test
@@ -39,7 +38,7 @@ class ScanViewModelTest {
 
             val detected = awaitItem()
             detected.shouldBeInstanceOf<ScanState.Detected>()
-            detected.draft.id shouldBe "fixed-id"
+            detected.draft.id.isNotBlank() shouldBe true
             detected.draft.invoiceNumber shouldBe "ZP46105854"
             detected.draft.totalAmount shouldBe 232
             detected.draft.merchantTaxId shouldBe "90650686"

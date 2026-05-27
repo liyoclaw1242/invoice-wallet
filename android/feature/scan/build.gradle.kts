@@ -1,6 +1,7 @@
 plugins {
     id("app.convention.android.library")
     id("app.convention.android.compose")
+    id("app.convention.android.hilt")
     id("app.convention.kotlin.jvm.test")
     id("app.convention.ktlint")
     alias(libs.plugins.kotlin.serialization)

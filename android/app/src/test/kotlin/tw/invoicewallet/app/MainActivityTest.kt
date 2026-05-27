@@ -23,7 +23,7 @@ class MainActivityTest {
     fun home_screen_shows_app_title() {
         composeRule.setContent {
             InvoiceWalletTheme {
-                HomeScreen()
+                InvoiceWalletScaffold {}
             }
         }
 

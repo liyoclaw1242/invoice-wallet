@@ -2,6 +2,7 @@ package tw.invoicewallet.feature.scan
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,16 +13,15 @@ import tw.invoicewallet.core.model.Invoice
 import tw.invoicewallet.feature.scan.qr.EInvoiceQrException
 import tw.invoicewallet.feature.scan.qr.EInvoiceQrParser
 import java.util.UUID
+import javax.inject.Inject
 
 /**
  * Drives scan → confirm → save. The QR path is wired here; the OCR path
  * (`onOcrResult`) arrives with T2.2 once ML Kit extraction exists.
  */
-class ScanViewModel(
-    private val invoiceRepository: InvoiceRepository,
-    private val clock: Clock = Clock.System,
-    private val idGenerator: () -> String = { UUID.randomUUID().toString() },
-) : ViewModel() {
+@HiltViewModel
+class ScanViewModel @Inject constructor(private val invoiceRepository: InvoiceRepository, private val clock: Clock) :
+    ViewModel() {
 
     private val _state = MutableStateFlow<ScanState>(ScanState.Idle)
     val state: StateFlow<ScanState> = _state.asStateFlow()
@@ -30,7 +30,7 @@ class ScanViewModel(
     fun onQrDetected(leftQr: String, rightBytes: ByteArray?) {
         _state.value = try {
             val parsed = EInvoiceQrParser.parse(leftQr, rightBytes)
-            ScanState.Detected(parsed.toDraftInvoice(id = idGenerator(), now = clock.now()))
+            ScanState.Detected(parsed.toDraftInvoice(id = UUID.randomUUID().toString(), now = clock.now()))
         } catch (e: EInvoiceQrException) {
             ScanState.Error(e.message ?: "無法解析發票 QR code")
         }
