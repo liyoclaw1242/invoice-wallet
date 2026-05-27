@@ -8,11 +8,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import tw.invoicewallet.app.ui.theme.InvoiceWalletTheme
+import tw.invoicewallet.feature.invoicelist.InvoiceListScreen
+import tw.invoicewallet.feature.invoicelist.InvoiceListUiState
 
 /**
  * Instrumented smoke test — runs on a real device/emulator via AndroidJUnitRunner.
- * Renders [HomeScreen] directly (no Activity launch) so it stays independent of the
- * Hilt instrumented test runner introduced in T0.4.
+ * Renders the home (invoice list) screen directly, no Activity launch / Hilt needed.
  */
 @RunWith(AndroidJUnit4::class)
 class HomeScreenSmokeTest {
@@ -24,7 +25,12 @@ class HomeScreenSmokeTest {
     fun home_screen_shows_app_title() {
         composeRule.setContent {
             InvoiceWalletTheme {
-                InvoiceWalletScaffold {}
+                InvoiceListScreen(
+                    uiState = InvoiceListUiState(),
+                    onQueryChange = {},
+                    onScanClick = {},
+                    onInvoiceClick = {},
+                )
             }
         }
 

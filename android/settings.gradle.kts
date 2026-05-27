@@ -37,3 +37,5 @@ include(":core:model")
 include(":core:database")
 // Iteration 2
 include(":feature:scan")
+// Iteration 3
+include(":feature:invoice-list")

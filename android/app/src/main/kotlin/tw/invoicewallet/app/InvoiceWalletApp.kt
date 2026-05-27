@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,30 +26,38 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import tw.invoicewallet.feature.invoicelist.InvoiceListRoute
 import tw.invoicewallet.feature.scan.ScanViewModel
 import tw.invoicewallet.feature.scan.camera.CameraQrScanner
 import tw.invoicewallet.feature.scan.ui.ScanScreen
 
 @Composable
 fun InvoiceWalletApp() {
-    InvoiceWalletScaffold { padding ->
-        ScanRoute(modifier = Modifier.padding(padding))
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = Routes.LIST) {
+        composable(Routes.LIST) {
+            InvoiceListRoute(
+                onScanClick = { navController.navigate(Routes.SCAN) },
+                onInvoiceClick = { /* invoice detail — T3.4 */ },
+            )
+        }
+        composable(Routes.SCAN) {
+            ScanRoute(onBack = { navController.popBackStack() })
+        }
     }
 }
 
-/** App chrome (title bar). Stateless so it can be rendered in tests without Hilt. */
+private object Routes {
+    const val LIST = "list"
+    const val SCAN = "scan"
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InvoiceWalletScaffold(content: @Composable (PaddingValues) -> Unit) {
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Invoice Wallet") }) },
-    ) { padding ->
-        content(padding)
-    }
-}
-
-@Composable
-private fun ScanRoute(modifier: Modifier = Modifier) {
+private fun ScanRoute(onBack: () -> Unit) {
     val viewModel: ScanViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -72,28 +80,37 @@ private fun ScanRoute(modifier: Modifier = Modifier) {
         if (!hasCameraPermission) cameraPermission.launch(Manifest.permission.CAMERA)
     }
 
-    ScanScreen(
-        state = state,
-        onPickImage = {
-            imagePicker.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("掃描發票") },
+                navigationIcon = { TextButton(onClick = onBack) { Text("返回") } },
             )
         },
-        onParse = { viewModel.onQrDetected(it, rightBytes = null) },
-        onConfirm = viewModel::onUserConfirm,
-        onCancel = viewModel::onCancel,
-        modifier = modifier,
-        cameraContent = {
-            if (hasCameraPermission) {
-                CameraQrScanner(
-                    onInvoiceQr = { left, right -> viewModel.onQrDetected(left, right) },
-                    modifier = Modifier.fillMaxWidth().height(320.dp),
+    ) { padding ->
+        ScanScreen(
+            state = state,
+            onPickImage = {
+                imagePicker.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
                 )
-            } else {
-                Button(onClick = { cameraPermission.launch(Manifest.permission.CAMERA) }) {
-                    Text("授權相機以即時掃描")
+            },
+            onParse = { viewModel.onQrDetected(it, rightBytes = null) },
+            onConfirm = viewModel::onUserConfirm,
+            onCancel = viewModel::onCancel,
+            modifier = Modifier.padding(padding),
+            cameraContent = {
+                if (hasCameraPermission) {
+                    CameraQrScanner(
+                        onInvoiceQr = { left, right -> viewModel.onQrDetected(left, right) },
+                        modifier = Modifier.fillMaxWidth().height(320.dp),
+                    )
+                } else {
+                    Button(onClick = { cameraPermission.launch(Manifest.permission.CAMERA) }) {
+                        Text("授權相機以即時掃描")
+                    }
                 }
-            }
-        },
-    )
+            },
+        )
+    }
 }

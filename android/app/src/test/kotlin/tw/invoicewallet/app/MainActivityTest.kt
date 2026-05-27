@@ -10,6 +10,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import tw.invoicewallet.app.ui.theme.InvoiceWalletTheme
+import tw.invoicewallet.feature.invoicelist.InvoiceListScreen
+import tw.invoicewallet.feature.invoicelist.InvoiceListUiState
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -23,7 +25,12 @@ class MainActivityTest {
     fun home_screen_shows_app_title() {
         composeRule.setContent {
             InvoiceWalletTheme {
-                InvoiceWalletScaffold {}
+                InvoiceListScreen(
+                    uiState = InvoiceListUiState(),
+                    onQueryChange = {},
+                    onScanClick = {},
+                    onInvoiceClick = {},
+                )
             }
         }
 

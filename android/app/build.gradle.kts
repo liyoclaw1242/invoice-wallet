@@ -25,6 +25,7 @@ android {
 
 dependencies {
     implementation(project(":feature:scan"))
+    implementation(project(":feature:invoice-list"))
     // Carries the Hilt DatabaseModule (so Hilt can resolve the graph here) and
     // re-exports :core:model (Invoice) via `api`.
     implementation(project(":core:database"))
@@ -33,6 +34,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // Shared test infrastructure (MainDispatcher rules, HiltTestRunner, fixtures).
     testImplementation(project(":core:testing"))
