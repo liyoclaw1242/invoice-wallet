@@ -40,7 +40,7 @@ invoice-app/                 # = invoice-wallet
 | Iteration | 狀態 | 備註 |
 |---|---|---|
 | 0 Foundation | ✅ 完成 | T0.1–T0.5 + T0.3b 全綠；CI 待 GitHub remote 才能實跑 |
-| 1 Core Data | 🔨 進行中 | T1.1 ✅ / T1.2 Room+SQLCipher、T1.3 DAOs(平行)、T1.4/T1.5 待做 |
+| 1 Core Data | 🔨 進行中 | T1.1 ✅ T1.2 ✅ / T1.3 DAOs(平行 subagent)、T1.4/T1.5 待做 |
 | 2 Scan | ⛔ | |
 | 3 List/Search | ⛔ | |
 | 4 Lottery | ⛔ | |
@@ -51,6 +51,11 @@ invoice-app/                 # = invoice-wallet
 ## 變更日誌
 
 - 2026-05-27：**T0.3b 完成 ✅**。instrumented smoke `HomeScreenSmokeTest` 在 emulator `invoice_pixel7_api35` 跑 `connectedDebugAndroidTest` 通過。修：androidTest APK 打包衝突（JUnit5 jar 重複 META-INF/LICENSE.md，因 :core:testing 以 api 匯出 jupiter 流入 androidTest）→ `configureKotlinAndroid` 加 `packaging.resources.excludes`（LICENSE*/NOTICE*/AL2.0/LGPL2.1）。Iteration 0 完整收尾；instrumented 測試管線端到端驗證（Iteration 1 DB/DAO 測試會用）。
+- 2026-05-27：**T1.2 完成 ✅**。`:core:database` android library（room + test + ktlint conventions），依賴 `:core:model`。分 3 phase 在模擬器驗證：
+  - **Phase 1**：5 個 Room `@Entity`（對應 §5.1，enum 存 name 字串）+ `Converters`（Instant↔Long、LocalDate↔ISO、List<String>↔JSON）+ entity↔domain `Mappers` + placeholder `InvoiceDao`（T1.3a 擴充）+ `InvoiceWalletDatabase`(v1, exportSchema)。InvoiceWalletDatabaseTest in-memory round-trip 綠。
+  - **Phase 2**：SQLCipher（`net.zetetic:sqlcipher-android` + `SupportOpenHelperFactory`，`System.loadLibrary("sqlcipher")` 單次載入）+ `DatabasePassphraseProvider`（EncryptedSharedPreferences / Android Keystore master key，32-byte 隨機 passphrase）+ `buildEncryptedDatabase()`。EncryptionTest：正確金鑰可讀、**錯誤金鑰開不了**。
+  - **Phase 3**：DatabaseMigrationTest（MigrationTestHelper 驗 v1 schema，schemas 匯出至 androidTest assets）+ DatabasePassphraseProviderTest（passphrase 穩定 32 bytes）。
+  - 驗收：`:core:database:connectedDebugAndroidTest` 5 測試全綠（emulator）；`./gradlew check` 綠。註：DAO 僅 placeholder InvoiceDao，完整 DAO 在 T1.3 平行 subagent。
 - 2026-05-27：**T1.1 完成 ✅（Iteration 1 開始）**。`:core:model` 純 Kotlin JVM module（無 Android 依賴，`kotlin.jvm` + serialization，bytecode target 17 對齊 D8）。Domain models 依 ARCHITECTURE §5.1：`Invoice`(+`formattedNumber()`)、`InvoiceItem`、`LotteryNumber`、`AuthGrant`、`QueryAuditLog` + enums `InvoiceSource`/`LotteryStatus`/`AuthChannel`，全部 `@Serializable`，日期用 kotlinx-datetime（`LocalDate`/`Instant`，公開 API → `api` 依賴）。TDD：InvoiceTest（formattedNumber、copy/value-equality、serialization roundtrip）紅→綠 + ModelSerializationTest（LotteryNumber 清單、AuthGrant nullable roundtrip）。驗收：`:core:model:check` 綠（5 測試 + ktlint）。註：domain models 為純資料類別（不含 Room 註解）；Room @Entity + mapper 在 T1.2。kotlinx-datetime 為 serializable 友善的技術預設。
 
 - 2026-05-26：建立 PROGRESS.md / QUESTIONS.md，記錄 baseline 與三項決策。前置 P1、P2 待解。

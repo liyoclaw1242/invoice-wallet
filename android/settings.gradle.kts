@@ -34,4 +34,4 @@ include(":app")
 include(":core:testing")
 // Iteration 1
 include(":core:model")
-// include(":core:database")
+include(":core:database")
