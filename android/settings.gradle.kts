@@ -31,7 +31,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 // T0.3
 include(":app")
 // T0.4
-// include(":core:testing")
+include(":core:testing")
 // Iteration 1
 // include(":core:model")
 // include(":core:database")

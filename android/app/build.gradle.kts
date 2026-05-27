@@ -27,6 +27,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
+    // Shared test infrastructure (MainDispatcher rules, HiltTestRunner, fixtures).
+    testImplementation(project(":core:testing"))
+    androidTestImplementation(project(":core:testing"))
+
     // Instrumented smoke tests (run on a device/emulator).
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
