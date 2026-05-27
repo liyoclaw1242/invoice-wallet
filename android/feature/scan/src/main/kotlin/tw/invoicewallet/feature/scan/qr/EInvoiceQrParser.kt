@@ -118,13 +118,15 @@ object EInvoiceQrParser {
     private fun parseHexAmount(field: String, label: String): Int = field.toLongOrNull(radix = 16)?.toInt()
         ?: throw EInvoiceQrException.MalformedLeftCode("invalid hex $label '$field'")
 
-    /** Groups a flat `name:qty:price:name:qty:price...` token list into items. */
+    /** Groups a flat `name:qty:price:name:qty:price...` token list into items. The
+     *  right code is space-padded to a fixed length, so qty/price carry trailing
+     *  whitespace — trim them before parsing (names keep their own spacing). */
     private fun groupItems(tokens: List<String>): List<ParsedItem> {
         val items = mutableListOf<ParsedItem>()
         var i = 0
         while (i + 2 < tokens.size) {
-            val quantity = tokens[i + 1].toIntOrNull()
-            val unitPrice = tokens[i + 2].toIntOrNull()
+            val quantity = tokens[i + 1].trim().toIntOrNull()
+            val unitPrice = tokens[i + 2].trim().toIntOrNull()
             if (quantity == null || unitPrice == null) break
             items += ParsedItem(name = tokens[i], quantity = quantity, unitPrice = unitPrice)
             i += 3

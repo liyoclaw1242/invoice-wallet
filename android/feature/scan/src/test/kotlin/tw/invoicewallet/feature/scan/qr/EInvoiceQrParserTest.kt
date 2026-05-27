@@ -49,6 +49,25 @@ class EInvoiceQrParserTest {
     }
 
     @Test
+    fun `right code with trailing space padding still yields both items (real 麥味登 invoice)`() {
+        // Decoded from a real receipt (invoice #4). The right QR is space-padded to a
+        // fixed length, so the last price arrives as "25" + spaces — must not drop it.
+        val left = "ZF131378791150410957900000000000000550000000098952903" +
+            "hD1D6Z3tgPPiaySVPqrf9Q==:**********:2:2:1:超厚雞肉起司滿分堡:1:60"
+        val right = ("**:奶茶(M)(熱):1:25" + " ".repeat(78)).toByteArray(Charsets.UTF_8)
+
+        val parsed = EInvoiceQrParser.parse(left, right)
+
+        parsed.invoiceNumber shouldBe "ZF13137879"
+        parsed.totalAmount shouldBe 85
+        parsed.sellerTaxId shouldBe "98952903"
+        parsed.items shouldBe listOf(
+            ParsedItem("超厚雞肉起司滿分堡", 1, 60),
+            ParsedItem("奶茶(M)(熱)", 1, 25),
+        )
+    }
+
+    @Test
     fun `malformed fixtures are rejected with an EInvoiceQrException`() {
         fixtures.malformed.forEach { m ->
             withClue("${m.id}: ${m.reason}") {
