@@ -1,0 +1,197 @@
+{
+  "_meta": {
+    "purpose": "Taiwan MOF e-invoice (電子發票證明聯) QR fixtures for parser tests.",
+    "generatedFrom": "3 real invoice photos in the project root; QR decoded with zbar/pyzbar + OpenCV + zxing-cpp.",
+    "leftQrSpec": "[字軌號碼10][開立日期民國7=YYYMMDD][隨機碼4][銷售額未稅8=hex][總計含稅8=hex][買方統編8][賣方統編8][AES驗證碼] then :-delimited [自用欄]:[品目筆數]:[總筆數]:[中文編碼 0=Big5/1=UTF-8]:[品名:數量:單價]...",
+    "rightQrSpec": "raw bytes begin with ** (0x2A2A), then continue the :-delimited item list (品名:數量:單價). Encoding governed by the LEFT code's 編碼旗標.",
+    "rightQrHexNote": "rightQrHex is the RAW bytes as lowercase hex — decode it yourself using the encoding flag (do NOT assume UTF-8).",
+    "buyerTaxIdConvention": "left code stores '00000000' for B2C; expected.buyerTaxId is null in that case.",
+    "keyFindings": [
+      "All 3 real photos are B2C and UTF-8 (旗標=1). NONE is Big5. The 'right code is usually Big5' assumption is OUTDATED for 2026 receipts — Big5(0) was the older default; modern POS emit UTF-8(1). Parser MUST honor the flag, not assume Big5.",
+      "AES verification field length is inconsistent across merchants (24-char base64 ending '==' in INV1/INV2 vs a 32-char block in INV3) — fixed-offset slicing of field #8 is fragile.",
+      "Amount hex case varies (lowercase 000000dd vs uppercase 000002F8) — parse case-insensitively.",
+      "Item unit prices need not sum to total (combos @0, promos), and item names can contain U+3000 and CRLF — do not over-validate."
+    ],
+    "missingForFullCoverage": [
+      "A B2B invoice (買方統編 ≠ 00000000) — none of the 3 photos has a buyer tax id.",
+      "A real Big5 invoice (編碼旗標=0) — usually an OLDER receipt; all 3 here are UTF-8.",
+      "Invoices from other periods — all 3 are 民國115年03-04月 (2026 Mar–Apr).",
+      "A clearer reshoot of MCCVI's RIGHT QR (rn_image_picker_lib_temp_07bfca8b...) to recover its single item — current right QR is motion-blurred."
+    ],
+    "counts": {
+      "realFixtures": 3,
+      "malformed": 5,
+      "targetWas": ">=10",
+      "note": "Only 3 source photos exist; per user choice this ships REAL data only (no fabricated valid fixtures). Malformed cases are synthetic by nature."
+    }
+  },
+  "fixtures": [
+    {
+      "id": "real-01-cilixiang-utf8-b2c-combo",
+      "description": "七里香甕仔雞 — B2C, UTF-8 (編碼旗標=1), 多品項套餐(主餐在左碼 + 5 項子品項在右碼). 真實量點: 未稅金額欄被商家填 0.",
+      "source": {
+        "type": "scanned",
+        "image": "PXL_20260527_031655728.jpg"
+      },
+      "leftQr": "ZF760112291150417517300000000000004380000000082653921DP8BKGWr18psJdQ8EGQthA==:**********:6:6:1:1080B套餐:1:1080:",
+      "rightQrHex": "2a2ae38080e79495e4bb94e99b9e28e5a597e9a4903039303a313a303ae38080e99baae88ab1e88289e78292e88486e7939c283a313a303ae38080e7ad8de6b9af28e5a597e9a49030393030323a313a303ae38080e5a4a7e985b8e7ad8de78292e7a9bae5bf83e88f9c3a313a303ae38080e5a4a7e7a297e585ace799bde9a3af28e5a5973a313a30",
+      "expected": {
+        "invoiceNumber": "ZF76011229",
+        "issueDate": "2026-04-17",
+        "randomCode": "5173",
+        "untaxedAmount": 0,
+        "totalAmount": 1080,
+        "sellerTaxId": "82653921",
+        "buyerTaxId": null,
+        "encoding": "utf8",
+        "items": [
+          {
+            "name": "1080B套餐",
+            "quantity": 1,
+            "unitPrice": 1080
+          },
+          {
+            "name": "　甕仔雞(套餐090",
+            "quantity": 1,
+            "unitPrice": 0
+          },
+          {
+            "name": "　雪花肉炒脆瓜(",
+            "quantity": 1,
+            "unitPrice": 0
+          },
+          {
+            "name": "　筍湯(套餐09002",
+            "quantity": 1,
+            "unitPrice": 0
+          },
+          {
+            "name": "　大酸筍炒空心菜",
+            "quantity": 1,
+            "unitPrice": 0
+          },
+          {
+            "name": "　大碗公白飯(套",
+            "quantity": 1,
+            "unitPrice": 0
+          }
+        ]
+      },
+      "notes": [
+        "右碼為標準 UTF-8 (e3 80 80 = U+3000 全形空白)；以 Big5 解碼會立刻丟 IllegalMultibyte。",
+        "每個子品名前冠一個全形空白 U+3000，且含 POS 內部碼碎片 (如 '(套餐09002')；品名最後一項看似被 POS 自身縮寫，但欄位本身完整。",
+        "未稅金額=0 為真實資料；勿假設 untaxed = round(total/1.05)。",
+        "品項單價子項皆為 0（套餐組合），加總≠總計。"
+      ]
+    },
+    {
+      "id": "real-02-mccvi-utf8-b2c-rightmissing",
+      "description": "MCCVI 瑪可希維 — B2C, UTF-8. 全檔唯一稅計正確的例子: 未稅 221 + 5% = 232.05 ≈ 232. 右碼因照片模糊無法解碼.",
+      "source": {
+        "type": "scanned",
+        "image": "rn_image_picker_lib_temp_07bfca8b-c3c2-4632-90dd-2f88dfe04abb.jpg"
+      },
+      "leftQr": "ZP4610585411504219684000000dd000000e80000000090650686uVRGyvkXO4arTAAHA722vQ==:**********:1:1:1:",
+      "rightQrHex": null,
+      "expected": {
+        "invoiceNumber": "ZP46105854",
+        "issueDate": "2026-04-21",
+        "randomCode": "9684",
+        "untaxedAmount": 221,
+        "totalAmount": 232,
+        "sellerTaxId": "90650686",
+        "buyerTaxId": null,
+        "encoding": "utf8",
+        "items": [
+          {
+            "name": null,
+            "quantity": null,
+            "unitPrice": null,
+            "_unknown": "single item lives in the un-decoded right QR (count field=1)"
+          }
+        ]
+      },
+      "notes": [
+        "唯一稅金正確的樣本: 221*1.05=232.05 → 232。",
+        "金額 hex 為小寫 '000000dd'/'000000e8'，其他發票為大寫 (000002F8)；解析器解 hex 須大小寫不敏感。",
+        "右碼 QR 在原照片動態/失焦模糊，zbar / OpenCV / zxing-cpp / WeChat 四引擎皆無法解碼；rightQrHex 記為 null。",
+        "encoding=utf8 取自左碼編碼旗標 (尾欄 ...:1:1:1: 末位)，未能以右碼 bytes 交叉驗證。"
+      ]
+    },
+    {
+      "id": "real-03-dominos-utf8-b2c-promo",
+      "description": "Domino's — B2C, UTF-8, 3 品項全在右碼 (左碼尾 :0:3:1 = 左碼0筆/總3筆). 含一堆真實量點.",
+      "source": {
+        "type": "scanned",
+        "image": "rn_image_picker_lib_temp_e2929427-fbc5-426f-a0fa-2640b2c7b909.jpg"
+      },
+      "leftQr": "YZ2986395711504266315000002F8000002F80000000039858516QlZkaTZwMW8wK2M4Y2ZDK0NBTkZNQT09**********:0:3:1",
+      "rightQrHex": "2a2a3ae5a4a720e6898be68b8d20e88289e9ad94e78e8be59b9be5969c3a313a3830303ae5a4a720e6898be68b8d20e8b685e7b49ae8b1aae88faf0d0a28e8b685e7b49ae8b1aae88faf293a313a3639303a312e3235e585ace58d8720e799bee4ba8be58fafe6a8823a313a3435",
+      "expected": {
+        "invoiceNumber": "YZ29863957",
+        "issueDate": "2026-04-26",
+        "randomCode": "6315",
+        "untaxedAmount": 760,
+        "totalAmount": 760,
+        "sellerTaxId": "39858516",
+        "buyerTaxId": null,
+        "encoding": "utf8",
+        "items": [
+          {
+            "name": "大 手拍 肉魔王四喜",
+            "quantity": 1,
+            "unitPrice": 800
+          },
+          {
+            "name": "大 手拍 超級豪華\r\n(超級豪華)",
+            "quantity": 1,
+            "unitPrice": 690
+          },
+          {
+            "name": "1.25公升 百事可樂",
+            "quantity": 1,
+            "unitPrice": 45
+          }
+        ]
+      },
+      "notes": [
+        "未稅 == 總計 == 760 (無稅額拆分) — 另一種真實量點。",
+        "品項單價加總 800+690+45=1535 ≠ 總計 760 (促銷/折抵)；勿 assert sum(items)=total。",
+        "第二項品名內含真實 CRLF (0x0d0a): '大 手拍 超級豪華\\r\\n(超級豪華)'；品名不可假設無換行/控制字元。",
+        "左碼加密驗證欄疑為 32 字元 (QlZk...QT09, base64 無 == padding) 且 ** 前缺 : 分隔，與 INV1/INV2 的 24 字元(以 == 結尾)不一致 → 第8欄固定偏移切法脆弱。"
+      ]
+    }
+  ],
+  "malformed": [
+    {
+      "id": "bad-01-left-too-short",
+      "leftQr": "AB123456781150101",
+      "rightQrHex": null,
+      "reason": "左碼僅 17 字元，不足財政部規格的 77 字元固定欄位 (字軌10+日期7+隨機4+未稅8+含稅8+買方8+賣方8+驗證24)。解析器應在切欄位前先驗長度並拒絕。"
+    },
+    {
+      "id": "bad-02-right-no-asterisk-prefix",
+      "leftQr": "AB123456781150101123400000064000000690000000012345678AAAAAAAAAAAAAAAAAAAAAA==:**********:1:2:1:商品A:1:50:",
+      "rightQrHex": "e5a4a7e7a2973a313a3530",
+      "reason": "右碼未以 ** (0x2A2A) 開頭。右碼必須以續接標記 ** 起始，否則應視為非右碼或毀損，不可直接當品項串解析。"
+    },
+    {
+      "id": "bad-03-missing-detail-sections",
+      "leftQr": "AB123456781150101123400000064000000690000000012345678AAAAAAAAAAAAAAAAAAAAAA==",
+      "rightQrHex": null,
+      "reason": "77 字元固定欄位之後完全缺少 :品目筆數:總筆數:中文編碼: 區段。解析器取編碼旗標/品項時會越界，須先判斷分隔欄位是否存在。"
+    },
+    {
+      "id": "bad-04-nonhex-amount-field",
+      "leftQr": "AB12345678115010112340000XYZW000000690000000012345678AAAAAAAAAAAAAAAAAAAAAA==:**********:1:1:1:",
+      "rightQrHex": null,
+      "reason": "未稅金額欄位含非十六進位字元 '0000XYZW'。int(field,16) 會拋錯；解析器需防呆並回報欄位格式錯誤，而非崩潰。"
+    },
+    {
+      "id": "bad-05-truncated-big5-multibyte",
+      "leftQr": "AB123456781150101123400000064000000690000000012345678AAAAAAAAAAAAAAAAAAAAAA==:**********:1:1:0:",
+      "rightQrHex": "2a2aa43a313a3330",
+      "reason": "右碼宣稱 Big5 (左碼編碼旗標=0) 但含半個 Big5 字 (落單的 0xA4 前導位元組，無後續位元組)。bytes.decode('big5') 會丟 IllegalMultibyte，也非合法 UTF-8。測解析器對毀損多位元組序列的容錯。"
+    }
+  ]
+}

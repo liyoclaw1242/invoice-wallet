@@ -35,3 +35,5 @@ include(":core:testing")
 // Iteration 1
 include(":core:model")
 include(":core:database")
+// Iteration 2
+include(":feature:scan")
