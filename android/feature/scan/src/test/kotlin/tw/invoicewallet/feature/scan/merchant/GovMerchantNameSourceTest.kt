@@ -25,10 +25,21 @@ class GovMerchantNameSourceTest {
     }
 
     @Test
-    fun `extracts the company name from a registry response`() = runTest {
-        val response = """{"data":{"統一編號":"90650686","公司名稱":"瑪可希維有限公司"}}"""
+    fun `extracts 公司名稱 from a company-registration response`() = runTest {
+        source("""{"data":{"統一編號":"90650686","公司名稱":"瑪可希維科技有限公司"}}""")
+            .fetch("90650686") shouldBe "瑪可希維科技有限公司"
+    }
 
-        source(response).fetch("90650686") shouldBe "瑪可希維有限公司"
+    @Test
+    fun `extracts 商業名稱 from a sole-proprietor response`() = runTest {
+        source("""{"data":{"商業名稱":"士豐商號","組織類型":"獨資"}}""")
+            .fetch("39858516") shouldBe "士豐商號"
+    }
+
+    @Test
+    fun `extracts 營業人名稱 nested under 財政部`() = runTest {
+        source("""{"data":{"財政部":{"營業人名稱":"七里香甕仔雞股份有限公司埔里營業所"}}}""")
+            .fetch("82653921") shouldBe "七里香甕仔雞股份有限公司埔里營業所"
     }
 
     @Test
