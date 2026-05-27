@@ -41,7 +41,7 @@ invoice-app/                 # = invoice-wallet
 |---|---|---|
 | 0 Foundation | ✅ 完成 | T0.1–T0.5 + T0.3b 全綠；CI 待 GitHub remote 才能實跑 |
 | 1 Core Data | ✅ 完成 | T1.1–T1.5 全綠（model→DB→DAO→Repository，加密 + 雙層測試）|
-| 2 Scan | 🔨 進行中 | T2.1 解析器 ✅ T2.4 ViewModel ✅ T2.5 確認 UI ✅ / T2.2 OCR、T2.3 CameraX(相機) 待做 |
+| 2 Scan | 🔨 進行中 | T2.1 解析器 ✅ T2.2 OCR 抽取 ✅ T2.4 ViewModel ✅ T2.5 UI ✅ + Hilt DI/APK ✅ / T2.3 CameraX+ML Kit(影像輸入) 待做 |
 | 3 List/Search | ⛔ | |
 | 4 Lottery | ⛔ | |
 | 5 Export | ⛔ | |
@@ -51,6 +51,7 @@ invoice-app/                 # = invoice-wallet
 ## 變更日誌
 
 - 2026-05-27：**T0.3b 完成 ✅**。instrumented smoke `HomeScreenSmokeTest` 在 emulator `invoice_pixel7_api35` 跑 `connectedDebugAndroidTest` 通過。修：androidTest APK 打包衝突（JUnit5 jar 重複 META-INF/LICENSE.md，因 :core:testing 以 api 匯出 jupiter 流入 androidTest）→ `configureKotlinAndroid` 加 `packaging.resources.excludes`（LICENSE*/NOTICE*/AL2.0/LGPL2.1）。Iteration 0 完整收尾；instrumented 測試管線端到端驗證（Iteration 1 DB/DAO 測試會用）。
+- 2026-05-27：**T2.2 完成 ✅**。`InvoiceFieldExtractor`（純邏輯，**不依賴 ML Kit**，吃 `RecognizedText`=辨識文字行；ML Kit `Text`→`RecognizedText` 留待 T2.3）。抽：發票號碼 `[A-Z]{2}[-\s]?\d{8}`（有/無分隔→信心 0.95/0.75）、日期（西元 20xx 優先、民國年月日 CJK、民國分隔 /.- ；自動 +1911）、總額（總計/總金額/應收/合計 優先序，去逗號取最大數）。`ExtractedField<T>` 帶 confidence、`lowConfidenceFields(threshold=0.8)` 供 UI 標示。TDD 9 測試（代表性 fixtures：證明聯/收銀機版面 + 日期/金額變體）。驗收：`:feature:scan:testDebugUnitTest`（共 19）綠 + `check` 綠。註：手機可用需 T2.3 接 ML Kit 影像輸入；真實 OCR 文字之後可擴充 fixtures。
 - 2026-05-27：**DI 接線 + :app 整合 + APK ✅**。專案首次 Hilt DI：`:core:database` 加 hilt convention + `DatabaseModule`（提供加密 InvoiceWalletDatabase/InvoiceDao/Clock/InvoiceRepository）。`ScanViewModel` 改 `@HiltViewModel @Inject`（移除 idGenerator，內用 UUID）。`:app` 依賴 `:feature:scan` + `:core:database`（帶 DatabaseModule 上 classpath，經 api 傳遞 :core:model）+ hilt-navigation-compose；`InvoiceWalletApp` = `InvoiceWalletScaffold`(TopAppBar「Invoice Wallet」) + `ScanRoute`(hiltViewModel + ScanScreen)。移除 HomeScreen，:app 2 測試改測 InvoiceWalletScaffold。驗收：`check assembleDebug` 綠、模擬器啟動無 crash（Hilt graph + SQLCipher runtime OK）、APK 32MB → `android/app/build/outputs/apk/debug/app-debug.apk`。
 - 2026-05-27：**T2.4 完成 ✅（提前於 T2.2/T2.3，因不卡 OCR 素材/相機）**。`ScanViewModel`（plain ViewModel，constructor 注入 InvoiceRepository + Clock + idGenerator）：`onQrDetected(left,rightBytes)`→`EInvoiceQrParser`→`ParsedInvoice.toDraftInvoice`（source=QR_CODE、issuePeriod 由日期推算雙月期別、tax=total−untaxed、merchantName 空待 OCR/手填）→`Detected(draft)`；`onUserConfirm(invoice)`→`viewModelScope` 內 `repository.upsert`→`Saved(id)`；malformed→`Error`；`onCancel`→`Idle`。OCR 路徑(`onOcrResult`)留待 T2.2。測試：Turbine 觀 StateFlow + FakeInvoiceRepository + MainDispatcherExtension（4 測試）。形成「掃 QR→確認→存進加密 DB」垂直切片。驗收：`:feature:scan:testDebugUnitTest`（含 parser 共 7）綠 + `check` 綠。
 - 2026-05-27：**T2.1 完成 ✅（Iteration 2 開始）**。`:feature:scan` android library（純 Kotlin 解析器）。`EInvoiceQrParser`：左碼前 53 字元固定欄（字軌/民國日期→ISO/隨機碼/未稅hex/含稅hex/買方/賣方），AES 變長 → 以 `*` 自用區定位編碼旗標與品項（非固定偏移）；右碼依**編碼旗標**（UTF-8/Big5，不假設）strict-decode bytes 後拆品項；買方 00000000→null、hex 大小寫不敏感、不過度驗證。malformed 拋 `EInvoiceQrException`。測試載入 `src/test/resources/einvoice-qr-fixtures.json`（**3 張真實發票** + 5 malformed）驅動，全綠。⚠️ fixtures 為真實資料，依使用者指示 commit。
