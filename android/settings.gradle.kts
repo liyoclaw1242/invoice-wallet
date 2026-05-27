@@ -42,3 +42,6 @@ include(":feature:invoice-list")
 include(":feature:invoice-detail")
 // Iteration 4
 include(":feature:lottery")
+// Iteration 5
+include(":feature:export")
+include(":feature:settings")
