@@ -15,4 +15,6 @@ interface SettingsRepository {
     suspend fun setMcpEnabled(enabled: Boolean)
 
     suspend fun setMcpLanMode(lanMode: Boolean)
+
+    suspend fun setRemoteEnabled(enabled: Boolean)
 }

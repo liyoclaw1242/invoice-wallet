@@ -42,7 +42,12 @@ import kotlinx.coroutines.withContext
 import tw.invoicewallet.feature.export.ExportFormat
 
 @Composable
-fun SettingsRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsRoute(
+    onBack: () -> Unit,
+    onPairRelayClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -77,6 +82,8 @@ fun SettingsRoute(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
         onMcpEnabledChange = viewModel::setMcpEnabled,
         onMcpLanModeChange = viewModel::setMcpLanMode,
         onRegenerateToken = viewModel::regenerateMcpToken,
+        onRemoteEnabledChange = viewModel::setRemoteEnabled,
+        onPairRelayClick = onPairRelayClick,
         onBack = onBack,
         modifier = modifier,
     )
@@ -96,6 +103,8 @@ fun SettingsScreen(
     onMcpEnabledChange: (Boolean) -> Unit = {},
     onMcpLanModeChange: (Boolean) -> Unit = {},
     onRegenerateToken: () -> Unit = {},
+    onRemoteEnabledChange: (Boolean) -> Unit = {},
+    onPairRelayClick: () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
@@ -219,6 +228,35 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
+            }
+
+            Section("遠端 AI（Relay）") {
+                Text(
+                    if (uiState.relayPaired) "已配對 Relay。" else "尚未配對。先在 relay 端取得配對碼。",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                OutlinedButton(
+                    onClick = onPairRelayClick,
+                    modifier = Modifier.testTag("pair-relay"),
+                ) { Text(if (uiState.relayPaired) "重新配對 Relay" else "配對 Relay") }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("允許 AI 遠端查詢")
+                    Switch(
+                        checked = uiState.remoteEnabled,
+                        onCheckedChange = onRemoteEnabledChange,
+                        enabled = uiState.relayPaired,
+                        modifier = Modifier.testTag("remote-enable"),
+                    )
+                }
+                Text(
+                    "開啟後手機會連到 relay；Claude 經 Cloudflare tunnel→relay→你的手機查詢。" +
+                        "發票資料不經過 relay，只在手機上產生回應。",
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
         }
     }

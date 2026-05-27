@@ -18,6 +18,7 @@ import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.core.testing.MainDispatcherExtension
 import tw.invoicewallet.datasource.mcpserver.McpServerControls
+import tw.invoicewallet.datasource.relayclient.RelayDeviceStore
 import tw.invoicewallet.feature.export.ExportFormat
 
 class SettingsViewModelTest {
@@ -33,6 +34,7 @@ class SettingsViewModelTest {
             carrierCodeStore = FakeCarrierCodeStore("/ABC123"),
             invoiceRepository = FakeInvoiceRepository(),
             mcpServer = FakeMcpServerControls(),
+            relayDeviceStore = FakeRelayDeviceStore(),
         )
         vm.uiState.test {
             val state = awaitItem()
@@ -48,6 +50,7 @@ class SettingsViewModelTest {
             FakeCarrierCodeStore(),
             FakeInvoiceRepository(),
             FakeMcpServerControls(),
+            FakeRelayDeviceStore(),
         )
         vm.uiState.test {
             awaitItem().themeMode shouldBe ThemeMode.SYSTEM
@@ -59,7 +62,13 @@ class SettingsViewModelTest {
     @Test
     fun `setting and clearing the carrier code persists and updates state`() = runTest {
         val store = FakeCarrierCodeStore()
-        val vm = SettingsViewModel(FakeSettingsRepository(), store, FakeInvoiceRepository(), FakeMcpServerControls())
+        val vm = SettingsViewModel(
+            FakeSettingsRepository(),
+            store,
+            FakeInvoiceRepository(),
+            FakeMcpServerControls(),
+            FakeRelayDeviceStore(),
+        )
         vm.uiState.test {
             awaitItem().carrierCode shouldBe ""
             vm.setCarrierCode("/XYZ.+9")
@@ -78,6 +87,7 @@ class SettingsViewModelTest {
             FakeCarrierCodeStore(),
             FakeInvoiceRepository(),
             FakeMcpServerControls(),
+            FakeRelayDeviceStore(),
         )
         vm.uiState.test {
             awaitItem().mcpToken shouldBe "tok-1"
@@ -95,6 +105,7 @@ class SettingsViewModelTest {
             FakeCarrierCodeStore(),
             FakeInvoiceRepository(listOf(invoice("全聯福利中心"))),
             FakeMcpServerControls(),
+            FakeRelayDeviceStore(),
         )
         vm.buildExport(ExportFormat.JSON) shouldContain "全聯福利中心"
         vm.buildExport(ExportFormat.CSV) shouldContain "全聯福利中心"
@@ -135,6 +146,22 @@ private class FakeSettingsRepository(initial: AppSettings = AppSettings()) : Set
         state.update { it.copy(onboardingCompleted = completed) }
     override suspend fun setMcpEnabled(enabled: Boolean) = state.update { it.copy(mcpEnabled = enabled) }
     override suspend fun setMcpLanMode(lanMode: Boolean) = state.update { it.copy(mcpLanMode = lanMode) }
+    override suspend fun setRemoteEnabled(enabled: Boolean) = state.update { it.copy(remoteEnabled = enabled) }
+}
+
+private class FakeRelayDeviceStore : RelayDeviceStore {
+    private var url: String? = null
+    private var secret: String? = null
+    override fun relayUrl(): String? = url
+    override fun deviceSecret(): String? = secret
+    override fun save(relayUrl: String, deviceSecret: String) {
+        url = relayUrl
+        secret = deviceSecret
+    }
+    override fun clear() {
+        url = null
+        secret = null
+    }
 }
 
 private class FakeMcpServerControls(private var token: String = "tok-1") : McpServerControls {

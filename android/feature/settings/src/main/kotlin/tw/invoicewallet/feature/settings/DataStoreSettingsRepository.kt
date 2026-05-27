@@ -18,6 +18,7 @@ class DataStoreSettingsRepository(private val dataStore: DataStore<Preferences>)
             onboardingCompleted = prefs[Keys.ONBOARDED] ?: false,
             mcpEnabled = prefs[Keys.MCP_ENABLED] ?: false,
             mcpLanMode = prefs[Keys.MCP_LAN] ?: false,
+            remoteEnabled = prefs[Keys.REMOTE_ENABLED] ?: false,
         )
     }
 
@@ -41,6 +42,10 @@ class DataStoreSettingsRepository(private val dataStore: DataStore<Preferences>)
         dataStore.edit { it[Keys.MCP_LAN] = lanMode }
     }
 
+    override suspend fun setRemoteEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.REMOTE_ENABLED] = enabled }
+    }
+
     private fun String?.toThemeMode(): ThemeMode =
         this?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() } ?: ThemeMode.SYSTEM
 
@@ -53,5 +58,6 @@ class DataStoreSettingsRepository(private val dataStore: DataStore<Preferences>)
         val ONBOARDED = booleanPreferencesKey("onboarding_completed")
         val MCP_ENABLED = booleanPreferencesKey("mcp_enabled")
         val MCP_LAN = booleanPreferencesKey("mcp_lan_mode")
+        val REMOTE_ENABLED = booleanPreferencesKey("remote_enabled")
     }
 }

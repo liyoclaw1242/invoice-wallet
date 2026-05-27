@@ -29,7 +29,9 @@ dependencies {
     implementation(project(":feature:invoice-detail"))
     implementation(project(":feature:lottery"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:pairing"))
     implementation(project(":data-source:mcp-server"))
+    implementation(project(":data-source:relay-client"))
     // Carries the Hilt DatabaseModule (so Hilt can resolve the graph here) and
     // re-exports :core:model (Invoice) via `api`.
     implementation(project(":core:database"))

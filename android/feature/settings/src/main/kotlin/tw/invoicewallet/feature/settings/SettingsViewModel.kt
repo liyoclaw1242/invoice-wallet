@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.datasource.mcpserver.McpServerControls
+import tw.invoicewallet.datasource.relayclient.RelayDeviceStore
 import tw.invoicewallet.feature.export.ExportFormat
 import tw.invoicewallet.feature.export.InvoiceExporter
 import javax.inject.Inject
@@ -23,6 +24,8 @@ data class SettingsUiState(
     val mcpEnabled: Boolean = false,
     val mcpLanMode: Boolean = false,
     val mcpToken: String = "",
+    val remoteEnabled: Boolean = false,
+    val relayPaired: Boolean = false,
 )
 
 @HiltViewModel
@@ -31,6 +34,7 @@ class SettingsViewModel @Inject constructor(
     private val carrierCodeStore: CarrierCodeStore,
     private val invoiceRepository: InvoiceRepository,
     private val mcpServer: McpServerControls,
+    private val relayDeviceStore: RelayDeviceStore,
 ) : ViewModel() {
 
     // The carrier code is read on demand (encrypted store, not a Flow), so we mirror it
@@ -47,6 +51,8 @@ class SettingsViewModel @Inject constructor(
                 mcpEnabled = settings.mcpEnabled,
                 mcpLanMode = settings.mcpLanMode,
                 mcpToken = token,
+                remoteEnabled = settings.remoteEnabled,
+                relayPaired = relayDeviceStore.isPaired,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
@@ -69,6 +75,8 @@ class SettingsViewModel @Inject constructor(
     fun setMcpEnabled(enabled: Boolean) = viewModelScope.launch { settingsRepository.setMcpEnabled(enabled) }
 
     fun setMcpLanMode(lanMode: Boolean) = viewModelScope.launch { settingsRepository.setMcpLanMode(lanMode) }
+
+    fun setRemoteEnabled(enabled: Boolean) = viewModelScope.launch { settingsRepository.setRemoteEnabled(enabled) }
 
     fun regenerateMcpToken() {
         mcpToken.value = mcpServer.regenerateToken()

@@ -13,4 +13,5 @@ data class AppSettings(
     val onboardingCompleted: Boolean = false,
     val mcpEnabled: Boolean = false,
     val mcpLanMode: Boolean = false,
+    val remoteEnabled: Boolean = false,
 )

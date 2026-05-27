@@ -7,24 +7,21 @@ plugins {
 }
 
 android {
-    namespace = "tw.invoicewallet.feature.settings"
+    namespace = "tw.invoicewallet.feature.pairing"
 }
 
 dependencies {
     implementation(project(":core:model"))
-    implementation(project(":core:database"))
-    implementation(project(":feature:export"))
-    implementation(project(":data-source:mcp-server"))
     implementation(project(":data-source:relay-client"))
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.coroutines.core)
 
-    // Plaintext app preferences (theme / scan mode / onboarding flag).
-    implementation(libs.androidx.datastore.preferences)
-    // The carrier barcode is sensitive → Keystore-backed encrypted storage.
-    implementation(libs.androidx.security.crypto)
+    // Claim the pairing code against the relay.
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
 
     testImplementation(project(":core:testing"))
+    testImplementation(libs.ktor.client.mock)
 }

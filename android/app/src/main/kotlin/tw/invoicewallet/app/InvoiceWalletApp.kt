@@ -34,6 +34,7 @@ import androidx.navigation.navArgument
 import tw.invoicewallet.feature.invoicedetail.InvoiceDetailRoute
 import tw.invoicewallet.feature.invoicelist.InvoiceListRoute
 import tw.invoicewallet.feature.lottery.LotteryRoute
+import tw.invoicewallet.feature.pairing.PairingRoute
 import tw.invoicewallet.feature.scan.ScanViewModel
 import tw.invoicewallet.feature.scan.camera.CameraQrScanner
 import tw.invoicewallet.feature.scan.ui.ScanScreen
@@ -65,7 +66,13 @@ fun InvoiceWalletApp(defaultScanMode: DefaultScanMode = DefaultScanMode.CAMERA) 
             LotteryRoute(onBack = { navController.popBackStack() })
         }
         composable(Routes.SETTINGS) {
-            SettingsRoute(onBack = { navController.popBackStack() })
+            SettingsRoute(
+                onBack = { navController.popBackStack() },
+                onPairRelayClick = { navController.navigate(Routes.PAIRING) },
+            )
+        }
+        composable(Routes.PAIRING) {
+            PairingRoute(onBack = { navController.popBackStack() })
         }
     }
 }
@@ -75,6 +82,7 @@ private object Routes {
     const val SCAN = "scan"
     const val LOTTERY = "lottery"
     const val SETTINGS = "settings"
+    const val PAIRING = "pairing"
     const val INVOICE_ID = "invoiceId"
     const val DETAIL = "detail/{$INVOICE_ID}"
     fun detail(id: String) = "detail/$id"

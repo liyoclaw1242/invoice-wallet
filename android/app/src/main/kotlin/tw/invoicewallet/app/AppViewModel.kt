@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import tw.invoicewallet.datasource.mcpserver.McpServerManager
+import tw.invoicewallet.datasource.relayclient.RelayManager
 import tw.invoicewallet.feature.settings.AppSettings
 import tw.invoicewallet.feature.settings.SettingsRepository
 import javax.inject.Inject
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class AppViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val mcpServerManager: McpServerManager,
+    private val relayManager: RelayManager,
 ) : ViewModel() {
 
     val settings: StateFlow<AppSettings?> =
@@ -37,6 +39,12 @@ class AppViewModel @Inject constructor(
                     mcpServerManager.stop()
                     if (enabled) mcpServerManager.start(lanMode = lanMode)
                 }
+        }
+        viewModelScope.launch {
+            settingsRepository.settings
+                .map { it.remoteEnabled }
+                .distinctUntilChanged()
+                .collect { enabled -> if (enabled) relayManager.start() else relayManager.stop() }
         }
     }
 
