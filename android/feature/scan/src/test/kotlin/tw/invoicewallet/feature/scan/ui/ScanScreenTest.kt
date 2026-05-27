@@ -38,6 +38,7 @@ class ScanScreenTest {
             MaterialTheme {
                 ScanScreen(
                     state = ScanState.Detected(draft),
+                    onPickImage = {},
                     onParse = {},
                     onConfirm = { confirmed = it },
                     onCancel = {},
@@ -57,7 +58,7 @@ class ScanScreenTest {
     @Test
     fun saved_state_shows_the_success_message() {
         composeRule.setContent {
-            MaterialTheme { ScanScreen(ScanState.Saved("inv-1"), {}, {}, {}) }
+            MaterialTheme { ScanScreen(ScanState.Saved("inv-1"), {}, {}, {}, {}) }
         }
 
         composeRule.onNodeWithTag("scan-saved").assertIsDisplayed()
@@ -66,7 +67,7 @@ class ScanScreenTest {
     @Test
     fun error_state_shows_the_error_message() {
         composeRule.setContent {
-            MaterialTheme { ScanScreen(ScanState.Error("無法解析發票 QR code"), {}, {}, {}) }
+            MaterialTheme { ScanScreen(ScanState.Error("無法解析發票 QR code"), {}, {}, {}, {}) }
         }
 
         composeRule.onNodeWithText("無法解析發票 QR code").assertIsDisplayed()

@@ -26,6 +26,13 @@ androidxSqlite = "2.4.0"
 sqlcipher = "4.6.1"
 androidxSecurityCrypto = "1.1.0-alpha06"
 
+# --- Camera ---
+cameraX = "1.4.1"
+
+# --- ML Kit (on-device, no network) ---
+mlkitBarcode = "17.3.0"
+mlkitTextChinese = "16.0.1"
+
 # --- Serialization / datetime ---
 kotlinxSerialization = "1.7.3"
 kotlinxDatetime = "0.6.1"
@@ -84,6 +91,18 @@ room-testing = { group = "androidx.room", name = "room-testing", version.ref = "
 androidx-sqlite-ktx = { group = "androidx.sqlite", name = "sqlite-ktx", version.ref = "androidxSqlite" }
 sqlcipher-android = { group = "net.zetetic", name = "sqlcipher-android", version.ref = "sqlcipher" }
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "androidxSecurityCrypto" }
+
+# CameraX — live preview + frame analysis for real-time QR scanning.
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraX" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraX" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraX" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraX" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
+
+# ML Kit — on-device barcode (QR) + Chinese OCR; runs locally, no network.
+mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
+mlkit-text-recognition-chinese = { group = "com.google.mlkit", name = "text-recognition-chinese", version.ref = "mlkitTextChinese" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 # Coroutines / serialization / datetime
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }

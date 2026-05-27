@@ -1,8 +1,10 @@
 package tw.invoicewallet.feature.scan
 
+import android.net.Uri
 import app.cash.turbine.test
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -13,6 +15,9 @@ import tw.invoicewallet.core.model.Invoice
 import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.core.testing.MainDispatcherExtension
+import tw.invoicewallet.feature.scan.ocr.RecognizedText
+import tw.invoicewallet.feature.scan.recognition.InvoiceRecognizer
+import tw.invoicewallet.feature.scan.recognition.RecognitionResult
 
 class ScanViewModelTest {
 
@@ -22,8 +27,10 @@ class ScanViewModelTest {
 
     private val fixedNow = Instant.parse("2026-05-27T00:00:00Z")
     private val repository = FakeInvoiceRepository()
+    private val recognizer = FakeInvoiceRecognizer()
     private val viewModel = ScanViewModel(
         invoiceRepository = repository,
+        recognizer = recognizer,
         clock = object : Clock {
             override fun now(): Instant = fixedNow
         },
@@ -80,6 +87,41 @@ class ScanViewModelTest {
         viewModel.state.value shouldBe ScanState.Idle
     }
 
+    @Test
+    fun `onImageSelected with a QR image builds a QR-sourced draft`() = runTest {
+        recognizer.result = RecognitionResult(qrLeft = VALID_LEFT_QR)
+
+        viewModel.onImageSelected(mockk())
+
+        val state = viewModel.state.value
+        state.shouldBeInstanceOf<ScanState.Detected>()
+        state.draft.invoiceNumber shouldBe "ZP46105854"
+        state.draft.source shouldBe InvoiceSource.QR_CODE
+    }
+
+    @Test
+    fun `onImageSelected with an OCR-only image builds an OCR-sourced draft`() = runTest {
+        recognizer.result = RecognitionResult(
+            ocr = RecognizedText.of("ZF-76011229", "開立日期 115/04/17", "總計 1080"),
+        )
+
+        viewModel.onImageSelected(mockk())
+
+        val state = viewModel.state.value
+        state.shouldBeInstanceOf<ScanState.Detected>()
+        state.draft.source shouldBe InvoiceSource.OCR
+        state.draft.totalAmount shouldBe 1080
+    }
+
+    @Test
+    fun `onImageSelected with nothing recognised moves to Error`() = runTest {
+        recognizer.result = RecognitionResult(ocr = RecognizedText.of("謝謝光臨"))
+
+        viewModel.onImageSelected(mockk())
+
+        viewModel.state.value.shouldBeInstanceOf<ScanState.Error>()
+    }
+
     private fun sampleInvoice(id: String) = Invoice(
         id = id,
         invoiceNumber = "ZP46105854",
@@ -104,6 +146,10 @@ class ScanViewModelTest {
         updatedAt = fixedNow,
         deletedAt = null,
     )
+
+    private class FakeInvoiceRecognizer(var result: RecognitionResult = RecognitionResult()) : InvoiceRecognizer {
+        override suspend fun recognize(image: Uri): RecognitionResult = result
+    }
 
     private companion object {
         // INV2 left QR from the real fixtures (B2C, no right code needed).

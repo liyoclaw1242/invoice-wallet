@@ -7,6 +7,9 @@ sealed interface ScanState {
     /** Nothing captured yet (camera live). */
     data object Idle : ScanState
 
+    /** An image was picked and is being recognised on-device. */
+    data object Recognizing : ScanState
+
     /** A QR code was parsed into an editable draft awaiting the user's confirmation. */
     data class Detected(val draft: Invoice) : ScanState
 

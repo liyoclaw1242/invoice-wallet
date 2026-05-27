@@ -10,6 +10,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -36,14 +38,17 @@ import tw.invoicewallet.feature.scan.ScanState
 @Composable
 fun ScanScreen(
     state: ScanState,
+    onPickImage: () -> Unit,
     onParse: (String) -> Unit,
     onConfirm: (Invoice) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    cameraContent: @Composable () -> Unit = {},
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         when (state) {
-            ScanState.Idle -> IdleContent(onParse)
+            ScanState.Idle -> IdleContent(onPickImage, onParse, cameraContent)
+            ScanState.Recognizing -> RecognizingContent()
             is ScanState.Detected -> ConfirmContent(state.draft, onConfirm, onCancel)
             is ScanState.Saved -> ResultContent(
                 tag = "scan-saved",
@@ -65,29 +70,48 @@ fun ScanScreen(
 }
 
 @Composable
-private fun IdleContent(onParse: (String) -> Unit) {
+private fun IdleContent(onPickImage: () -> Unit, onParse: (String) -> Unit, cameraContent: @Composable () -> Unit) {
+    val scroll = rememberScrollState()
     var raw by remember { mutableStateOf("") }
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).testTag("scan-idle"),
+        modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(scroll).testTag("scan-idle"),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text("掃描發票", style = MaterialTheme.typography.headlineMedium)
-        Text(
-            "相機掃描即將推出。現在可貼上電子發票左碼 QR 內容測試解析。",
-            style = MaterialTheme.typography.bodyMedium,
-        )
+        Text("把鏡頭對準發票上的 QR code，會自動辨識。", style = MaterialTheme.typography.bodyMedium)
+        // Live camera preview (provided by the app; QR is detected in real time).
+        cameraContent()
+        HorizontalDivider()
+        Button(
+            onClick = onPickImage,
+            modifier = Modifier.fillMaxWidth().testTag("pick-image-button"),
+        ) {
+            Text("改從相簿選擇照片")
+        }
+        Text("或手動貼上電子發票左碼 QR 字串：", style = MaterialTheme.typography.bodySmall)
         OutlinedTextField(
             value = raw,
             onValueChange = { raw = it },
             label = { Text("發票左碼 QR 字串") },
             modifier = Modifier.fillMaxWidth().testTag("qr-input"),
         )
-        Button(
+        TextButton(
             onClick = { onParse(raw.trim()) },
             modifier = Modifier.testTag("parse-button"),
         ) {
             Text("解析")
         }
+    }
+}
+
+@Composable
+private fun RecognizingContent() {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(24.dp).testTag("scan-recognizing"),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        CircularProgressIndicator()
+        Text("辨識中…", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
