@@ -45,3 +45,6 @@ include(":feature:lottery")
 // Iteration 5
 include(":feature:export")
 include(":feature:settings")
+// Iteration 6
+include(":data-source:authz")
+include(":data-source:mcp-server")
