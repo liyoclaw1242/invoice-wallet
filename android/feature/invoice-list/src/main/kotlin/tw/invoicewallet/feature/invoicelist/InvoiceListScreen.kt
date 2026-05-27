@@ -34,6 +34,7 @@ fun InvoiceListRoute(
     onScanClick: () -> Unit,
     onInvoiceClick: (String) -> Unit,
     onLotteryClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: InvoiceListViewModel = hiltViewModel(),
 ) {
@@ -44,6 +45,7 @@ fun InvoiceListRoute(
         onScanClick = onScanClick,
         onInvoiceClick = onInvoiceClick,
         onLotteryClick = onLotteryClick,
+        onSettingsClick = onSettingsClick,
         modifier = modifier,
     )
 }
@@ -57,6 +59,7 @@ fun InvoiceListScreen(
     onInvoiceClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     onLotteryClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
@@ -65,6 +68,7 @@ fun InvoiceListScreen(
                 title = { Text("Invoice Wallet") },
                 actions = {
                     TextButton(onClick = onLotteryClick, modifier = Modifier.testTag("lottery-action")) { Text("對獎") }
+                    TextButton(onClick = onSettingsClick, modifier = Modifier.testTag("settings-action")) { Text("設定") }
                 },
             )
         },

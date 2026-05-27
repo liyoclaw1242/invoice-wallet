@@ -37,9 +37,11 @@ import tw.invoicewallet.feature.lottery.LotteryRoute
 import tw.invoicewallet.feature.scan.ScanViewModel
 import tw.invoicewallet.feature.scan.camera.CameraQrScanner
 import tw.invoicewallet.feature.scan.ui.ScanScreen
+import tw.invoicewallet.feature.settings.DefaultScanMode
+import tw.invoicewallet.feature.settings.SettingsRoute
 
 @Composable
-fun InvoiceWalletApp() {
+fun InvoiceWalletApp(defaultScanMode: DefaultScanMode = DefaultScanMode.CAMERA) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Routes.LIST) {
         composable(Routes.LIST) {
@@ -47,10 +49,11 @@ fun InvoiceWalletApp() {
                 onScanClick = { navController.navigate(Routes.SCAN) },
                 onInvoiceClick = { id -> navController.navigate(Routes.detail(id)) },
                 onLotteryClick = { navController.navigate(Routes.LOTTERY) },
+                onSettingsClick = { navController.navigate(Routes.SETTINGS) },
             )
         }
         composable(Routes.SCAN) {
-            ScanRoute(onBack = { navController.popBackStack() })
+            ScanRoute(onBack = { navController.popBackStack() }, defaultScanMode = defaultScanMode)
         }
         composable(
             route = Routes.DETAIL,
@@ -61,6 +64,9 @@ fun InvoiceWalletApp() {
         composable(Routes.LOTTERY) {
             LotteryRoute(onBack = { navController.popBackStack() })
         }
+        composable(Routes.SETTINGS) {
+            SettingsRoute(onBack = { navController.popBackStack() })
+        }
     }
 }
 
@@ -68,6 +74,7 @@ private object Routes {
     const val LIST = "list"
     const val SCAN = "scan"
     const val LOTTERY = "lottery"
+    const val SETTINGS = "settings"
     const val INVOICE_ID = "invoiceId"
     const val DETAIL = "detail/{$INVOICE_ID}"
     fun detail(id: String) = "detail/$id"
@@ -75,7 +82,7 @@ private object Routes {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ScanRoute(onBack: () -> Unit) {
+private fun ScanRoute(onBack: () -> Unit, defaultScanMode: DefaultScanMode) {
     val viewModel: ScanViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -95,7 +102,11 @@ private fun ScanRoute(onBack: () -> Unit) {
     ) { granted -> hasCameraPermission = granted }
 
     LaunchedEffect(Unit) {
-        if (!hasCameraPermission) cameraPermission.launch(Manifest.permission.CAMERA)
+        if (defaultScanMode == DefaultScanMode.GALLERY) {
+            imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } else if (!hasCameraPermission) {
+            cameraPermission.launch(Manifest.permission.CAMERA)
+        }
     }
 
     Scaffold(
