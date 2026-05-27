@@ -111,6 +111,16 @@ func logRequests(next http.Handler) http.Handler {
 	})
 }
 
+// acceptToken accepts either an OAuth-issued token or the static API token (the
+// header-injection path that bypasses claude.ai's known OAuth bug, issue #155).
+func (s *Server) acceptToken(token string) bool {
+	if s.oauth.Validate(token) {
+		return true
+	}
+	return s.cfg.APIToken != "" && token != "" &&
+		subtle.ConstantTimeCompare([]byte(token), []byte(s.cfg.APIToken)) == 1
+}
+
 // handleMCPGet answers the Streamable HTTP GET (server→client SSE stream). We don't
 // offer server-initiated streams, so 405 per spec.
 func (s *Server) handleMCPGet(w http.ResponseWriter, _ *http.Request) {
@@ -122,7 +132,7 @@ func (s *Server) handleMCPGet(w http.ResponseWriter, _ *http.Request) {
 // phone (waking it if needed) and returns the phone's response as JSON or SSE. Pure
 // notifications get 202 with no body; `initialize` responses carry an Mcp-Session-Id.
 func (s *Server) handleMCP(w http.ResponseWriter, r *http.Request) {
-	if !s.oauth.Validate(bearerToken(r)) {
+	if !s.acceptToken(bearerToken(r)) {
 		w.Header().Set("WWW-Authenticate",
 			`Bearer resource_metadata="`+baseURL(r)+`/.well-known/oauth-protected-resource"`)
 		writeError(w, http.StatusUnauthorized, "missing or invalid access token")
@@ -227,8 +237,10 @@ func baseURL(r *http.Request) string {
 
 func (s *Server) handleProtectedResourceMeta(w http.ResponseWriter, r *http.Request) {
 	base := baseURL(r)
+	// Canonical resource URI WITHOUT a trailing slash — must match the `resource`
+	// parameter Claude derives from the connector URL (RFC 8707 / MCP).
 	writeJSON(w, http.StatusOK, map[string]any{
-		"resource":              base + "/mcp-" + s.cfg.MCPSecret + "/",
+		"resource":              base + "/mcp-" + s.cfg.MCPSecret,
 		"authorization_servers": []string{base},
 	})
 }
@@ -264,13 +276,22 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleAuthorize(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
+	if os.Getenv("RELAY_LOG_REQUESTS") == "1" {
+		log.Printf("[authorize] query=%q", r.URL.RawQuery)
+	}
 	redirectURI := q.Get("redirect_uri")
 	code, err := s.oauth.Authorize(
 		q.Get("client_id"), redirectURI, q.Get("code_challenge"), q.Get("code_challenge_method"),
 	)
 	if err != nil {
+		if os.Getenv("RELAY_LOG_REQUESTS") == "1" {
+			log.Printf("[authorize] error: %v", err)
+		}
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
+	}
+	if os.Getenv("RELAY_LOG_REQUESTS") == "1" {
+		log.Printf("[authorize] issued code=%q client=%q redirect=%q", code, q.Get("client_id"), redirectURI)
 	}
 	sep := "?"
 	if strings.Contains(redirectURI, "?") {
@@ -290,7 +311,10 @@ func (s *Server) handleToken(w http.ResponseWriter, r *http.Request) {
 	}
 	grant := r.PostFormValue("grant_type")
 	if os.Getenv("RELAY_LOG_REQUESTS") == "1" {
-		log.Printf("[token] grant_type=%q client_id=%q", grant, r.PostFormValue("client_id"))
+		log.Printf("[token] grant_type=%q client_id=%q code=%q redirect_uri=%q verifier=%t scope=%q",
+			grant, r.PostFormValue("client_id"), r.PostFormValue("code"),
+			r.PostFormValue("redirect_uri"), r.PostFormValue("code_verifier") != "",
+			r.PostFormValue("scope"))
 	}
 
 	var (
@@ -306,6 +330,9 @@ func (s *Server) handleToken(w http.ResponseWriter, r *http.Request) {
 			r.PostFormValue("code"), r.PostFormValue("code_verifier"),
 			r.PostFormValue("client_id"), r.PostFormValue("redirect_uri"),
 		)
+	}
+	if os.Getenv("RELAY_LOG_REQUESTS") == "1" {
+		log.Printf("[token] result ok=%t err=%v", err == nil, err)
 	}
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_grant"})

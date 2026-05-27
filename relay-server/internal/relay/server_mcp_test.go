@@ -117,6 +117,28 @@ func TestMCPForwardsToConnectedPhone(t *testing.T) {
 	}
 }
 
+func TestMCPStaticAPITokenAccepted(t *testing.T) {
+	srv := newTestServer(t)
+	secret := pairDevice(t, srv)
+	ts := httptest.NewServer(srv.Handler())
+	defer ts.Close()
+	conn := echoPhone(t, srv, ts, secret, `{"jsonrpc":"2.0","id":1,"result":{"ok":true}}`)
+	defer conn.Close()
+
+	// Static API token (header-injection path) is accepted without any OAuth.
+	resp := postMCP(t, ts, srv, "test-api-token", "", `{"jsonrpc":"2.0","method":"tools/list","id":1}`)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("static token: want 200, got %d", resp.StatusCode)
+	}
+	// A wrong static token is rejected.
+	bad := postMCP(t, ts, srv, "wrong-token", "", `{"jsonrpc":"2.0","method":"tools/list","id":1}`)
+	defer bad.Body.Close()
+	if bad.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("wrong token: want 401, got %d", bad.StatusCode)
+	}
+}
+
 func TestMCPGetReturns405(t *testing.T) {
 	srv := newTestServer(t)
 	if rec := do(t, srv, http.MethodGet, mcpPath(srv), "", ""); rec.Code != http.StatusMethodNotAllowed {

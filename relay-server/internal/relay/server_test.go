@@ -17,7 +17,7 @@ func newTestServer(t *testing.T) *Server {
 	if err != nil {
 		t.Fatalf("store: %v", err)
 	}
-	return New(config.Config{Port: 8080, MCPSecret: "test-secret"}, store)
+	return New(config.Config{Port: 8080, MCPSecret: "test-secret", APIToken: "test-api-token"}, store)
 }
 
 func do(t *testing.T, srv *Server, method, path, auth, body string) *httptest.ResponseRecorder {

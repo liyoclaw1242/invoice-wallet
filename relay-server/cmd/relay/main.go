@@ -36,6 +36,16 @@ func main() {
 	fmt.Fprintf(os.Stderr, "invoice-relay listening on %s\n", addr)
 	fmt.Fprintf(os.Stderr, "MCP endpoint: /mcp-%s/\n", cfg.MCPSecret)
 
+	// The claude.ai web connector's OAuth is broken (won't attach the Bearer);
+	// Claude Code / Desktop with a static Bearer header works. Print a ready command.
+	pub := os.Getenv("RELAY_PUBLIC_URL")
+	if pub == "" {
+		pub = "https://<your-relay-url>"
+	}
+	fmt.Fprintf(os.Stderr, "\nClaude Code / Desktop（建議，繞過 claude.ai OAuth bug）：\n")
+	fmt.Fprintf(os.Stderr, "  claude mcp add --transport http invoice-wallet %s/mcp-%s/ \\\n", pub, cfg.MCPSecret)
+	fmt.Fprintf(os.Stderr, "    --header \"Authorization: Bearer %s\"\n\n", cfg.APIToken)
+
 	// First run (no device paired) → mint a pairing code automatically.
 	if _, err := store.GetDevice(); errors.Is(err, storage.ErrNotFound) {
 		mintAndPrint(srv)

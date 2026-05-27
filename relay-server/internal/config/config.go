@@ -13,6 +13,7 @@ type Config struct {
 	Port      int    // listen port (cloudflared fronts this); default 8080
 	StatePath string // JSON state file
 	MCPSecret string // 32-char random suffix for the /mcp-<secret>/ endpoint
+	APIToken  string // static Bearer accepted on the MCP endpoint (header-injection path)
 }
 
 // Load resolves configuration, generating + persisting the MCP secret on first run.
@@ -36,10 +37,15 @@ func Load() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+	apiToken, err := ensureSecret(filepath.Join(dataDir, "api_token"))
+	if err != nil {
+		return Config{}, err
+	}
 	return Config{
 		Port:      port,
 		StatePath: filepath.Join(dataDir, "state.json"),
 		MCPSecret: secret,
+		APIToken:  apiToken,
 	}, nil
 }
 
