@@ -29,7 +29,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 // --- Modules (uncommented as they are created) ---
 // T0.3
-// include(":app")
+include(":app")
 // T0.4
 // include(":core:testing")
 // Iteration 1

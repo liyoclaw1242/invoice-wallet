@@ -14,13 +14,26 @@ import org.gradle.kotlin.dsl.withType
 class KotlinJvmTestConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            when (val extension = extensions.findByName("android")) {
-                is ApplicationExtension ->
-                    extension.testOptions.unitTests.all { it.useJUnitPlatform() }
-                is LibraryExtension ->
-                    extension.testOptions.unitTests.all { it.useJUnitPlatform() }
-                else ->
+            val isAndroid = when (val extension = extensions.findByName("android")) {
+                is ApplicationExtension -> {
+                    extension.testOptions.unitTests.apply {
+                        // Robolectric needs real Android resources.
+                        isIncludeAndroidResources = true
+                        all { it.useJUnitPlatform() }
+                    }
+                    true
+                }
+                is LibraryExtension -> {
+                    extension.testOptions.unitTests.apply {
+                        isIncludeAndroidResources = true
+                        all { it.useJUnitPlatform() }
+                    }
+                    true
+                }
+                else -> {
                     tasks.withType<Test>().configureEach { useJUnitPlatform() }
+                    false
+                }
             }
 
             dependencies {
@@ -30,7 +43,14 @@ class KotlinJvmTestConventionPlugin : Plugin<Project> {
                 add("testImplementation", libs.findLibrary("turbine").get())
                 add("testImplementation", libs.findLibrary("kotest-assertions-core").get())
                 add("testImplementation", libs.findLibrary("kotlinx-coroutines-test").get())
-                add("testImplementation", libs.findLibrary("robolectric").get())
+
+                if (isAndroid) {
+                    // Robolectric + Compose UI tests are JUnit4-based; the vintage engine
+                    // runs them on the JUnit Platform next to the Jupiter tests.
+                    add("testImplementation", libs.findLibrary("robolectric").get())
+                    add("testImplementation", libs.findLibrary("androidx-test-ext-junit").get())
+                    add("testRuntimeOnly", libs.findLibrary("junit-vintage-engine").get())
+                }
             }
         }
     }

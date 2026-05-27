@@ -52,6 +52,8 @@ internal fun Project.configureAndroidCompose(
         add("implementation", libs.findLibrary("androidx-compose-ui-tooling-preview").get())
         add("implementation", libs.findLibrary("androidx-compose-material3").get())
         add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
+        // ui-test-junit4 on both source sets: Robolectric (test) + instrumented (androidTest).
+        add("testImplementation", libs.findLibrary("androidx-compose-ui-test-junit4").get())
         add("androidTestImplementation", libs.findLibrary("androidx-compose-ui-test-junit4").get())
         add("debugImplementation", libs.findLibrary("androidx-compose-ui-test-manifest").get())
     }

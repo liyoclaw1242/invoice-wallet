@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launch theme. Real theming is done in Compose (InvoiceWalletTheme); this only
+         needs to be a no-action-bar framework theme so no Material XML dependency is pulled in. -->
+    <style name="Theme.InvoiceWallet" parent="@android:style/Theme.Material.Light.NoActionBar" />
+</resources>
