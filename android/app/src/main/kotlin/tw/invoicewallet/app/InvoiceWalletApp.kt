@@ -26,9 +26,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import tw.invoicewallet.feature.invoicedetail.InvoiceDetailRoute
 import tw.invoicewallet.feature.invoicelist.InvoiceListRoute
 import tw.invoicewallet.feature.scan.ScanViewModel
 import tw.invoicewallet.feature.scan.camera.CameraQrScanner
@@ -41,11 +44,17 @@ fun InvoiceWalletApp() {
         composable(Routes.LIST) {
             InvoiceListRoute(
                 onScanClick = { navController.navigate(Routes.SCAN) },
-                onInvoiceClick = { /* invoice detail — T3.4 */ },
+                onInvoiceClick = { id -> navController.navigate(Routes.detail(id)) },
             )
         }
         composable(Routes.SCAN) {
             ScanRoute(onBack = { navController.popBackStack() })
+        }
+        composable(
+            route = Routes.DETAIL,
+            arguments = listOf(navArgument(Routes.INVOICE_ID) { type = NavType.StringType }),
+        ) {
+            InvoiceDetailRoute(onBack = { navController.popBackStack() })
         }
     }
 }
@@ -53,6 +62,9 @@ fun InvoiceWalletApp() {
 private object Routes {
     const val LIST = "list"
     const val SCAN = "scan"
+    const val INVOICE_ID = "invoiceId"
+    const val DETAIL = "detail/{$INVOICE_ID}"
+    fun detail(id: String) = "detail/$id"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

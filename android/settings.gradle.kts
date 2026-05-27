@@ -39,3 +39,4 @@ include(":core:database")
 include(":feature:scan")
 // Iteration 3
 include(":feature:invoice-list")
+include(":feature:invoice-detail")

@@ -26,6 +26,7 @@ android {
 dependencies {
     implementation(project(":feature:scan"))
     implementation(project(":feature:invoice-list"))
+    implementation(project(":feature:invoice-detail"))
     // Carries the Hilt DatabaseModule (so Hilt can resolve the graph here) and
     // re-exports :core:model (Invoice) via `api`.
     implementation(project(":core:database"))
