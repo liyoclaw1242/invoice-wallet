@@ -48,3 +48,5 @@ include(":feature:settings")
 // Iteration 6
 include(":data-source:authz")
 include(":data-source:mcp-server")
+// Relay (remote AI path)
+include(":data-source:relay-client")
