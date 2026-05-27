@@ -8,7 +8,9 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -68,16 +70,56 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /device/refresh", s.handleRefresh)
 	mux.HandleFunc("GET /ws", s.handleWS)
 	// Secret-path MCP endpoint (ARCHITECTURE §8.1): a wrong secret hits no route → 404.
-	mux.HandleFunc("POST /mcp-"+s.cfg.MCPSecret+"/{$}", s.handleMCP)
+	// Accept both with and without the trailing slash — Claude's connector posts to
+	// the no-slash form first. GET is answered 405 (no server→client SSE stream).
+	base := "/mcp-" + s.cfg.MCPSecret
+	mux.HandleFunc("POST "+base, s.handleMCP)
+	mux.HandleFunc("POST "+base+"/{$}", s.handleMCP)
+	mux.HandleFunc("GET "+base, s.handleMCPGet)
+	mux.HandleFunc("GET "+base+"/{$}", s.handleMCPGet)
+	// Metadata-only request log (diagnostic): set RELAY_LOG_REQUESTS=1 to enable.
+	if os.Getenv("RELAY_LOG_REQUESTS") == "1" {
+		return logRequests(mux)
+	}
 	return mux
 }
 
-// handleMCP forwards a raw JSON-RPC request to the phone (waking it if needed) and
-// returns the phone's response. The secret path is already validated by routing.
+// logRequests logs request metadata only — no bodies, no Authorization values — to
+// reveal exactly how a client (e.g. Claude's connector) probes the server.
+func logRequests(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("[req] %s %s accept=%q ct=%q auth=%t session=%q protoVer=%q ua=%q",
+			r.Method, r.URL.Path,
+			r.Header.Get("Accept"), r.Header.Get("Content-Type"),
+			r.Header.Get("Authorization") != "",
+			r.Header.Get("Mcp-Session-Id"), r.Header.Get("MCP-Protocol-Version"),
+			r.Header.Get("User-Agent"))
+		next.ServeHTTP(w, r)
+	})
+}
+
+// handleMCPGet answers the Streamable HTTP GET (server→client SSE stream). We don't
+// offer server-initiated streams, so 405 per spec.
+func (s *Server) handleMCPGet(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Allow", "POST")
+	writeError(w, http.StatusMethodNotAllowed, "no server-initiated stream")
+}
+
+// handleMCP implements the Streamable HTTP POST: it forwards a JSON-RPC request to the
+// phone (waking it if needed) and returns the phone's response as JSON or SSE. Pure
+// notifications get 202 with no body; `initialize` responses carry an Mcp-Session-Id.
 func (s *Server) handleMCP(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "read error")
+		return
+	}
+
+	method, isRequest := inspectRPC(body)
+
+	// Notifications (no id) expect no response — ack and don't block on the phone.
+	if !isRequest {
+		w.WriteHeader(http.StatusAccepted)
 		return
 	}
 
@@ -107,11 +149,51 @@ func (s *Server) handleMCP(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadGateway, "phone error: "+err.Error())
 		return
 	}
-
 	s.audit(storage.EventForward, "", resp.Status != "error", resp.Error)
-	w.Header().Set("Content-Type", "application/json")
+
+	// New session on initialize (Streamable HTTP session management).
+	if method == "initialize" {
+		w.Header().Set("Mcp-Session-Id", config.RandomURLToken(16))
+	}
+	if acceptsSSE(r) {
+		writeSSE(w, resp.Payload)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(resp.Payload)
+	}
+}
+
+// inspectRPC reports the method and whether the message is a request (has an id).
+// Batches and unparseable bodies are treated as requests (forwarded, response awaited).
+func inspectRPC(body []byte) (method string, isRequest bool) {
+	var msg struct {
+		Method string          `json:"method"`
+		ID     json.RawMessage `json:"id"`
+	}
+	if err := json.Unmarshal(body, &msg); err != nil {
+		return "", true
+	}
+	hasID := len(msg.ID) > 0 && string(msg.ID) != "null"
+	return msg.Method, hasID
+}
+
+func acceptsSSE(r *http.Request) bool {
+	return strings.Contains(r.Header.Get("Accept"), "text/event-stream")
+}
+
+// writeSSE emits the JSON-RPC response as a single Server-Sent Event, then closes.
+func writeSSE(w http.ResponseWriter, payload []byte) {
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
 	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(resp.Payload)
+	_, _ = w.Write([]byte("event: message\ndata: "))
+	_, _ = w.Write(payload)
+	_, _ = w.Write([]byte("\n\n"))
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
 }
 
 func (s *Server) audit(event, tool string, success bool, errMsg string) {

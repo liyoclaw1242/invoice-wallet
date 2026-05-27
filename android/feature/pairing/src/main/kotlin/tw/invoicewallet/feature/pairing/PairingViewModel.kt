@@ -40,11 +40,13 @@ class PairingViewModel @Inject constructor(
             _uiState.update { it.copy(status = PairingStatus.ERROR, message = "請輸入 relay 網址與配對碼") }
             return
         }
+        // Force HTTPS — the relay is always behind TLS and Android blocks cleartext.
+        val url = normalizeRelayUrl(relayUrl)
         _uiState.update { it.copy(status = PairingStatus.PAIRING, message = "") }
         viewModelScope.launch {
-            when (val result = client.claim(relayUrl, pairingCode, fcmToken, Build.MODEL ?: "Android")) {
+            when (val result = client.claim(url, pairingCode, fcmToken, Build.MODEL ?: "Android")) {
                 is PairingResult.Success -> {
-                    deviceStore.save(relayUrl, result.deviceSecret)
+                    deviceStore.save(url, result.deviceSecret)
                     _uiState.update { it.copy(status = PairingStatus.PAIRED, message = "配對成功") }
                 }
                 is PairingResult.Failure ->
