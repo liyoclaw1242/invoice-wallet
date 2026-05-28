@@ -1,5 +1,13 @@
 .gradle
 build/
+
+# Raw 2048² Gemini PNGs — too big to commit (≈70 MB total) and the processed
+# WebPs in android/app/src/main/res/drawable-nodpi/ are the source of truth.
+# The processing script + a README stay tracked.
+temp-asset/*.png
+temp-asset/*.jpg
+temp-asset/*.jpeg
+
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
