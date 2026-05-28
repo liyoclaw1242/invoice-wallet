@@ -1,34 +1,70 @@
 #!/usr/bin/env python3
 """
-One-off: turn the raw 2048² Gemini PNGs into trimmed, named WebP drawables.
+One-off: turn the raw 2048² Gemini PNGs into shippable WebPs.
 
-Outputs go to android/app/src/main/res/drawable-nodpi/ — no density bucket means
-Android uses the asset at its raw pixel size regardless of screen density; we
-control display size in Compose via Modifier.size().
+Pipeline per illustration:
+  load → knock paper out to transparent (soft-edge alpha) → auto-trim alpha
+  → pad to square (transparent) → resize → WebP with alpha
+
+The cream-paper background Gemini bakes into each illustration was visible as
+a "card" rectangle against the app's surface colour (#EFEAE0). Transparent
+alpha lets the illustration sit on any surface seamlessly.
+
+Outputs land in android/core/design-system/src/main/res/drawable-nodpi/ so
+any feature module can `import tw.invoicewallet.core.designsystem.R`.
 
 Originals stay in temp-asset/ (gitignored). Re-run any time prompts change.
 """
 
 import os
-from PIL import Image, ImageChops, ImageDraw, ImageFilter
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = "/Users/liyoclaw/Projects/invoice-app"
 SRC = f"{ROOT}/temp-asset"
 DST = f"{ROOT}/android/core/design-system/src/main/res/drawable-nodpi"
 os.makedirs(DST, exist_ok=True)
 
-# Mean paper-cream colour of the canvas — close to #F4EEE0 but the watercolour
-# texture varies, so we use a generous tolerance below.
+# Mean paper-cream colour of Gemini's canvas — close to #F4EEE0 but the
+# watercolour texture varies, so we threshold within a band rather than
+# matching exactly. (The same constant doubles as the "paint over" colour
+# for the pairing-image label cleanup below.)
 BG = (244, 238, 224)
 
 
-def auto_trim(img, tolerance=28, pad=24):
-    """Crop near-background margins. Pads back a little so subjects don't kiss the edge."""
-    rgb = img.convert("RGB")
-    bg = Image.new("RGB", rgb.size, BG)
-    diff = ImageChops.difference(rgb, bg).convert("L")
-    mask = diff.point(lambda v: 255 if v > tolerance else 0)
-    bbox = mask.getbbox()
+def knock_out_paper(img, threshold=38, soft_band=22):
+    """
+    Returns an RGBA copy with paper-coloured pixels turned transparent.
+
+    Pixels whose RGB distance from [BG] is below [threshold] become fully
+    transparent. Pixels in the soft band [threshold, threshold + soft_band]
+    get a linearly-interpolated alpha, giving a feathered edge rather than
+    a jagged cut. Painted pixels stay fully opaque.
+    """
+    rgba = np.array(img.convert("RGBA"), dtype=np.int32)
+    rgb = rgba[..., :3]
+    bg = np.array(BG, dtype=np.int32)
+    dist = np.sqrt(((rgb - bg) ** 2).sum(axis=-1))
+
+    alpha = np.where(
+        dist < threshold,
+        0.0,
+        np.where(
+            dist < threshold + soft_band,
+            (dist - threshold) / soft_band * 255.0,
+            255.0,
+        ),
+    )
+    rgba[..., 3] = np.clip(alpha, 0, 255).astype(np.uint8)
+    return Image.fromarray(rgba.astype(np.uint8), "RGBA")
+
+
+def auto_trim(img, pad=24):
+    """Trim transparent margins (alpha == 0) with a few px of breathing room."""
+    if img.mode != "RGBA":
+        img = img.convert("RGBA")
+    bbox = img.split()[-1].getbbox()  # alpha channel bbox
     if bbox is None:
         return img
     w, h = img.size
@@ -43,24 +79,34 @@ def auto_trim(img, tolerance=28, pad=24):
     )
 
 
-def to_square(img, bg=BG):
-    """Pad to a square canvas — keeps composable size logic simple."""
+def to_square(img):
+    """Pad to a square canvas with transparent pixels."""
+    if img.mode != "RGBA":
+        img = img.convert("RGBA")
     w, h = img.size
     s = max(w, h)
-    out = Image.new("RGB", (s, s), bg)
-    out.paste(img, ((s - w) // 2, (s - h) // 2))
+    out = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    out.paste(img, ((s - w) // 2, (s - h) // 2), img)
     return out
 
 
 def save_webp(img, name, max_dim, quality):
+    if img.mode != "RGBA":
+        img = img.convert("RGBA")
     if max(img.size) > max_dim:
         img.thumbnail((max_dim, max_dim), Image.LANCZOS)
     path = f"{DST}/{name}.webp"
-    img.save(path, "WEBP", quality=quality, method=6)
+    img.save(path, "WEBP", quality=quality, method=6, exact=True)
     print(f"  {name:32s} {img.size[0]}x{img.size[1]}  {os.path.getsize(path) // 1024} KB")
 
 
-# --- 1. Standard full illustrations (auto-trim + square + 1024 WebP q=82) ---
+def process(src, name, max_dim=1024, quality=82):
+    img = Image.open(f"{SRC}/{src}")
+    out = to_square(auto_trim(knock_out_paper(img)))
+    save_webp(out, name, max_dim=max_dim, quality=quality)
+
+
+# --- 1. Standard full illustrations ---
 
 STANDARD = {
     "Gemini_Generated_Image_r7ughkr7ughkr7ug.png": "illust_onboarding_local",
@@ -75,35 +121,30 @@ STANDARD = {
 
 print("standard illustrations:")
 for src, name in STANDARD.items():
-    img = Image.open(f"{SRC}/{src}")
-    save_webp(to_square(auto_trim(img)), name, max_dim=1024, quality=82)
+    process(src, name)
 
-# --- 2. Streak flame icon — tighter, smaller, higher q for small UI use ---
+# --- 2. Streak flame icon — small, tighter quality ---
 
 print("\nflame icon:")
-img = Image.open(f"{SRC}/Gemini_Generated_Image_ibmcl7ibmcl7ibmc.png")
-save_webp(to_square(auto_trim(img, tolerance=22, pad=12)), "ic_streak_flame", max_dim=512, quality=88)
+process("Gemini_Generated_Image_ibmcl7ibmcl7ibmc.png", "ic_streak_flame", max_dim=512, quality=88)
 
-# --- 3. Pairing: Gemini sprinkled English annotation labels ("tin-can
-# communication" / "intentional connection") across the empty space *and* with
-# arrows pointing into the cans. Subjects and labels are too interwoven to clean
-# up programmatically. Regenerate with a stronger anti-text prompt — see the
-# README in this folder for the suggested wording.
+# --- 3. Pairing — SKIPPED: Gemini ignored "no text" and added English
+# annotation labels intertwined with the subjects. Regenerate with the
+# stronger anti-text prompt in this folder's README.
 
 print("\npairing: SKIPPED (Gemini added English labels intertwined with subjects — regenerate).")
 
-# --- 4. Category icons: split the 3×3 grid into 8 cells (centre is decorative). ---
+# --- 4. Category icons: split the 3×3 grid into 8 cells (centre is decorative).
 
 print("\ncategory icons (split from 3×3 grid):")
 grid = Image.open(f"{SRC}/Gemini_Generated_Image_mvmajjmvmajjmvma.png")
 gw, gh = grid.size
-# Grid spans roughly x ∈ [4%, 96%], y ∈ [8%, 96%].
 gx0, gy0 = int(0.04 * gw), int(0.08 * gh)
 gx1, gy1 = int(0.96 * gw), int(0.96 * gh)
 cell_w = (gx1 - gx0) // 3
 cell_h = (gy1 - gy0) // 3
 
-# (col, row) addressing inside the grid; (1, 1) is the decorative centre and skipped.
+# (col, row) — (1, 1) is the decorative centre, skipped.
 CATEGORIES = [
     ("food",      0, 0),
     ("drink",     1, 0),
@@ -118,10 +159,14 @@ for slug, cx, cy in CATEGORIES:
     x0 = gx0 + cx * cell_w
     y0 = gy0 + cy * cell_h
     cell = grid.crop((x0, y0, x0 + cell_w, y0 + cell_h))
-    # Drop the bottom 25 % where the Chinese label sits — we'll show labels in Compose.
+    # Drop the bottom 25 % where the Chinese label sits — labels are drawn in Compose.
     cw, ch = cell.size
     illust = cell.crop((0, 0, cw, int(ch * 0.75)))
-    illust = auto_trim(illust, tolerance=28, pad=10)
-    save_webp(to_square(illust), f"ic_category_{slug}", max_dim=256, quality=88)
+    illust = to_square(auto_trim(knock_out_paper(illust)))
+    save_webp(illust, f"ic_category_{slug}", max_dim=256, quality=88)
+
+# Silence the unused-import warnings — these are kept available for ad-hoc
+# label cleanup runs (see README for the pairing-image scenario).
+_ = (ImageDraw, ImageFilter)
 
 print("\ndone")
