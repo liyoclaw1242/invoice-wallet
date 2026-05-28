@@ -2,7 +2,8 @@ package tw.invoicewallet.app
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.view.SoundEffectConstants
+import android.media.AudioManager
+import android.media.ToneGenerator
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -109,9 +110,19 @@ private fun ScanRoute(onBack: () -> Unit, onEditInvoice: (String) -> Unit, defau
     val state by viewModel.state.collectAsState()
     val session by viewModel.session.collectAsState()
     val context = LocalContext.current
-    val view = LocalView.current
     val haptics = LocalHapticFeedback.current
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // A dedicated ToneGenerator gives a clearly audible "beep" — independent of the
+    // device's "touch sounds" setting that the earlier SoundEffectConstants.CLICK relied
+    // on. STREAM_NOTIFICATION still honours silent mode so it stays polite.
+    val toneGen = remember {
+        // volume is 0-100; 80 is clearly audible without being shrill.
+        runCatching { ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80) }.getOrNull()
+    }
+    DisposableEffect(toneGen) {
+        onDispose { toneGen?.release() }
+    }
 
     val imagePicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia(),
@@ -143,7 +154,11 @@ private fun ScanRoute(onBack: () -> Unit, onEditInvoice: (String) -> Unit, defau
         viewModel.events.collect { event ->
             val (msg, action) = when (event) {
                 is ScanEvent.Saved -> {
-                    view.playSoundEffect(SoundEffectConstants.CLICK)
+                    // Single short beep for a normal save; a brighter ACK2 (double beep)
+                    // when the cached lottery match said the user just won.
+                    val tone =
+                        if (event.lotteryPrize != null) ToneGenerator.TONE_PROP_BEEP2 else ToneGenerator.TONE_PROP_BEEP
+                    toneGen?.startTone(tone, 200)
                     haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     val base = "已存 ${event.label}"
                     val msg = event.lotteryPrize?.let { "$base · 中獎 NT$%,d".format(it) } ?: base
