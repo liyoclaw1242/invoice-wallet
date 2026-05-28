@@ -25,17 +25,11 @@ class QrCodeAnalyzer(private val onInvoiceQr: (left: String, rightBytes: ByteArr
         )
     }
 
-    @Volatile
-    private var emitted = false
     private var left: String? = null
     private var right: ByteArray? = null
     private var framesSinceLeft = 0
 
     override fun analyze(imageProxy: ImageProxy) {
-        if (emitted) {
-            imageProxy.close()
-            return
-        }
         val results = try {
             imageProxy.use { reader.read(it) }
         } catch (_: Exception) {
@@ -52,10 +46,19 @@ class QrCodeAnalyzer(private val onInvoiceQr: (left: String, rightBytes: ByteArr
         }
         val l = left
         if (l != null) framesSinceLeft++
-        if (!emitted && l != null && (right != null || framesSinceLeft >= GRACE_FRAMES)) {
-            emitted = true
+        if (l != null && (right != null || framesSinceLeft >= GRACE_FRAMES)) {
             onInvoiceQr(l, right)
+            // Continuous scan: clear the accumulator so the next physical receipt can be
+            // captured. The ViewModel's 3-second dedup absorbs the re-emit of the SAME QR
+            // that's still in frame after the user has already saved it.
+            reset()
         }
+    }
+
+    private fun reset() {
+        left = null
+        right = null
+        framesSinceLeft = 0
     }
 
     private companion object {
