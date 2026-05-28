@@ -69,6 +69,40 @@ class DesignSystemSmokeTest {
     }
 
     @Test
+    fun nav_bar_with_inline_icons_renders_and_routes_clicks() {
+        var picked: String? = null
+        composeRule.setContent {
+            WalletTheme {
+                tw.invoicewallet.core.designsystem.components.WalletNavBar(
+                    items = listOf(
+                        tw.invoicewallet.core.designsystem.components.WalletNavItem(
+                            route = "list",
+                            label = "發票",
+                            icon = tw.invoicewallet.core.designsystem.components.IconReceipt,
+                        ),
+                        tw.invoicewallet.core.designsystem.components.WalletNavItem(
+                            route = "lottery",
+                            label = "對獎",
+                            icon = tw.invoicewallet.core.designsystem.components.IconTicket,
+                        ),
+                        tw.invoicewallet.core.designsystem.components.WalletNavItem(
+                            route = "settings",
+                            label = "設定",
+                            icon = tw.invoicewallet.core.designsystem.components.IconCog,
+                        ),
+                    ),
+                    selectedRoute = "list",
+                    onSelect = { picked = it },
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("發票").assertIsDisplayed()
+        composeRule.onNodeWithText("對獎").performClick()
+        assert(picked == "lottery") { "expected 'lottery' route, got $picked" }
+    }
+
+    @Test
     fun pillChip_fires_onClick_in_both_states() {
         var clicks = 0
         composeRule.setContent {
