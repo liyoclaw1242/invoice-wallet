@@ -19,24 +19,31 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.concurrent.Executors
+
+private val TealStroke = Color(0xFF8FB5B2) // WalletTheme.colors.accentTeal — sage-teal
 
 /**
  * Live camera preview that scans for an e-invoice QR in real time and reports it via
  * [onInvoiceQr]. Bound to the composition's lifecycle; analysis runs off the main thread.
- * Ships with a centred viewfinder reticle — 4 corner brackets framing where both QRs
- * should land — so users know where to aim without us reading the camera image back.
+ * Overlays a viewfinder: a faint static reticle as an "aim here" guide, plus a vivid
+ * dynamic box drawn around any QR zxing-cpp is currently seeing.
  */
 @Composable
 fun CameraQrScanner(onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit, modifier: Modifier = Modifier) {
@@ -46,6 +53,12 @@ fun CameraQrScanner(onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit,
     DisposableEffect(Unit) {
         onDispose { analysisExecutor.shutdown() }
     }
+
+    // Per-frame detection envelope from the analyzer thread → Compose state. StateFlow
+    // gives a thread-safe single-writer, single-reader (collector) channel; writing
+    // .value from the background thread is fine, collection lands on Main.
+    val detections = remember { MutableStateFlow<DetectionFrame?>(null) }
+    val frame by detections.collectAsState()
 
     Box(modifier = modifier) {
         AndroidView(
@@ -77,7 +90,10 @@ fun CameraQrScanner(onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit,
                         .also {
                             it.setAnalyzer(
                                 analysisExecutor,
-                                QrCodeAnalyzer { left, right -> currentOnQr(left, right) },
+                                QrCodeAnalyzer(
+                                    onInvoiceQr = { left, right -> currentOnQr(left, right) },
+                                    onFrame = { f -> detections.value = f },
+                                ),
                             )
                         }
                     provider.unbindAll()
@@ -91,22 +107,19 @@ fun CameraQrScanner(onInvoiceQr: (left: String, rightBytes: ByteArray?) -> Unit,
                 previewView
             },
         )
-        ScanViewfinder(modifier = Modifier.fillMaxSize())
+        ScanViewfinder(frame = frame, modifier = Modifier.fillMaxSize())
     }
 }
 
 /**
- * Static alignment reticle: four corner brackets framing the centre region where a
- * Taiwan e-invoice's two side-by-side QRs comfortably fit. Brackets gently pulse in
- * opacity so the overlay reads as "alive" without distracting from the preview.
+ * Two-layer overlay:
+ *  1. A faint static reticle (corner brackets) always shown — gives the user "aim here"
+ *     guidance even before any QR is detected.
+ *  2. A vivid polygon stroke per detected QR, mapped from image-buffer space to canvas
+ *     space via rotation + FILL_CENTER scaling.
  */
 @Composable
-private fun ScanViewfinder(modifier: Modifier = Modifier) {
-    // Dusty sage-teal (WalletTheme.colors.accentTeal hard-coded — this is a sibling of
-    // CameraQrScanner inside :feature:scan, which deliberately doesn't depend on the
-    // design-system module just for one colour).
-    val tealStroke = Color(0xFF8FB5B2)
-
+private fun ScanViewfinder(frame: DetectionFrame?, modifier: Modifier = Modifier) {
     val pulse = rememberInfiniteTransition(label = "viewfinder-pulse")
     val alpha by pulse.animateFloat(
         initialValue = 0.55f,
@@ -119,44 +132,114 @@ private fun ScanViewfinder(modifier: Modifier = Modifier) {
     )
 
     Canvas(modifier = modifier) {
-        // The reticle covers roughly the centre 84 % × 64 % of the camera area — wide
-        // enough for the two QRs side-by-side plus the 1-D barcode above them.
-        val frameW = size.width * 0.84f
-        val frameH = size.height * 0.64f
-        val left = (size.width - frameW) / 2f
-        val top = (size.height - frameH) / 2f
+        val hasDetection = frame?.polygons?.isNotEmpty() == true
 
-        val cornerLen = minOf(frameW, frameH) * 0.18f
-        val strokePx = 3.dp.toPx()
+        // Static "aim here" guide — dimmed when there's an active detection so the
+        // vivid box can shine, full opacity otherwise.
+        drawStaticReticle(
+            alphaBase = if (hasDetection) 0.18f else alpha,
+        )
 
-        // Soft pulse 0.55 ↔ 1.0 so the overlay reads as alive without strobing.
-        val color = tealStroke.copy(alpha = alpha)
+        // Per-QR dynamic polygons.
+        if (frame == null) return@Canvas
+        val transform = computeTransform(frame, size.width, size.height)
+        frame.polygons.forEach { poly ->
+            drawDynamicBox(poly, frame.rotationDegrees, frame.imageWidth, frame.imageHeight, transform)
+        }
+    }
+}
 
-        listOf(
-            // top-left
-            Offset(left, top) to listOf(
-                Offset(left + cornerLen, top),
-                Offset(left, top + cornerLen),
-            ),
-            // top-right
-            Offset(left + frameW, top) to listOf(
-                Offset(left + frameW - cornerLen, top),
-                Offset(left + frameW, top + cornerLen),
-            ),
-            // bottom-left
-            Offset(left, top + frameH) to listOf(
-                Offset(left + cornerLen, top + frameH),
-                Offset(left, top + frameH - cornerLen),
-            ),
-            // bottom-right
-            Offset(left + frameW, top + frameH) to listOf(
-                Offset(left + frameW - cornerLen, top + frameH),
-                Offset(left + frameW, top + frameH - cornerLen),
-            ),
-        ).forEach { (corner, arms) ->
-            arms.forEach { arm ->
-                drawLine(color = color, start = corner, end = arm, strokeWidth = strokePx, cap = StrokeCap.Round)
-            }
+/** Computed once per frame: how the upright image lands inside the canvas (FILL_CENTER). */
+private data class ViewTransform(val scale: Float, val offsetX: Float, val offsetY: Float)
+
+private fun computeTransform(frame: DetectionFrame, canvasW: Float, canvasH: Float): ViewTransform {
+    val (uprightW, uprightH) = if (frame.rotationDegrees == 90 || frame.rotationDegrees == 270) {
+        frame.imageHeight.toFloat() to frame.imageWidth.toFloat()
+    } else {
+        frame.imageWidth.toFloat() to frame.imageHeight.toFloat()
+    }
+    // PreviewView's default ScaleType is FILL_CENTER → scale to cover, crop the excess.
+    val scale = maxOf(canvasW / uprightW, canvasH / uprightH)
+    val displayW = uprightW * scale
+    val displayH = uprightH * scale
+    return ViewTransform(
+        scale = scale,
+        offsetX = (canvasW - displayW) / 2f,
+        offsetY = (canvasH - displayH) / 2f,
+    )
+}
+
+/** Rotate image-space point (px, py) by [rotationDegrees] CW to get upright coordinates. */
+private fun rotatePoint(px: Float, py: Float, imageW: Int, imageH: Int, rotationDegrees: Int): Pair<Float, Float> =
+    when (rotationDegrees) {
+        0 -> px to py
+        90 -> (imageH - py) to px
+        180 -> (imageW - px) to (imageH - py)
+        270 -> py to (imageW - px)
+        else -> px to py
+    }
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawDynamicBox(
+    poly: QrPolygon,
+    rotation: Int,
+    imageW: Int,
+    imageH: Int,
+    t: ViewTransform,
+) {
+    val pts = listOf(poly.topLeft, poly.topRight, poly.bottomRight, poly.bottomLeft)
+        .map { (px, py) ->
+            val (ux, uy) = rotatePoint(px.toFloat(), py.toFloat(), imageW, imageH, rotation)
+            Offset(ux * t.scale + t.offsetX, uy * t.scale + t.offsetY)
+        }
+    val path = Path().apply {
+        moveTo(pts[0].x, pts[0].y)
+        lineTo(pts[1].x, pts[1].y)
+        lineTo(pts[2].x, pts[2].y)
+        lineTo(pts[3].x, pts[3].y)
+        close()
+    }
+    val strokePx = 4.dp.toPx()
+    drawPath(
+        path = path,
+        color = TealStroke,
+        style = Stroke(width = strokePx, cap = StrokeCap.Round, join = StrokeJoin.Round),
+    )
+}
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawStaticReticle(alphaBase: Float) {
+    val frameW = size.width * 0.84f
+    val frameH = size.height * 0.64f
+    val left = (size.width - frameW) / 2f
+    val top = (size.height - frameH) / 2f
+    val cornerLen = minOf(frameW, frameH) * 0.18f
+    val strokePx = 3.dp.toPx()
+    val color = TealStroke.copy(alpha = alphaBase)
+
+    val corners = listOf(
+        // top-left
+        Offset(left, top) to listOf(
+            Offset(left + cornerLen, top),
+            Offset(left, top + cornerLen),
+        ),
+        // top-right
+        Offset(left + frameW, top) to listOf(
+            Offset(left + frameW - cornerLen, top),
+            Offset(left + frameW, top + cornerLen),
+        ),
+        // bottom-left
+        Offset(left, top + frameH) to listOf(
+            Offset(left + cornerLen, top + frameH),
+            Offset(left, top + frameH - cornerLen),
+        ),
+        // bottom-right
+        Offset(left + frameW, top + frameH) to listOf(
+            Offset(left + frameW - cornerLen, top + frameH),
+            Offset(left + frameW, top + frameH - cornerLen),
+        ),
+    )
+    corners.forEach { (corner, arms) ->
+        arms.forEach { arm ->
+            drawLine(color = color, start = corner, end = arm, strokeWidth = strokePx, cap = StrokeCap.Round)
         }
     }
 }
