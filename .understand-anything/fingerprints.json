@@ -1,0 +1,4766 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "6a38f23818bae9a265405dc25d28229c6ca68e02",
+  "generatedAt": "2026-05-28T09:11:02.738Z",
+  "files": {
+    ".understand-anything/.understandignore": {
+      "filePath": ".understand-anything/.understandignore",
+      "contentHash": "73579feb175b1954e526e25f8a6ec0ef8b92283eae86c5ac6de4883b0270180c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 48,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/build.gradle.kts": {
+      "filePath": "android/app/build.gradle.kts",
+      "contentHash": "8ba157c07408b30d2c85df91ae2523e949eed26ab41de06dc6db5e25f4be92bd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/src/androidTest/kotlin/tw/invoicewallet/app/HomeScreenSmokeTest.kt": {
+      "filePath": "android/app/src/androidTest/kotlin/tw/invoicewallet/app/HomeScreenSmokeTest.kt",
+      "contentHash": "e2fc3d70c0957373b7f7dda74228f97290e5445588ba014137551ea61df0d783",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/src/main/kotlin/tw/invoicewallet/app/AppViewModel.kt": {
+      "filePath": "android/app/src/main/kotlin/tw/invoicewallet/app/AppViewModel.kt",
+      "contentHash": "8e89dbfe5eace7b88abf0b80708b510d4fd3e3744a35f43a8e1cca7009a0b27c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 53,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/src/main/kotlin/tw/invoicewallet/app/InvoiceWalletApp.kt": {
+      "filePath": "android/app/src/main/kotlin/tw/invoicewallet/app/InvoiceWalletApp.kt",
+      "contentHash": "82a467b856784d1652c4cc346049d52cdc16711a7fbc3b1b5706832ddd69ae6e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 284,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/src/main/kotlin/tw/invoicewallet/app/InvoiceWalletApplication.kt": {
+      "filePath": "android/app/src/main/kotlin/tw/invoicewallet/app/InvoiceWalletApplication.kt",
+      "contentHash": "1c16342c476d5d9da0c33704f532c1b78b2b05794c613f27b329e0e5d74cd7d2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/src/main/kotlin/tw/invoicewallet/app/MainActivity.kt": {
+      "filePath": "android/app/src/main/kotlin/tw/invoicewallet/app/MainActivity.kt",
+      "contentHash": "1538a26006b046fc8a893994c05a39d1336821e3f1a91fbc9b2b864ba99a05e6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 42,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/src/main/kotlin/tw/invoicewallet/app/ui/theme/Color.kt": {
+      "filePath": "android/app/src/main/kotlin/tw/invoicewallet/app/ui/theme/Color.kt",
+      "contentHash": "9da9c60faa4aa6ae32d3852184e4123f05e931dc39b0937e709f418c0c268124",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/src/main/kotlin/tw/invoicewallet/app/ui/theme/Theme.kt": {
+      "filePath": "android/app/src/main/kotlin/tw/invoicewallet/app/ui/theme/Theme.kt",
+      "contentHash": "e9d3cdae6449ece6ddde374d1305495dfb1f7782ec791c44f31ed6075faf0eaf",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 30,
+      "hasStructuralAnalysis": false
+    },
+    "android/app/src/test/kotlin/tw/invoicewallet/app/MainActivityTest.kt": {
+      "filePath": "android/app/src/test/kotlin/tw/invoicewallet/app/MainActivityTest.kt",
+      "contentHash": "3a9b3bdf5a9de5174040a6d69e446bbb259697f4af082aa617b1d422f16e7e94",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 41,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/build.gradle.kts": {
+      "filePath": "android/build-logic/convention/build.gradle.kts",
+      "contentHash": "8c23b9bf357cbcc2728c0e25a3f86162db78470ea0a256fb24ba33a9579308aa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 68,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/src/main/kotlin/AndroidApplicationConventionPlugin.kt": {
+      "filePath": "android/build-logic/convention/src/main/kotlin/AndroidApplicationConventionPlugin.kt",
+      "contentHash": "5f13f7e66e99399c4061a5e45e1ec27de59b159cd55845d6ef8000c33bb33a17",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/src/main/kotlin/AndroidComposeConventionPlugin.kt": {
+      "filePath": "android/build-logic/convention/src/main/kotlin/AndroidComposeConventionPlugin.kt",
+      "contentHash": "17627434c545791b54a1ec9e5535e3fb9efd81371f9ed0a5d2aa27184940a525",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/src/main/kotlin/AndroidHiltConventionPlugin.kt": {
+      "filePath": "android/build-logic/convention/src/main/kotlin/AndroidHiltConventionPlugin.kt",
+      "contentHash": "ef00dc89bcfe06eecb92d1d151286e822d69d2e8243bbf7d8831b9feee6d3534",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/src/main/kotlin/AndroidLibraryConventionPlugin.kt": {
+      "filePath": "android/build-logic/convention/src/main/kotlin/AndroidLibraryConventionPlugin.kt",
+      "contentHash": "c1bee3d745484079c536809fa367f93e15ab3e248f476a860f4c5729daa2c8cb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/src/main/kotlin/AndroidRoomConventionPlugin.kt": {
+      "filePath": "android/build-logic/convention/src/main/kotlin/AndroidRoomConventionPlugin.kt",
+      "contentHash": "87fd408faa7d2f99e6e503a61d11735c5fd939e194afa2734ec530ea4a3839bd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/src/main/kotlin/KotlinAndroid.kt": {
+      "filePath": "android/build-logic/convention/src/main/kotlin/KotlinAndroid.kt",
+      "contentHash": "9081e60eab3cb254f73bbd4ef119b36b01a100b9204dbfa9356c052f4d0d3e46",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 70,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/src/main/kotlin/KotlinJvmTestConventionPlugin.kt": {
+      "filePath": "android/build-logic/convention/src/main/kotlin/KotlinJvmTestConventionPlugin.kt",
+      "contentHash": "e7258d78ed41b44701b501103cd9c013fbcb70c8c48607a69433f33816e2fa9b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 58,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/convention/src/main/kotlin/KtlintConventionPlugin.kt": {
+      "filePath": "android/build-logic/convention/src/main/kotlin/KtlintConventionPlugin.kt",
+      "contentHash": "b7740f6100fb36b44c22bca1080d3f08a3514bbb41fa666cc23f3bffaffc3119",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": false
+    },
+    "android/build-logic/settings.gradle.kts": {
+      "filePath": "android/build-logic/settings.gradle.kts",
+      "contentHash": "ce1b6a7d75fa9fd49e47e20acb1814d8cf3bf2920d8a13a618ef8b3c1095f790",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": false
+    },
+    "android/build.gradle.kts": {
+      "filePath": "android/build.gradle.kts",
+      "contentHash": "e1356bf7f0155eb058de9201dc7a7e570e5dbe22ef0149738aeb55ee31ad3377",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/build.gradle.kts": {
+      "filePath": "android/core/database/build.gradle.kts",
+      "contentHash": "7865b38c07a4c76b9e12332738f47032631dc01ed8499f926f41b2d2e1cb0ea1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 42,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/AuthGrantDaoTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/AuthGrantDaoTest.kt",
+      "contentHash": "192d0c51a5e5508715d9674c7a5aedc6cd7ac2b1f28f1b81ca919bff0638d128",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 59,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/InvoiceDaoTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/InvoiceDaoTest.kt",
+      "contentHash": "39d6088c81a93d80002d31e20d65ad97cc2f2ce7d5c9a6ee9a392a7ce3482209",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 95,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/InvoiceItemDaoTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/InvoiceItemDaoTest.kt",
+      "contentHash": "d572a823d10b8e2e60245e5fb41070f7ffee506ef83abf4a384f5a2cb459dc80",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 61,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/LotteryNumberDaoTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/LotteryNumberDaoTest.kt",
+      "contentHash": "4b80e6413b633c10e1850d47ca7249c284d005e04e2454f2e3a2dc8009da6289",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/QueryAuditLogDaoTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/dao/QueryAuditLogDaoTest.kt",
+      "contentHash": "e5e6314ec62dcd92c16cf7c6940ec917f76eb4788eec2ad478ee14acc5f4bb79",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 49,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/DatabaseMigrationTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/DatabaseMigrationTest.kt",
+      "contentHash": "5d00c1e80b71b28b8864bbd31ed24f4c888b79e7e8de22116d993ec4d6b15600",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/DatabasePassphraseProviderTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/DatabasePassphraseProviderTest.kt",
+      "contentHash": "35b97e577829ce559cdafd11269faf8bd378f610ca52ab4cfe8a42c9dd095658",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/EncryptionTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/EncryptionTest.kt",
+      "contentHash": "7cd6e259492f538b08321bb33e02d090edee7dae3fdca3ecd5d4f40f5b4f5b7c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 88,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/InvoiceWalletDatabaseTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/InvoiceWalletDatabaseTest.kt",
+      "contentHash": "04214274c8a4df575390c6b950efdf1d36cc070dfca293401ff60e03eccfaeb0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 74,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/repository/RoomRepositoryIntegrationTest.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/repository/RoomRepositoryIntegrationTest.kt",
+      "contentHash": "d17723a708cd6675faddb0ef40077feb0563f8c75f0f7a802d69251349781ba2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 128,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/TestEntities.kt": {
+      "filePath": "android/core/database/src/androidTest/kotlin/tw/invoicewallet/core/database/TestEntities.kt",
+      "contentHash": "317c4142757c477b542aca1119f8bca9c1e9a774925c26623fa7d9de94857fe1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 89,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/Converters.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/Converters.kt",
+      "contentHash": "e19e46cac5d0bf75f2670eac2defbfc57ebfd8baa7ce53c180cbe8693921ebe9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 29,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/AuthGrantDao.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/AuthGrantDao.kt",
+      "contentHash": "619f52f996754e30bd079377a069b8ce60386ba0a1b20a55c91341c76c79a8cd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/InvoiceDao.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/InvoiceDao.kt",
+      "contentHash": "b0e5955909ce876a14f73ff4a273adcd6d7288de842e6aa6e16d18acd8061ad2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 60,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/InvoiceItemDao.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/InvoiceItemDao.kt",
+      "contentHash": "7e088c142a9f2fc727ee9aadd2bf7321242cd9ee2d21e826655761108cfbd2bf",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/LotteryNumberDao.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/LotteryNumberDao.kt",
+      "contentHash": "194fc5f7c6dc60a4f30868a90b99082ddfab2c76ad2b535d445566afc76720cb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/QueryAuditLogDao.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/dao/QueryAuditLogDao.kt",
+      "contentHash": "eaa512c50943711ee57785447105c28632579f5fcb630d3dda71c6ef4fcaf74f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/DatabasePassphraseProvider.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/DatabasePassphraseProvider.kt",
+      "contentHash": "617992e4998eb0a19730dffdd75b37a396214be2463e7c76198d3beb338f282f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 48,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/di/DatabaseModule.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/di/DatabaseModule.kt",
+      "contentHash": "767ab3e74a919a464cd2bca87a85801dbb5d5cf8b57490c2ad90eef9e86aae7d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 83,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/EncryptedDatabase.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/EncryptedDatabase.kt",
+      "contentHash": "3a9fa74b328933ddb44c68432f8e48ab67dd3f0accf094b8fac7cbbecf537808",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 35,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/AuthGrantEntity.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/AuthGrantEntity.kt",
+      "contentHash": "0d2bc08dce283e803a64f69c5ed41cf3b84d2c7c32ebefebd4c9d1cc8698c7c0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/InvoiceEntity.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/InvoiceEntity.kt",
+      "contentHash": "17a47464d2fb0d18248f2b1739c62e5dda9c47aa2e1324e97353562449c55238",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 44,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/InvoiceItemEntity.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/InvoiceItemEntity.kt",
+      "contentHash": "558c7382cf3d122900561f149db203818f7579af22f25324d91681f5f30d3ada",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/LotteryNumberEntity.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/LotteryNumberEntity.kt",
+      "contentHash": "250d28b86992cb4cd522678287e523975ea1b03ce52220c45b176fd1f4c68f84",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/QueryAuditLogEntity.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/entity/QueryAuditLogEntity.kt",
+      "contentHash": "c92a492dc435731e89983d3dd6e0f62cd4763be47358ad12dcd04ac6536084c3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/InvoiceWalletDatabase.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/InvoiceWalletDatabase.kt",
+      "contentHash": "362af8eda33755d0e6bd5a8d2eefa9d0598ed3f88e7eb61f91f65b8e37dd0c1f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/mapper/Mappers.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/mapper/Mappers.kt",
+      "contentHash": "ac085ae85ad11b6e3128f9c3111ac141f5a88d3612c86c354712827a07f13864",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 158,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/AuthGrantRepository.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/AuthGrantRepository.kt",
+      "contentHash": "149d9d64f982751f83ab3bf84a3b29b0a721a2889c0cf5c5280edc83f33a39e7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/InvoiceRepository.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/InvoiceRepository.kt",
+      "contentHash": "fe06c783673e5b0ae6919c47145ab7a7b03f33182b6191806bff24701c188b29",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 39,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/LotteryRepository.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/LotteryRepository.kt",
+      "contentHash": "cbe26969dc4054ef2e97cb012c20dfa5b2477724f508beaa71dab7c7d2bd0956",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/RoomAuthGrantRepository.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/RoomAuthGrantRepository.kt",
+      "contentHash": "86555f8ad203825a2fc14d2f3597abe76f7a5264e266bb77f0c666b0628f591f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 34,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/RoomInvoiceRepository.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/RoomInvoiceRepository.kt",
+      "contentHash": "6b3adfb026f303e93b168a876bcf39a12c6c30bbaaa6da0290a3031d97ce40fe",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/RoomLotteryRepository.kt": {
+      "filePath": "android/core/database/src/main/kotlin/tw/invoicewallet/core/database/repository/RoomLotteryRepository.kt",
+      "contentHash": "d66c1a6d5bc9d23465978cf2eda28ded3cc2d05c83e6bcb1b4856c4d375a68dd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/Fakes.kt": {
+      "filePath": "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/Fakes.kt",
+      "contentHash": "f5e3202f6d3500b9c89b6efa23a351411bc2a3e3439541f175a3f68e220d69e8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 129,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/RoomAuthGrantRepositoryTest.kt": {
+      "filePath": "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/RoomAuthGrantRepositoryTest.kt",
+      "contentHash": "e23b909725902c647956d4613b579cd37f1ccd86514a16cc858562fc0e6b86a0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/RoomInvoiceRepositoryTest.kt": {
+      "filePath": "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/RoomInvoiceRepositoryTest.kt",
+      "contentHash": "ac61190b263cd1d54c48f82a9e1a0fa212b74bdefca3a6be7990ba8145c98997",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 77,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/RoomLotteryRepositoryTest.kt": {
+      "filePath": "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/RoomLotteryRepositoryTest.kt",
+      "contentHash": "e55baf60ed28592c083c4cf7445d9d4fb28608e2a47858a83ec1d3f3226d8720",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 29,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/TestModels.kt": {
+      "filePath": "android/core/database/src/test/kotlin/tw/invoicewallet/core/database/repository/TestModels.kt",
+      "contentHash": "e48f5106c7ed76d9c7d3d7f02207355c81382390bb6978774f3cb2343d8298c0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 84,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/build.gradle.kts": {
+      "filePath": "android/core/design-system/build.gradle.kts",
+      "contentHash": "ec912b469d4b3bd3e496ad6a97328dbaa2e8637637842cd018fd50265c9fa5d7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 15,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/CategoryBadge.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/CategoryBadge.kt",
+      "contentHash": "c8e908aa98aa6da4c89d1ed7886777efcbe1b576432735eecdcd9c7f1495f1dd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 41,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/CategoryGuesser.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/CategoryGuesser.kt",
+      "contentHash": "37bdd41dde737763fe5eb82b09d3615c1f75c50659bc0e563c66dc6debd28c58",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 72,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/CompactPill.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/CompactPill.kt",
+      "contentHash": "2cf47490662708db1ef09bd9f864834406567fd1b2de87e005d550a0721aeef7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/PillButton.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/PillButton.kt",
+      "contentHash": "4c3bd96d10ed27f764443d5f951eaeebb2824112814e8e3ed52ea6e111571e4f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 66,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/PillChip.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/PillChip.kt",
+      "contentHash": "a25f73b279a375a746b476cdd9ea67c3bef9b5f3f63af75cd3dec6b02593fbe9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 60,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/SectionLabel.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/SectionLabel.kt",
+      "contentHash": "347b593168d7964cac8535dcf3e72fad64f6a99dc72fb145bb2d8759764e705c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/TintedSquareIcon.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/TintedSquareIcon.kt",
+      "contentHash": "6132911e0e08865e222bfc726b77efb4e1e0e7d1123afbcbca4706631680b8fa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 38,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/ToastPill.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/ToastPill.kt",
+      "contentHash": "666e2c6334f31d7b3bf2a9fa6328f9fe28075dcad1316b3dd4d110424bcae68e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/WalletIcons.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/WalletIcons.kt",
+      "contentHash": "bb2906940d0b6b0d83df827f7a1cb7fa78a28731766d18afdb88174e85175478",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 80,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/WalletNavBar.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/components/WalletNavBar.kt",
+      "contentHash": "f9d9de42d6aea1eb2062948cfdc4ead6f1f84be3c5be394d54752410ad53ece9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 92,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletColors.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletColors.kt",
+      "contentHash": "39939ab167d17cf0892df3561844aa8e99d835bbf6f8cd20756f64761752850e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 75,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletShapes.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletShapes.kt",
+      "contentHash": "65825bd59dee93f41b7b6acf9150b51f95ef5cef2a3f0c6ce57254a28944d67b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletSpacing.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletSpacing.kt",
+      "contentHash": "370700afe764fc5775e0ccb94d45ef7d1a9a56e69c3a6f519318fe06c723e0da",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletTheme.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletTheme.kt",
+      "contentHash": "ec80523660831b93bc16d1a98819ecc0267882abf46ba49ac7d3a04f40f959a3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 65,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletTypography.kt": {
+      "filePath": "android/core/design-system/src/main/kotlin/tw/invoicewallet/core/designsystem/theme/WalletTypography.kt",
+      "contentHash": "fca7525548e136ffba97d0c5a344a69447d0b1d83ce900a023a65c00cf2954d1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 61,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_category_clothing.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_category_clothing.webp",
+      "contentHash": "eaa8c257ae6d6d2c1e527abc622f8cec0193aaac9dcf1434b9c74435e9df24ca",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 111,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_category_convstore.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_category_convstore.webp",
+      "contentHash": "82754931d593d82c976fe24b25d37767df9700ef976c15a2a1f72f859fa76d8a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 98,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_category_drink.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_category_drink.webp",
+      "contentHash": "606c0560ebbcf50d2068333e4a392f587c7cb6e26b4e451da0b36fd7c8d646d4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 79,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_category_food.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_category_food.webp",
+      "contentHash": "6a6246f20f49b2ea3f7ab000e7c842cabb9288a7c77aa62a1226e4e3d1a70d60",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 81,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_category_home.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_category_home.webp",
+      "contentHash": "b4d1fa30292586f25ecf380b26b9881805ca8ad658b39b35cc097c545193cfd1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 41,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_category_medical.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_category_medical.webp",
+      "contentHash": "51888c4c72b56860f50e13dc87ca6ccc4f72a9d2218f20234d14285fb2e78a65",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 100,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_category_tech.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_category_tech.webp",
+      "contentHash": "969fe946128a7d35ee61aac96bfa496122cdb238a077c90d22889a8ebb7b3a38",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 52,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_category_transit.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_category_transit.webp",
+      "contentHash": "12899b46671f9cf6c3d5004370bddff8cb2c8e4385c6c227f819b3f275a1e649",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 95,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/ic_streak_flame.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/ic_streak_flame.webp",
+      "contentHash": "7adad099dab2caab139e4e2f337ffc48fcb42006d3a03cef1755581121d33cb3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 462,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/illust_empty_list.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/illust_empty_list.webp",
+      "contentHash": "07908ccc6774012857b2fb431b425789699eeb4b0b0e460affd4233ff0389b3a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 684,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/illust_lottery_noprize.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/illust_lottery_noprize.webp",
+      "contentHash": "8d722c602c5354e6789e06dc00d9e7d3c461972a506df4f657857268c41ef154",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 503,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/illust_lottery_pending.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/illust_lottery_pending.webp",
+      "contentHash": "902148178f391b3bab03e130a1fd1033a8992332d82880d6be4b3822965c9db9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 533,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/illust_lottery_won.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/illust_lottery_won.webp",
+      "contentHash": "1f8699d93b20bf483876c7e3d8e79ab9fc1a4ab5dc51ce69887e330b1339c117",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 296,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/illust_onboarding_ai.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/illust_onboarding_ai.webp",
+      "contentHash": "94beb44f340f28d89ec6682b30cf1b9a2dbeb058a2b199410bd3c16efa8a917d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 475,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/illust_onboarding_csv.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/illust_onboarding_csv.webp",
+      "contentHash": "756eef9c97c9acb652f11e08100ba07db9a0c2a77861409625ca99bd51403e54",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1033,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/illust_onboarding_local.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/illust_onboarding_local.webp",
+      "contentHash": "4e5c6d181ee65a8f4d9bd986c83c51f05f020c9c220cefd0cf8acfd55fc62cb6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 801,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/main/res/drawable-nodpi/illust_onboarding_scan.webp": {
+      "filePath": "android/core/design-system/src/main/res/drawable-nodpi/illust_onboarding_scan.webp",
+      "contentHash": "d6efa4b973a5032bf966fcf62dbebce83c37abb3e7ab8ba0f3bf769bcc144411",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1274,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/design-system/src/test/kotlin/tw/invoicewallet/core/designsystem/DesignSystemSmokeTest.kt": {
+      "filePath": "android/core/design-system/src/test/kotlin/tw/invoicewallet/core/designsystem/DesignSystemSmokeTest.kt",
+      "contentHash": "486bc37f0c5bea95ca7af37c3ceea83d8520357e58623eb899de0b56880158b8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 123,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/build.gradle.kts": {
+      "filePath": "android/core/model/build.gradle.kts",
+      "contentHash": "4961c6292360999332b0e9d73798cc91273e134008e1e2927d5c4157d2e79210",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/AuthGrant.kt": {
+      "filePath": "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/AuthGrant.kt",
+      "contentHash": "580be8580a985c4526fc82408f39f6fbfb040b8abfd2dd7b04f7710b8d7b494f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/Enums.kt": {
+      "filePath": "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/Enums.kt",
+      "contentHash": "9045acb929f15aeb2853119b77f56b65de852790f9d51ccb6ac09f0b5889ecd6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/Invoice.kt": {
+      "filePath": "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/Invoice.kt",
+      "contentHash": "ed7213f811b8eb0ff184b5de29af580f6206cc5c4295cfca3b659f550f18f928",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 44,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/InvoiceItem.kt": {
+      "filePath": "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/InvoiceItem.kt",
+      "contentHash": "6dcf8d14a40da119395fb970b70e420481c8a539e58a031044adca9876e90964",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/LotteryNumber.kt": {
+      "filePath": "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/LotteryNumber.kt",
+      "contentHash": "6072e682652105e1bc9b0aeec1844351fae9b5162986742d8793700e7a144e21",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/QueryAuditLog.kt": {
+      "filePath": "android/core/model/src/main/kotlin/tw/invoicewallet/core/model/QueryAuditLog.kt",
+      "contentHash": "03a61005a4cac39fecf676dd8872122c56e8a4b6aba3b8340ea4a21c65aa0880",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 15,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/src/test/kotlin/tw/invoicewallet/core/model/InvoiceTest.kt": {
+      "filePath": "android/core/model/src/test/kotlin/tw/invoicewallet/core/model/InvoiceTest.kt",
+      "contentHash": "5b15cf6b5d586f0d79b9a23a1a97a0ff54c01fab79a592fa342affa177156d3f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 57,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/model/src/test/kotlin/tw/invoicewallet/core/model/ModelSerializationTest.kt": {
+      "filePath": "android/core/model/src/test/kotlin/tw/invoicewallet/core/model/ModelSerializationTest.kt",
+      "contentHash": "ae836e599d633cf747556c48bab284197f7647b04ccf589186f8b0119b823e19",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 43,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/testing/build.gradle.kts": {
+      "filePath": "android/core/testing/build.gradle.kts",
+      "contentHash": "91255399f83bd4b11f1480c6a58a11419c99806d541b6f9a75549fb4daf04fa6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/testing/src/main/kotlin/tw/invoicewallet/core/testing/HiltTestRunner.kt": {
+      "filePath": "android/core/testing/src/main/kotlin/tw/invoicewallet/core/testing/HiltTestRunner.kt",
+      "contentHash": "e3abace8983fd05cfb93c77133c3ea3b495a826661fff9399bccb8b394222150",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/testing/src/main/kotlin/tw/invoicewallet/core/testing/MainDispatcherExtension.kt": {
+      "filePath": "android/core/testing/src/main/kotlin/tw/invoicewallet/core/testing/MainDispatcherExtension.kt",
+      "contentHash": "d4d0f52bb400107d9e61cb7cefc012693f701edf6b95232a4c3999ad0d74d572",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 31,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/testing/src/main/kotlin/tw/invoicewallet/core/testing/MainDispatcherRule.kt": {
+      "filePath": "android/core/testing/src/main/kotlin/tw/invoicewallet/core/testing/MainDispatcherRule.kt",
+      "contentHash": "65c71c66f1abc75435a9e0eea7a6684e169e5fe5c05411dd81af8c39dc2261db",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/testing/src/main/kotlin/tw/invoicewallet/core/testing/TestClock.kt": {
+      "filePath": "android/core/testing/src/main/kotlin/tw/invoicewallet/core/testing/TestClock.kt",
+      "contentHash": "2ecceeabd95fdda2a078811e5585443b4de33b23d0200b7e72cc1c0ad1b5c0ea",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": false
+    },
+    "android/core/testing/src/test/kotlin/tw/invoicewallet/core/testing/MainDispatcherExtensionTest.kt": {
+      "filePath": "android/core/testing/src/test/kotlin/tw/invoicewallet/core/testing/MainDispatcherExtensionTest.kt",
+      "contentHash": "81fd3ab2e57d1f79953795efb3cdf1da42dbff16cbce6bfc95c0a223e09d6416",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/authz/build.gradle.kts": {
+      "filePath": "android/data-source/authz/build.gradle.kts",
+      "contentHash": "4981338eaa6053e674b991a395507c362db957781e574ed744c1ff4a63603009",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/authz/src/main/kotlin/tw/invoicewallet/datasource/authz/AuthorizationEngine.kt": {
+      "filePath": "android/data-source/authz/src/main/kotlin/tw/invoicewallet/datasource/authz/AuthorizationEngine.kt",
+      "contentHash": "f539d1b0e3140171d521e2ff59a9186f88c54ede64867da09789ceecfccaa1e7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 73,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/authz/src/test/kotlin/tw/invoicewallet/datasource/authz/AuthorizationEngineTest.kt": {
+      "filePath": "android/data-source/authz/src/test/kotlin/tw/invoicewallet/datasource/authz/AuthorizationEngineTest.kt",
+      "contentHash": "ea12aa80533e017f06379996ae0700786cf0456ae5dd1d5ff42feae2e4aa4f7f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 144,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/build.gradle.kts": {
+      "filePath": "android/data-source/mcp-server/build.gradle.kts",
+      "contentHash": "d4fa942d0a89765ec748ddaa24e74c189b22013b24bc9c14c62ba9aca345589a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 29,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/di/McpServerModule.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/di/McpServerModule.kt",
+      "contentHash": "df47b2d7e58e0a6a3d403a10b781b397f44daf6cfb7cb8f74464a03120886dfb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 34,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpDispatcher.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpDispatcher.kt",
+      "contentHash": "adbec1db91852719bbb7a48a8317a2b7a1b160ce545ffd3fd1b15f565d172f2d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 156,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerController.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerController.kt",
+      "contentHash": "ba489d2ca1a9d617778a18fce394abb6f712ad41c329dc56dd0723887a9372cd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 39,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerControls.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerControls.kt",
+      "contentHash": "248be9f0bc077a5028ed91f24aa703ca7264001d8aa4e8aef0b0098a8cbac3c2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerManager.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerManager.kt",
+      "contentHash": "53e757b9fa075ba6f3e6a48d409ff309704ecc6c8213ceaada34fe8761d6f734",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 84,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerRouting.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerRouting.kt",
+      "contentHash": "0c6fc38d28b6bbc63bf27eadfa450d4caa3355e4b2b31c43a1b90dab90710c44",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpTokenStore.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpTokenStore.kt",
+      "contentHash": "7b0d29c8d88cf5f8481e1b6ac518f417248a94e233d1841e2fdec0bdeff6f5bf",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpTool.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/McpTool.kt",
+      "contentHash": "f7e6022ad366b5f7d091f108d1ff2167d491d2606ebca1cedf96c6d8d58bbd3d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/tools/InvoiceAnalyticsTools.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/tools/InvoiceAnalyticsTools.kt",
+      "contentHash": "dedd34d68cc2c007aa5919376bd8d944974e118bca49d1cf23e96716c60106dd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 114,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/tools/InvoiceListingTools.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/tools/InvoiceListingTools.kt",
+      "contentHash": "7b75b6d27965a76df0290540356bb3752766e97ee84cc775cf222a6e3a177f7b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 82,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/tools/InvoiceSearchTools.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/tools/InvoiceSearchTools.kt",
+      "contentHash": "87462c5e22cc06651571fa0f5e6262a95e9a0e75ffb0eacfda7f53f00a2bced3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 87,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/tools/ToolSupport.kt": {
+      "filePath": "android/data-source/mcp-server/src/main/kotlin/tw/invoicewallet/datasource/mcpserver/tools/ToolSupport.kt",
+      "contentHash": "eb4fcdf6f93b57559d20df72d16c5e4dd79eee50459885fc18eaccf3f1dc9cf9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 74,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/test/kotlin/tw/invoicewallet/datasource/mcpserver/McpDispatcherTest.kt": {
+      "filePath": "android/data-source/mcp-server/src/test/kotlin/tw/invoicewallet/datasource/mcpserver/McpDispatcherTest.kt",
+      "contentHash": "fcb7ff49e4de879230ec018dc7bcb087384941e8539a2699570a6ffc87be7de7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 123,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/test/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerControllerTest.kt": {
+      "filePath": "android/data-source/mcp-server/src/test/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerControllerTest.kt",
+      "contentHash": "40f30cd1178c983b1cddd57d27f89591e9d8eb9371f2c3ea870098c70322d7a4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 64,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/test/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerRoutingTest.kt": {
+      "filePath": "android/data-source/mcp-server/src/test/kotlin/tw/invoicewallet/datasource/mcpserver/McpServerRoutingTest.kt",
+      "contentHash": "f1fad0644853e4503f4b32392d76f25e5195ea72b34209ddfa6d76daf7ef306b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 67,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/mcp-server/src/test/kotlin/tw/invoicewallet/datasource/mcpserver/tools/ToolsTest.kt": {
+      "filePath": "android/data-source/mcp-server/src/test/kotlin/tw/invoicewallet/datasource/mcpserver/tools/ToolsTest.kt",
+      "contentHash": "8dcdc155ba2a4a617bf945c3ede228e4796f189ef3d703c33178a94a9858e4e9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 248,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/relay-client/build.gradle.kts": {
+      "filePath": "android/data-source/relay-client/build.gradle.kts",
+      "contentHash": "91fb0aee64c0cfebfbd5f1369b2f716b1a6d8f545dffb47fe9e73d737aec1c36",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 31,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/di/RelayClientModule.kt": {
+      "filePath": "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/di/RelayClientModule.kt",
+      "contentHash": "27aa50180e95c0f225abc2dd27d85e9bfbddb65b2cb86de3639f6200f9d65be6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/RelayConnection.kt": {
+      "filePath": "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/RelayConnection.kt",
+      "contentHash": "b3e6487a7d88e4563e338d58250f336d533c90a388b9bf55cd9823c58d55754e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/RelayDeviceStore.kt": {
+      "filePath": "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/RelayDeviceStore.kt",
+      "contentHash": "f13a2d5aca09026082d5c6749e93d10dbb475eade72fe3cdfe0348065249bcb3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/RelayManager.kt": {
+      "filePath": "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/RelayManager.kt",
+      "contentHash": "ce62d11f3c73e651d6d3e1a103882ab753b6824eabaf476fae40bee1efa3f6b6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 91,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/RelayMessageHandler.kt": {
+      "filePath": "android/data-source/relay-client/src/main/kotlin/tw/invoicewallet/datasource/relayclient/RelayMessageHandler.kt",
+      "contentHash": "4e10d20df8cd8ea8ac1d113e7ba322b61e45b51af1bc51955708e1bf5c41d8b9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": false
+    },
+    "android/data-source/relay-client/src/test/kotlin/tw/invoicewallet/datasource/relayclient/RelayMessageHandlerTest.kt": {
+      "filePath": "android/data-source/relay-client/src/test/kotlin/tw/invoicewallet/datasource/relayclient/RelayMessageHandlerTest.kt",
+      "contentHash": "deda5f93f494352ab52f23a6af2b62a01f9cd83d01843772a05f8b1e3d65d5e2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 73,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/export/build.gradle.kts": {
+      "filePath": "android/feature/export/build.gradle.kts",
+      "contentHash": "dfc35e71bc020f6f15d5d397192595e2795ed336cf133ab3562c1d39f167336a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/export/src/main/kotlin/tw/invoicewallet/feature/export/ExportFormat.kt": {
+      "filePath": "android/feature/export/src/main/kotlin/tw/invoicewallet/feature/export/ExportFormat.kt",
+      "contentHash": "b3e9d9e95b36a7b417ac86d60199f6800685b4dbcbdfd5755a7674b7e7f774c9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/export/src/main/kotlin/tw/invoicewallet/feature/export/InvoiceExporter.kt": {
+      "filePath": "android/feature/export/src/main/kotlin/tw/invoicewallet/feature/export/InvoiceExporter.kt",
+      "contentHash": "9dff2a02272a5f4b8f94ef7516b3e8652f104dc62b9af6d9ce75cd8f7f484a31",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 171,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/export/src/test/kotlin/tw/invoicewallet/feature/export/InvoiceExporterTest.kt": {
+      "filePath": "android/feature/export/src/test/kotlin/tw/invoicewallet/feature/export/InvoiceExporterTest.kt",
+      "contentHash": "87b3382d6df137fdb07d377fcb266b960b43e517e7278e224838670e46e0c646",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 129,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-detail/build.gradle.kts": {
+      "filePath": "android/feature/invoice-detail/build.gradle.kts",
+      "contentHash": "36873c09fdddd7657247cb18ca92d8a44443faf69e73b25ba74b0b93f19a7732",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-detail/src/main/kotlin/tw/invoicewallet/feature/invoicedetail/InvoiceDetailScreen.kt": {
+      "filePath": "android/feature/invoice-detail/src/main/kotlin/tw/invoicewallet/feature/invoicedetail/InvoiceDetailScreen.kt",
+      "contentHash": "1d1e9c658ef0360157d7d02262bab27283adbb8d57a5c64ade3dc7f60752fc0a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 390,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-detail/src/main/kotlin/tw/invoicewallet/feature/invoicedetail/InvoiceDetailViewModel.kt": {
+      "filePath": "android/feature/invoice-detail/src/main/kotlin/tw/invoicewallet/feature/invoicedetail/InvoiceDetailViewModel.kt",
+      "contentHash": "81c55c97c977f73d9df32f4ae8b15faf0f6fa3670c582f95808fda1d40b568ac",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 72,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-detail/src/test/kotlin/tw/invoicewallet/feature/invoicedetail/InvoiceDetailScreenTest.kt": {
+      "filePath": "android/feature/invoice-detail/src/test/kotlin/tw/invoicewallet/feature/invoicedetail/InvoiceDetailScreenTest.kt",
+      "contentHash": "6067094233895af9b35dc165d66462b179f9655e4166a7037c40e0a97ddd4e39",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 108,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-detail/src/test/kotlin/tw/invoicewallet/feature/invoicedetail/InvoiceDetailViewModelTest.kt": {
+      "filePath": "android/feature/invoice-detail/src/test/kotlin/tw/invoicewallet/feature/invoicedetail/InvoiceDetailViewModelTest.kt",
+      "contentHash": "efb5549d86dcb18fa1887108de393afa5bcea2f23891b9ed90b5b06379789597",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 168,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-list/build.gradle.kts": {
+      "filePath": "android/feature/invoice-list/build.gradle.kts",
+      "contentHash": "382ca94b65654b555818134ad853cd8fd18719d18e3e7915e4b31210eea3e637",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-list/src/main/kotlin/tw/invoicewallet/feature/invoicelist/InvoiceListScreen.kt": {
+      "filePath": "android/feature/invoice-list/src/main/kotlin/tw/invoicewallet/feature/invoicelist/InvoiceListScreen.kt",
+      "contentHash": "5adafacc802c537056203961b595680733bbcc8c5c4ab64c790115904cfc4d54",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 403,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-list/src/main/kotlin/tw/invoicewallet/feature/invoicelist/InvoiceListViewModel.kt": {
+      "filePath": "android/feature/invoice-list/src/main/kotlin/tw/invoicewallet/feature/invoicelist/InvoiceListViewModel.kt",
+      "contentHash": "4972fff01f8b86a7f7ea189f8a9c1ca199d1e45921bf06074b566d9a075733f1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 188,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-list/src/test/kotlin/tw/invoicewallet/feature/invoicelist/InvoiceListScreenTest.kt": {
+      "filePath": "android/feature/invoice-list/src/test/kotlin/tw/invoicewallet/feature/invoicelist/InvoiceListScreenTest.kt",
+      "contentHash": "8abed3eb3947dd9c132d5e2a6467580b390a986bce5ef97e221a428140a324c6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 126,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/invoice-list/src/test/kotlin/tw/invoicewallet/feature/invoicelist/InvoiceListViewModelTest.kt": {
+      "filePath": "android/feature/invoice-list/src/test/kotlin/tw/invoicewallet/feature/invoicelist/InvoiceListViewModelTest.kt",
+      "contentHash": "770f483f08d7b382b074bb64ebfd71b4d77a7aaa934885757dfe275e8acb6c8c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 188,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/build.gradle.kts": {
+      "filePath": "android/feature/lottery/build.gradle.kts",
+      "contentHash": "bcd5347954e67455e8096374d3b472fbf128432f234fa0b452966f928f6cd930",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 30,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/di/LotteryModule.kt": {
+      "filePath": "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/di/LotteryModule.kt",
+      "contentHash": "f2e76fe692d3846b5131a07e11ca05edf334d20b302bd20b84d2e386f4308b0b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/LotteryApiClient.kt": {
+      "filePath": "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/LotteryApiClient.kt",
+      "contentHash": "16a38121bb4e7ac43cc9df8c58022258f25e4c320c9dd710a169961ace8b5309",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 81,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/LotteryMatcher.kt": {
+      "filePath": "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/LotteryMatcher.kt",
+      "contentHash": "f7f8ff456c2bc9cdf3848df608da18e60f240c044e039b2c457a9d1d9c80aea7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 63,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/LotteryScreen.kt": {
+      "filePath": "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/LotteryScreen.kt",
+      "contentHash": "4c139f5351e1d7e3a1ed81c94f36fa29eeabe7c6aa8c53361cd1242917c7d450",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 273,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/LotteryViewModel.kt": {
+      "filePath": "android/feature/lottery/src/main/kotlin/tw/invoicewallet/feature/lottery/LotteryViewModel.kt",
+      "contentHash": "9a456c91c198e29f7be501ce52c65e939367222f62df915c4c9deaa9bbc70f4e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 83,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/src/test/kotlin/tw/invoicewallet/feature/lottery/LotteryApiClientTest.kt": {
+      "filePath": "android/feature/lottery/src/test/kotlin/tw/invoicewallet/feature/lottery/LotteryApiClientTest.kt",
+      "contentHash": "7e7c3967bddeee05d138257776a6acb3f7be25a1c74c820684ca78b9d7a483c3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/src/test/kotlin/tw/invoicewallet/feature/lottery/LotteryMatcherTest.kt": {
+      "filePath": "android/feature/lottery/src/test/kotlin/tw/invoicewallet/feature/lottery/LotteryMatcherTest.kt",
+      "contentHash": "7cb588e5fd2744075dc5c4f04061d630cf7a6d7da0666824efb3b68f975c69b2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 120,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/lottery/src/test/kotlin/tw/invoicewallet/feature/lottery/LotteryViewModelTest.kt": {
+      "filePath": "android/feature/lottery/src/test/kotlin/tw/invoicewallet/feature/lottery/LotteryViewModelTest.kt",
+      "contentHash": "8fa16ea7eecee09ec513cde34515b160b78affb2efb9c2577ca6e5158b23e7ae",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 102,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/build.gradle.kts": {
+      "filePath": "android/feature/pairing/build.gradle.kts",
+      "contentHash": "eed21e63c7c0b8c4ce7741206f0a2370f3f3a6a922a2151ac3b494729aba3b90",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/di/PairingModule.kt": {
+      "filePath": "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/di/PairingModule.kt",
+      "contentHash": "b27de269a72d4c966e3dd7242164eb98e0ffc1555cd33ad76ba8115e5ba6c0c5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/PairingClient.kt": {
+      "filePath": "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/PairingClient.kt",
+      "contentHash": "574b386c9f5924fe38b2c862c9764cdee3979ba5fe526099fdacac18c9ccec24",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 61,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/PairingPayload.kt": {
+      "filePath": "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/PairingPayload.kt",
+      "contentHash": "0509e2a792869e543839de1e6385205d6cb024601dc6cd249d2d501381b17889",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/PairingScreen.kt": {
+      "filePath": "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/PairingScreen.kt",
+      "contentHash": "1854f56627f29dea051ebe245204741d0c5f48debccaa24ca865737e14c2fc87",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 104,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/PairingViewModel.kt": {
+      "filePath": "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/PairingViewModel.kt",
+      "contentHash": "355d4310b8c78b7cf14eeef6354fc1d448f29a0013bc5095053c96e7efdfffa8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 58,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/RelayUrl.kt": {
+      "filePath": "android/feature/pairing/src/main/kotlin/tw/invoicewallet/feature/pairing/RelayUrl.kt",
+      "contentHash": "45c64c83286d68055d4582e5d910f3703bd37883a4ea48c326caccf49bb1d36a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/test/kotlin/tw/invoicewallet/feature/pairing/PairingClientTest.kt": {
+      "filePath": "android/feature/pairing/src/test/kotlin/tw/invoicewallet/feature/pairing/PairingClientTest.kt",
+      "contentHash": "3059d4183b33aa88e37c7aa306327ca99d7740ff14528ff2f85039536755fb9d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 52,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/test/kotlin/tw/invoicewallet/feature/pairing/PairingViewModelTest.kt": {
+      "filePath": "android/feature/pairing/src/test/kotlin/tw/invoicewallet/feature/pairing/PairingViewModelTest.kt",
+      "contentHash": "4365271b825426c6a967b44defcf35ae0b7fd49add0513a33ca5df0060040419",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 96,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/pairing/src/test/kotlin/tw/invoicewallet/feature/pairing/RelayUrlTest.kt": {
+      "filePath": "android/feature/pairing/src/test/kotlin/tw/invoicewallet/feature/pairing/RelayUrlTest.kt",
+      "contentHash": "3b7188ff14c5991fda1edbd35e348a5dbb6071d017c98f664ad06bddeb23ff2d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/build.gradle.kts": {
+      "filePath": "android/feature/scan/build.gradle.kts",
+      "contentHash": "77c164841e4c38da2faa14337617d65ba4aadb4e169928800ac23e8f643002bb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 75,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/camera/CameraQrScanner.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/camera/CameraQrScanner.kt",
+      "contentHash": "6117bd4e0e66f08b932d0f9db1d7c760cd16e16e0997a128b58da7e2f6b0eee1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 246,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/camera/QrCodeAnalyzer.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/camera/QrCodeAnalyzer.kt",
+      "contentHash": "1c17aa17d306c346443337faf5d375c75ee3a80d5f60b66bf44607ba81a2c32b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 115,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/di/ScanModule.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/di/ScanModule.kt",
+      "contentHash": "3cbab0b3e1c022b42069e2743ac464c6395a45aa7caec1742a57d91112de4010",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 46,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/merchant/CachingMerchantDirectory.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/merchant/CachingMerchantDirectory.kt",
+      "contentHash": "02f68b491d7eccab8312995c1d29f2a2b9a967861fc9ad8c955963d201c9e4d6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/merchant/GovMerchantNameSource.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/merchant/GovMerchantNameSource.kt",
+      "contentHash": "8cadcb1bf921a2e685f0dbf3721c24e38c8e05598af91bba98719cf4f7fe533d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 50,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/merchant/MerchantDirectory.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/merchant/MerchantDirectory.kt",
+      "contentHash": "6000f0888e56ecfa441fb9a18745a9f3be32dc96dc8aff03d86d67ca37a76af9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ocr/InvoiceFieldExtractor.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ocr/InvoiceFieldExtractor.kt",
+      "contentHash": "b3db94c1ff35d9f4b9bd291a06fb11a672cd380b91ef5c3e1299f33d21ab6a52",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 88,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ocr/OcrModel.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ocr/OcrModel.kt",
+      "contentHash": "0a01eae98dc358766865f775ab5a9efdbbb3ddbdacb3df37e18e1f62fc73b710",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 36,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/qr/EInvoiceQrModel.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/qr/EInvoiceQrModel.kt",
+      "contentHash": "d528bc0699666ca71adda8c562ba940d49dd861ec6d26c40f1fc65bb94226c28",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/qr/EInvoiceQrParser.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/qr/EInvoiceQrParser.kt",
+      "contentHash": "73933efb5e0c78c8f114c9d66805e2a65bfc046ee0ca90b845b1d40a02d56ad5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 214,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/recognition/ImagePreprocess.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/recognition/ImagePreprocess.kt",
+      "contentHash": "ab38303eea57cef2ab94a30536e8248046752cba3718bbd3350f88923517f389",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 87,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/recognition/InvoiceRecognizer.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/recognition/InvoiceRecognizer.kt",
+      "contentHash": "c3efc64dd980f40d00fc04c61b23f2b08efe6ad2e63c1b0fac0f50cc93c6eb68",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/recognition/MlKitInvoiceRecognizer.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/recognition/MlKitInvoiceRecognizer.kt",
+      "contentHash": "806daa1d39de0b866a816952fa980472c989bb572143bd1956966b83565fb961",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 103,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/recognition/ZxingDecoder.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/recognition/ZxingDecoder.kt",
+      "contentHash": "ef40ded0255194d8007db1f1f55cfc53abdb25065d93b03a7bee747b88c6961b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 46,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ScanDraft.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ScanDraft.kt",
+      "contentHash": "28cc91e68505bbd747da731e31f64034bc8cdc2fcecc626e914a7b21f30f144a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 105,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ScanState.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ScanState.kt",
+      "contentHash": "41be61b85ad7f9097e047a3496638005c45be6660c126e51bd0bdba524d7233e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ScanViewModel.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ScanViewModel.kt",
+      "contentHash": "f789594cf2afee594f765cd2359bb47a4e447d3006f32d1de67eddf121584749",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 234,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ui/ScanScreen.kt": {
+      "filePath": "android/feature/scan/src/main/kotlin/tw/invoicewallet/feature/scan/ui/ScanScreen.kt",
+      "contentHash": "dee6f489a48638aa99aa4607a2ddfafea6f962416e104558069da8f280f15802",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 272,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/FakeInvoiceRepository.kt": {
+      "filePath": "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/FakeInvoiceRepository.kt",
+      "contentHash": "e08063b6c78274f7c0e5acd17da8e382fb3cd95f22c1ec597e0940f8f8210fd1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/merchant/CachingMerchantDirectoryTest.kt": {
+      "filePath": "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/merchant/CachingMerchantDirectoryTest.kt",
+      "contentHash": "75ff1c2dbef6cee7c24b5790ad70037bd9055b61ec0a6961df9558f5ded2b8b1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 35,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/merchant/GovMerchantNameSourceTest.kt": {
+      "filePath": "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/merchant/GovMerchantNameSourceTest.kt",
+      "contentHash": "78ed4d4cf563a4a7293dd1afa3a8465e31989969f85cf675f25bc5df9dc0ade7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/ocr/InvoiceFieldExtractorTest.kt": {
+      "filePath": "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/ocr/InvoiceFieldExtractorTest.kt",
+      "contentHash": "2d72f81f2d162a2963e581088b987c973dac96af7c1edfc12ab23ca21e7d1d6d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 82,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/qr/EInvoiceQrParserTest.kt": {
+      "filePath": "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/qr/EInvoiceQrParserTest.kt",
+      "contentHash": "3901ce90c1b7387a3b29ebfc6efbc92fb0a0e8d3bc79f8a8e4fa9f52f2757971",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 195,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/ScanViewModelTest.kt": {
+      "filePath": "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/ScanViewModelTest.kt",
+      "contentHash": "1f922e7e00782c93681d25fccb97b2fa75c8e315ce68490154c127f2a16a82fe",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 288,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/ui/ScanScreenTest.kt": {
+      "filePath": "android/feature/scan/src/test/kotlin/tw/invoicewallet/feature/scan/ui/ScanScreenTest.kt",
+      "contentHash": "4458acbeea9fabeee3c732fbd6dda8e7bdb3521e63ddaaedd38530f4cb67bfb7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 100,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/build.gradle.kts": {
+      "filePath": "android/feature/settings/build.gradle.kts",
+      "contentHash": "e5e675f43de43fda383313310a557481d9c529376e36b64b25edbfeba83f9097",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/AppSettings.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/AppSettings.kt",
+      "contentHash": "fa20b3483e3649ac511fe42c7811f270e9bfb0a21c1e071cc9e308a274d07c35",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/carrier/CarrierCsv.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/carrier/CarrierCsv.kt",
+      "contentHash": "f6ee929748323cb2bc1dfbb790855533dec1afe3dfe266b62b9ff538a09751a9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 184,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/carrier/CarrierCsvImporter.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/carrier/CarrierCsvImporter.kt",
+      "contentHash": "4f774bcb01d81d8a1daa3ae2011920fc66ab18b55ce517a96fe64441002996c4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 108,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/CarrierCodeStore.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/CarrierCodeStore.kt",
+      "contentHash": "7f7b948ffaa2498913d634e71aecbdc80b3ff05179599a02cc96d18d081a6588",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 15,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/DataStoreSettingsRepository.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/DataStoreSettingsRepository.kt",
+      "contentHash": "f05aba11a26d37f82ecbae5e634757f2cb192d0486529d512ac1e8ca5fa75b03",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 64,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/di/SettingsModule.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/di/SettingsModule.kt",
+      "contentHash": "88ee33aea6f296ee60b4b8fce2a86a4e008ba3477dce9b940256482467868768",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 38,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/EncryptedCarrierCodeStore.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/EncryptedCarrierCodeStore.kt",
+      "contentHash": "eba21fdd0bc29a3e5db368561a24d76459a4f35178c4b5e99a0db5da98bb108f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 42,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/onboarding/OnboardingScreen.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/onboarding/OnboardingScreen.kt",
+      "contentHash": "0c392659e61816624b150f27b2828e72e6770bddce4b1d0984fbd4a92eb32894",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 175,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/SettingsRepository.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/SettingsRepository.kt",
+      "contentHash": "e51bb3bbe3e1eec87dab42087a4d8f11d86d0d7d2225bab49cbcdea2e4c882ec",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/SettingsScreen.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/SettingsScreen.kt",
+      "contentHash": "8e81600e2aba9b9f4a34b5939e2668a156c0336af7908474906be9804f199667",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 425,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/SettingsViewModel.kt": {
+      "filePath": "android/feature/settings/src/main/kotlin/tw/invoicewallet/feature/settings/SettingsViewModel.kt",
+      "contentHash": "fab987f1ade1da053ffae6a9f98c7805ead227776097ac4610ca0c0de5fa6079",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 118,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/carrier/CarrierCsvImporterTest.kt": {
+      "filePath": "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/carrier/CarrierCsvImporterTest.kt",
+      "contentHash": "6c4240a203c2c9a0539bd63d0cba0d2db2e683d090fe71de5520566a0ab5ecbb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 145,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/carrier/CarrierCsvParserTest.kt": {
+      "filePath": "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/carrier/CarrierCsvParserTest.kt",
+      "contentHash": "73ab0b322a734328fc8416966ca3ee3409bf3c1bf80f987023ad0182b3e08288",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 83,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/DataStoreSettingsRepositoryTest.kt": {
+      "filePath": "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/DataStoreSettingsRepositoryTest.kt",
+      "contentHash": "9f87dd6cf236a4e1187711c3ac56dfc4fddc32a49980485fef50283394554313",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 65,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/OnboardingScreenTest.kt": {
+      "filePath": "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/OnboardingScreenTest.kt",
+      "contentHash": "ced50a78c1ada0932a5d8c52f89a58913f9a39060c6435d5278967f6568dc41c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/SettingsScreenTest.kt": {
+      "filePath": "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/SettingsScreenTest.kt",
+      "contentHash": "aff9e05b449428c30b8239371461ce1f8633ebd5667abcb976a9f65c1fd44fb2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 102,
+      "hasStructuralAnalysis": false
+    },
+    "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/SettingsViewModelTest.kt": {
+      "filePath": "android/feature/settings/src/test/kotlin/tw/invoicewallet/feature/settings/SettingsViewModelTest.kt",
+      "contentHash": "b8820089aa7a9aa6961f6c3db5c8c812e4664ea810aacd51e2cb16cb2de69ad1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 226,
+      "hasStructuralAnalysis": false
+    },
+    "android/gradle/wrapper/gradle-wrapper.jar": {
+      "filePath": "android/gradle/wrapper/gradle-wrapper.jar",
+      "contentHash": "d1a53e17afe60d81acf6ea42221d8cd2626589b330f143e0cc4ae439c6c4575d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 379,
+      "hasStructuralAnalysis": false
+    },
+    "android/gradlew": {
+      "filePath": "android/gradlew",
+      "contentHash": "f96a757581fe5292465e3f3393380bd11fd8086d450b92e7c693da6513f583fe",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 235,
+      "hasStructuralAnalysis": false
+    },
+    "android/settings.gradle.kts": {
+      "filePath": "android/settings.gradle.kts",
+      "contentHash": "653e8d147316bd9e2d90441ac30c8f452e5d69cd1478402370aa1c4de10c1cf9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": false
+    },
+    "relay-server/cmd/relay/main.go": {
+      "filePath": "relay-server/cmd/relay/main.go",
+      "contentHash": "f88f1a2c411290c91fc778b2ec98c0100ea9b99ada9c0781fa7276701655d4d3",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": false,
+          "lineCount": 50
+        },
+        {
+          "name": "mintAndPrint",
+          "params": [
+            "srv"
+          ],
+          "exported": false,
+          "lineCount": 10
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "errors",
+          "specifiers": [
+            "errors"
+          ]
+        },
+        {
+          "source": "fmt",
+          "specifiers": [
+            "fmt"
+          ]
+        },
+        {
+          "source": "log",
+          "specifiers": [
+            "log"
+          ]
+        },
+        {
+          "source": "net/http",
+          "specifiers": [
+            "http"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "os/signal",
+          "specifiers": [
+            "signal"
+          ]
+        },
+        {
+          "source": "syscall",
+          "specifiers": [
+            "syscall"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/pairing",
+          "specifiers": [
+            "pairing"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/relay",
+          "specifiers": [
+            "relay"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/storage",
+          "specifiers": [
+            "storage"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 84,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/deploy/systemd/invoice-relay.service": {
+      "filePath": "relay-server/deploy/systemd/invoice-relay.service",
+      "contentHash": "4e81ac6553c8a8b9242f661c7d654f900213995c645bbe6456f3589ed9c560e0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": false
+    },
+    "relay-server/internal/config/config_test.go": {
+      "filePath": "relay-server/internal/config/config_test.go",
+      "contentHash": "0f7b6c72e2dddab5426d14cc887afa9ea9002db34e474f5a727e56f8850b717f",
+      "functions": [
+        {
+          "name": "TestLoadGeneratesStableSecret",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "TestPortFromEnv",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "TestPairingCodeFormat",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "TestRandomURLTokenLength",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 5
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "regexp",
+          "specifiers": [
+            "regexp"
+          ]
+        },
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        }
+      ],
+      "exports": [
+        "TestLoadGeneratesStableSecret",
+        "TestPortFromEnv",
+        "TestPairingCodeFormat",
+        "TestRandomURLTokenLength"
+      ],
+      "totalLines": 59,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/config/config.go": {
+      "filePath": "relay-server/internal/config/config.go",
+      "contentHash": "c8ddea3a89cecc8b83b271504f0e5c4f190cb874c22af1ef71494bbd7b9eabff",
+      "functions": [
+        {
+          "name": "Load",
+          "params": [],
+          "returnType": "(Config, error)",
+          "exported": true,
+          "lineCount": 28
+        },
+        {
+          "name": "ensureSecret",
+          "params": [
+            "path"
+          ],
+          "returnType": "(string, error)",
+          "exported": false,
+          "lineCount": 14
+        },
+        {
+          "name": "envOr",
+          "params": [
+            "key",
+            "fallback"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 6
+        }
+      ],
+      "classes": [
+        {
+          "name": "Config",
+          "methods": [],
+          "properties": [
+            "Port",
+            "StatePath",
+            "MCPSecret",
+            "APIToken"
+          ],
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "path/filepath",
+          "specifiers": [
+            "filepath"
+          ]
+        },
+        {
+          "source": "strconv",
+          "specifiers": [
+            "strconv"
+          ]
+        },
+        {
+          "source": "strings",
+          "specifiers": [
+            "strings"
+          ]
+        }
+      ],
+      "exports": [
+        "Config",
+        "Load"
+      ],
+      "totalLines": 74,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/config/secret.go": {
+      "filePath": "relay-server/internal/config/secret.go",
+      "contentHash": "4290b4a29afea2b262ed8b717c24a4125de3432a55a98558493e293aceabe6c0",
+      "functions": [
+        {
+          "name": "RandomURLToken",
+          "params": [
+            "nBytes"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "PairingCode",
+          "params": [],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "crypto/rand",
+          "specifiers": [
+            "rand"
+          ]
+        },
+        {
+          "source": "encoding/base64",
+          "specifiers": [
+            "base64"
+          ]
+        },
+        {
+          "source": "math/big",
+          "specifiers": [
+            "big"
+          ]
+        }
+      ],
+      "exports": [
+        "RandomURLToken",
+        "PairingCode"
+      ],
+      "totalLines": 34,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/oauth/oauth_test.go": {
+      "filePath": "relay-server/internal/oauth/oauth_test.go",
+      "contentHash": "19eee5465b0a1758839507162a5aa11380873ebbb0133f29a1960c2804d7ac1c",
+      "functions": [
+        {
+          "name": "challengeFor",
+          "params": [
+            "verifier"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 4
+        },
+        {
+          "name": "TestFullAuthorizationCodeFlowWithPKCE",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "TestAuthorizeRejectsUnknownClient",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "TestAuthorizeRejectsNonS256",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "TestExchangeRejectsWrongVerifier",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "TestExchangeIsSingleUse",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "TestExchangeRejectsExpiredCode",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "TestClientCredentialsIssuesValidToken",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "TestValidateRejectsUnknownAndExpired",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 14
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "crypto/sha256",
+          "specifiers": [
+            "sha256"
+          ]
+        },
+        {
+          "source": "encoding/base64",
+          "specifiers": [
+            "base64"
+          ]
+        },
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        }
+      ],
+      "exports": [
+        "TestFullAuthorizationCodeFlowWithPKCE",
+        "TestAuthorizeRejectsUnknownClient",
+        "TestAuthorizeRejectsNonS256",
+        "TestExchangeRejectsWrongVerifier",
+        "TestExchangeIsSingleUse",
+        "TestExchangeRejectsExpiredCode",
+        "TestClientCredentialsIssuesValidToken",
+        "TestValidateRejectsUnknownAndExpired"
+      ],
+      "totalLines": 110,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/oauth/oauth.go": {
+      "filePath": "relay-server/internal/oauth/oauth.go",
+      "contentHash": "71a99dd77372c4e80998029665a5076aa50ffca6823d194cc5a630971ff7b96a",
+      "functions": [
+        {
+          "name": "New",
+          "params": [
+            "now"
+          ],
+          "returnType": "*Provider",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "Register",
+          "params": [
+            "redirectURIs"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "Authorize",
+          "params": [
+            "clientID",
+            "redirectURI",
+            "codeChallenge",
+            "codeChallengeMethod"
+          ],
+          "returnType": "(string, error)",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "Exchange",
+          "params": [
+            "code",
+            "codeVerifier",
+            "clientID",
+            "redirectURI"
+          ],
+          "returnType": "(string, int, error)",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "IssueToken",
+          "params": [
+            "clientID"
+          ],
+          "returnType": "(string, int, error)",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "Validate",
+          "params": [
+            "token"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "redirectAllowed",
+          "params": [
+            "registered",
+            "redirectURI"
+          ],
+          "returnType": "bool",
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "verifyPKCE",
+          "params": [
+            "verifier",
+            "challenge"
+          ],
+          "returnType": "bool",
+          "exported": false,
+          "lineCount": 5
+        }
+      ],
+      "classes": [
+        {
+          "name": "client",
+          "methods": [],
+          "properties": [
+            "redirectURIs"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "authCode",
+          "methods": [],
+          "properties": [
+            "clientID",
+            "redirectURI",
+            "challenge",
+            "expiresAt"
+          ],
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "Provider",
+          "methods": [
+            "Register",
+            "Authorize",
+            "Exchange",
+            "IssueToken",
+            "Validate"
+          ],
+          "properties": [
+            "mu",
+            "clients",
+            "codes",
+            "tokens",
+            "now"
+          ],
+          "exported": true,
+          "lineCount": 7
+        }
+      ],
+      "imports": [
+        {
+          "source": "crypto/sha256",
+          "specifiers": [
+            "sha256"
+          ]
+        },
+        {
+          "source": "crypto/subtle",
+          "specifiers": [
+            "subtle"
+          ]
+        },
+        {
+          "source": "encoding/base64",
+          "specifiers": [
+            "base64"
+          ]
+        },
+        {
+          "source": "errors",
+          "specifiers": [
+            "errors"
+          ]
+        },
+        {
+          "source": "sync",
+          "specifiers": [
+            "sync"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/config",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "Provider",
+        "New",
+        "Register",
+        "Authorize",
+        "Exchange",
+        "IssueToken",
+        "Validate"
+      ],
+      "totalLines": 173,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/pairing/pairing_test.go": {
+      "filePath": "relay-server/internal/pairing/pairing_test.go",
+      "contentHash": "945d9deaf4a141d77bff4316156cb9a45c7342e096e23f3eccf6a7e6d5218338",
+      "functions": [
+        {
+          "name": "newService",
+          "params": [
+            "t",
+            "now"
+          ],
+          "returnType": "(*Service, storage.Store)",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "TestClaimSucceedsAndRegistersDevice",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "TestClaimRejectsUnknownCode",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "TestClaimRejectsExpiredCode",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "TestClaimRejectsReuse",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "TestRefreshFCMRequiresMatchingSecret",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/storage",
+          "specifiers": [
+            "storage"
+          ]
+        }
+      ],
+      "exports": [
+        "TestClaimSucceedsAndRegistersDevice",
+        "TestClaimRejectsUnknownCode",
+        "TestClaimRejectsExpiredCode",
+        "TestClaimRejectsReuse",
+        "TestRefreshFCMRequiresMatchingSecret"
+      ],
+      "totalLines": 84,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/pairing/pairing.go": {
+      "filePath": "relay-server/internal/pairing/pairing.go",
+      "contentHash": "b335def7d77b4ce9d29f5f08781bb2b1e13b241c3582ffdd2efc6a2550766898",
+      "functions": [
+        {
+          "name": "NewService",
+          "params": [
+            "store",
+            "now"
+          ],
+          "returnType": "*Service",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "Create",
+          "params": [],
+          "returnType": "(storage.PairingRequest, error)",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "Claim",
+          "params": [
+            "code",
+            "fcmToken",
+            "deviceName"
+          ],
+          "returnType": "(string, error)",
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "RefreshFCM",
+          "params": [
+            "secret",
+            "fcmToken"
+          ],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "secretEqual",
+          "params": [
+            "a",
+            "b"
+          ],
+          "returnType": "bool",
+          "exported": false,
+          "lineCount": 10
+        }
+      ],
+      "classes": [
+        {
+          "name": "Service",
+          "methods": [
+            "Create",
+            "Claim",
+            "RefreshFCM"
+          ],
+          "properties": [
+            "store",
+            "now"
+          ],
+          "exported": true,
+          "lineCount": 4
+        }
+      ],
+      "imports": [
+        {
+          "source": "errors",
+          "specifiers": [
+            "errors"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/storage",
+          "specifiers": [
+            "storage"
+          ]
+        }
+      ],
+      "exports": [
+        "Service",
+        "NewService",
+        "Create",
+        "Claim",
+        "RefreshFCM"
+      ],
+      "totalLines": 112,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/relay/server_mcp_test.go": {
+      "filePath": "relay-server/internal/relay/server_mcp_test.go",
+      "contentHash": "e54627ff3110371a6dc03465efb01d314ebeab92eb78cea53af75ceff4b48325",
+      "functions": [
+        {
+          "name": "Wake",
+          "params": [],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "mcpPath",
+          "params": [
+            "srv"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "mintToken",
+          "params": [
+            "t",
+            "srv"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "echoPhone",
+          "params": [
+            "t",
+            "srv",
+            "ts",
+            "secret",
+            "payload"
+          ],
+          "returnType": "*websocket.Conn",
+          "exported": false,
+          "lineCount": 21
+        },
+        {
+          "name": "postMCP",
+          "params": [
+            "t",
+            "ts",
+            "srv",
+            "token",
+            "accept",
+            "body"
+          ],
+          "returnType": "*http.Response",
+          "exported": false,
+          "lineCount": 16
+        },
+        {
+          "name": "TestMCPWrongSecretIs404",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "TestMCPWithoutTokenIs401",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "TestMCPForwardsToConnectedPhone",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "TestMCPStaticAPITokenAccepted",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "TestMCPGetReturns405",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "TestMCPNotificationReturns202",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "TestMCPInitializeSetsSessionIdAndSSE",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "TestMCPWakesPhoneWhenDisconnected",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 16
+        }
+      ],
+      "classes": [
+        {
+          "name": "recordingWaker",
+          "methods": [
+            "Wake"
+          ],
+          "properties": [
+            "calls"
+          ],
+          "exported": false,
+          "lineCount": 1
+        }
+      ],
+      "imports": [
+        {
+          "source": "context",
+          "specifiers": [
+            "context"
+          ]
+        },
+        {
+          "source": "encoding/json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "io",
+          "specifiers": [
+            "io"
+          ]
+        },
+        {
+          "source": "net/http",
+          "specifiers": [
+            "http"
+          ]
+        },
+        {
+          "source": "net/http/httptest",
+          "specifiers": [
+            "httptest"
+          ]
+        },
+        {
+          "source": "strings",
+          "specifiers": [
+            "strings"
+          ]
+        },
+        {
+          "source": "sync/atomic",
+          "specifiers": [
+            "atomic"
+          ]
+        },
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "github.com/gorilla/websocket",
+          "specifiers": [
+            "websocket"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/session",
+          "specifiers": [
+            "session"
+          ]
+        }
+      ],
+      "exports": [
+        "Wake",
+        "TestMCPWrongSecretIs404",
+        "TestMCPWithoutTokenIs401",
+        "TestMCPForwardsToConnectedPhone",
+        "TestMCPStaticAPITokenAccepted",
+        "TestMCPGetReturns405",
+        "TestMCPNotificationReturns202",
+        "TestMCPInitializeSetsSessionIdAndSSE",
+        "TestMCPWakesPhoneWhenDisconnected"
+      ],
+      "totalLines": 211,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/relay/server_oauth_test.go": {
+      "filePath": "relay-server/internal/relay/server_oauth_test.go",
+      "contentHash": "03075656ebacaa24cb9b9ea5d334640784049301960eaeb68e02c77f67c07146",
+      "functions": [
+        {
+          "name": "req",
+          "params": [
+            "t",
+            "srv",
+            "method",
+            "path",
+            "contentType",
+            "body"
+          ],
+          "returnType": "*httptest.ResponseRecorder",
+          "exported": false,
+          "lineCount": 10
+        },
+        {
+          "name": "TestProtectedResourceMetadata",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "TestAuthServerMetadataAdvertisesEndpoints",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "TestClientCredentialsTokenFlow",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "TestOAuthFullHTTPFlowYieldsToken",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 55
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "crypto/sha256",
+          "specifiers": [
+            "sha256"
+          ]
+        },
+        {
+          "source": "encoding/base64",
+          "specifiers": [
+            "base64"
+          ]
+        },
+        {
+          "source": "encoding/json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "net/http",
+          "specifiers": [
+            "http"
+          ]
+        },
+        {
+          "source": "net/http/httptest",
+          "specifiers": [
+            "httptest"
+          ]
+        },
+        {
+          "source": "net/url",
+          "specifiers": [
+            "url"
+          ]
+        },
+        {
+          "source": "strings",
+          "specifiers": [
+            "strings"
+          ]
+        },
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        }
+      ],
+      "exports": [
+        "TestProtectedResourceMetadata",
+        "TestAuthServerMetadataAdvertisesEndpoints",
+        "TestClientCredentialsTokenFlow",
+        "TestOAuthFullHTTPFlowYieldsToken"
+      ],
+      "totalLines": 128,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/relay/server_test.go": {
+      "filePath": "relay-server/internal/relay/server_test.go",
+      "contentHash": "ec43fe45687ecda66a80e47aaada47fd86ac707d94e55442255c3d7825f0e1c6",
+      "functions": [
+        {
+          "name": "newTestServer",
+          "params": [
+            "t"
+          ],
+          "returnType": "*Server",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "do",
+          "params": [
+            "t",
+            "srv",
+            "method",
+            "path",
+            "auth",
+            "body"
+          ],
+          "returnType": "*httptest.ResponseRecorder",
+          "exported": false,
+          "lineCount": 10
+        },
+        {
+          "name": "TestHealth",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "TestClaimHappyPathReturnsSecret",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "TestClaimUnknownCodeIs404",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "TestClaimReuseIs409",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "TestRefreshRequiresValidSecret",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 16
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "encoding/json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "net/http",
+          "specifiers": [
+            "http"
+          ]
+        },
+        {
+          "source": "net/http/httptest",
+          "specifiers": [
+            "httptest"
+          ]
+        },
+        {
+          "source": "strings",
+          "specifiers": [
+            "strings"
+          ]
+        },
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/storage",
+          "specifiers": [
+            "storage"
+          ]
+        }
+      ],
+      "exports": [
+        "TestHealth",
+        "TestClaimHappyPathReturnsSecret",
+        "TestClaimUnknownCodeIs404",
+        "TestClaimReuseIs409",
+        "TestRefreshRequiresValidSecret"
+      ],
+      "totalLines": 95,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/relay/server_ws_test.go": {
+      "filePath": "relay-server/internal/relay/server_ws_test.go",
+      "contentHash": "ab50b643fa24668f7893e68806b4a0c7ddebbd3d30c8a84763dc27de11354774",
+      "functions": [
+        {
+          "name": "pairDevice",
+          "params": [
+            "t",
+            "srv"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "wsURL",
+          "params": [
+            "httpURL"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "TestWSRejectsWrongSecret",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "TestWSConnectAndForward",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 38
+        },
+        {
+          "name": "waitFor",
+          "params": [
+            "t",
+            "cond"
+          ],
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "context",
+          "specifiers": [
+            "context"
+          ]
+        },
+        {
+          "source": "encoding/json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "net/http",
+          "specifiers": [
+            "http"
+          ]
+        },
+        {
+          "source": "net/http/httptest",
+          "specifiers": [
+            "httptest"
+          ]
+        },
+        {
+          "source": "strings",
+          "specifiers": [
+            "strings"
+          ]
+        },
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "github.com/gorilla/websocket",
+          "specifiers": [
+            "websocket"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/session",
+          "specifiers": [
+            "session"
+          ]
+        }
+      ],
+      "exports": [
+        "TestWSRejectsWrongSecret",
+        "TestWSConnectAndForward"
+      ],
+      "totalLines": 94,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/relay/server.go": {
+      "filePath": "relay-server/internal/relay/server.go",
+      "contentHash": "2bc7b65a87d917f42bcb69eec416f06692495dd0eb573d2ff4365b5fecfa247d",
+      "functions": [
+        {
+          "name": "New",
+          "params": [
+            "cfg",
+            "store"
+          ],
+          "returnType": "*Server",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "SetWaker",
+          "params": [
+            "w"
+          ],
+          "exported": true,
+          "lineCount": 1
+        },
+        {
+          "name": "Pairing",
+          "params": [],
+          "returnType": "*pairing.Service",
+          "exported": true,
+          "lineCount": 1
+        },
+        {
+          "name": "Sessions",
+          "params": [],
+          "returnType": "*session.Manager",
+          "exported": true,
+          "lineCount": 1
+        },
+        {
+          "name": "Handler",
+          "params": [],
+          "returnType": "http.Handler",
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "logRequests",
+          "params": [
+            "next"
+          ],
+          "returnType": "http.Handler",
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "acceptToken",
+          "params": [
+            "token"
+          ],
+          "returnType": "bool",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "handleMCPGet",
+          "params": [
+            "w",
+            "_"
+          ],
+          "exported": false,
+          "lineCount": 4
+        },
+        {
+          "name": "handleMCP",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 61
+        },
+        {
+          "name": "inspectRPC",
+          "params": [
+            "body"
+          ],
+          "returnType": "(method string, isRequest bool)",
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "acceptsSSE",
+          "params": [
+            "r"
+          ],
+          "returnType": "bool",
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "writeSSE",
+          "params": [
+            "w",
+            "payload"
+          ],
+          "exported": false,
+          "lineCount": 12
+        },
+        {
+          "name": "baseURL",
+          "params": [
+            "r"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "handleProtectedResourceMeta",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "handleAuthServerMeta",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "handleRegister",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 14
+        },
+        {
+          "name": "handleAuthorize",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 29
+        },
+        {
+          "name": "handleToken",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 40
+        },
+        {
+          "name": "audit",
+          "params": [
+            "event",
+            "tool",
+            "success",
+            "errMsg"
+          ],
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "handleWS",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 15
+        },
+        {
+          "name": "handleHealth",
+          "params": [
+            "w",
+            "_"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "handleClaim",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "handleRefresh",
+          "params": [
+            "w",
+            "r"
+          ],
+          "exported": false,
+          "lineCount": 24
+        },
+        {
+          "name": "claimStatus",
+          "params": [
+            "err"
+          ],
+          "returnType": "int",
+          "exported": false,
+          "lineCount": 12
+        },
+        {
+          "name": "bearerToken",
+          "params": [
+            "r"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "writeJSON",
+          "params": [
+            "w",
+            "status",
+            "body"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "writeError",
+          "params": [
+            "w",
+            "status",
+            "msg"
+          ],
+          "exported": false,
+          "lineCount": 3
+        }
+      ],
+      "classes": [
+        {
+          "name": "Server",
+          "methods": [
+            "SetWaker",
+            "Pairing",
+            "Sessions",
+            "Handler",
+            "acceptToken",
+            "handleMCPGet",
+            "handleMCP",
+            "handleProtectedResourceMeta",
+            "handleAuthServerMeta",
+            "handleRegister",
+            "handleAuthorize",
+            "handleToken",
+            "audit",
+            "handleWS",
+            "handleHealth",
+            "handleClaim",
+            "handleRefresh"
+          ],
+          "properties": [
+            "cfg",
+            "store",
+            "pairing",
+            "sessions",
+            "waker",
+            "wakeTimeout",
+            "upgrader",
+            "oauth"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "claimRequest",
+          "methods": [],
+          "properties": [
+            "PairingCode",
+            "FCMToken",
+            "DeviceName"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "refreshRequest",
+          "methods": [],
+          "properties": [
+            "FCMToken"
+          ],
+          "exported": false,
+          "lineCount": 3
+        }
+      ],
+      "imports": [
+        {
+          "source": "context",
+          "specifiers": [
+            "context"
+          ]
+        },
+        {
+          "source": "crypto/subtle",
+          "specifiers": [
+            "subtle"
+          ]
+        },
+        {
+          "source": "encoding/json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "errors",
+          "specifiers": [
+            "errors"
+          ]
+        },
+        {
+          "source": "io",
+          "specifiers": [
+            "io"
+          ]
+        },
+        {
+          "source": "log",
+          "specifiers": [
+            "log"
+          ]
+        },
+        {
+          "source": "net/http",
+          "specifiers": [
+            "http"
+          ]
+        },
+        {
+          "source": "net/url",
+          "specifiers": [
+            "url"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "strings",
+          "specifiers": [
+            "strings"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "github.com/gorilla/websocket",
+          "specifiers": [
+            "websocket"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/config",
+          "specifiers": [
+            "config"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/oauth",
+          "specifiers": [
+            "oauth"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/pairing",
+          "specifiers": [
+            "pairing"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/session",
+          "specifiers": [
+            "session"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/storage",
+          "specifiers": [
+            "storage"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/transport",
+          "specifiers": [
+            "transport"
+          ]
+        }
+      ],
+      "exports": [
+        "Server",
+        "New",
+        "SetWaker",
+        "Pairing",
+        "Sessions",
+        "Handler"
+      ],
+      "totalLines": 460,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/session/session_test.go": {
+      "filePath": "relay-server/internal/session/session_test.go",
+      "contentHash": "ff8c9fef1469d90270729fa7a1848e389e343084a1af63e313a7732d3449c03f",
+      "functions": [
+        {
+          "name": "newFakeConn",
+          "params": [],
+          "returnType": "*fakeConn",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "WriteJSON",
+          "params": [
+            "v"
+          ],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "ReadJSON",
+          "params": [
+            "v"
+          ],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "Close",
+          "params": [],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "TestForwardWithoutConnection",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "TestForwardRoundTrip",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 28
+        },
+        {
+          "name": "TestForwardTimesOut",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "waitConnected",
+          "params": [
+            "t",
+            "m"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "contains",
+          "params": [
+            "s",
+            "sub"
+          ],
+          "returnType": "bool",
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "indexOf",
+          "params": [
+            "s",
+            "sub"
+          ],
+          "returnType": "int",
+          "exported": false,
+          "lineCount": 8
+        }
+      ],
+      "classes": [
+        {
+          "name": "fakeConn",
+          "methods": [
+            "WriteJSON",
+            "ReadJSON",
+            "Close"
+          ],
+          "properties": [
+            "toPhone",
+            "fromPhone",
+            "closed"
+          ],
+          "exported": false,
+          "lineCount": 5
+        }
+      ],
+      "imports": [
+        {
+          "source": "context",
+          "specifiers": [
+            "context"
+          ]
+        },
+        {
+          "source": "encoding/json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "errors",
+          "specifiers": [
+            "errors"
+          ]
+        },
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        }
+      ],
+      "exports": [
+        "WriteJSON",
+        "ReadJSON",
+        "Close",
+        "TestForwardWithoutConnection",
+        "TestForwardRoundTrip",
+        "TestForwardTimesOut"
+      ],
+      "totalLines": 126,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/session/session.go": {
+      "filePath": "relay-server/internal/session/session.go",
+      "contentHash": "d150791009ca756c4d363e3fe787643441f52655697c5b4859934f2a33a35ed0",
+      "functions": [
+        {
+          "name": "NewManager",
+          "params": [
+            "timeout"
+          ],
+          "returnType": "*Manager",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "Connected",
+          "params": [],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "WaitConnected",
+          "params": [
+            "ctx"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "Serve",
+          "params": [
+            "conn"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "Forward",
+          "params": [
+            "ctx",
+            "payload"
+          ],
+          "returnType": "(Envelope, error)",
+          "exported": true,
+          "lineCount": 35
+        },
+        {
+          "name": "deliver",
+          "params": [
+            "env"
+          ],
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [
+        {
+          "name": "Envelope",
+          "methods": [],
+          "properties": [
+            "Type",
+            "RequestID",
+            "Payload",
+            "Status",
+            "Error"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "Conn",
+          "methods": [
+            "WriteJSON",
+            "ReadJSON",
+            "Close"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "Manager",
+          "methods": [
+            "Connected",
+            "WaitConnected",
+            "Serve",
+            "Forward",
+            "deliver"
+          ],
+          "properties": [
+            "timeout",
+            "mu",
+            "conn",
+            "writeMu",
+            "pending"
+          ],
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "imports": [
+        {
+          "source": "context",
+          "specifiers": [
+            "context"
+          ]
+        },
+        {
+          "source": "encoding/json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "errors",
+          "specifiers": [
+            "errors"
+          ]
+        },
+        {
+          "source": "sync",
+          "specifiers": [
+            "sync"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "github.com/liyoclaw/invoice-relay/internal/config",
+          "specifiers": [
+            "config"
+          ]
+        }
+      ],
+      "exports": [
+        "Envelope",
+        "Conn",
+        "Manager",
+        "NewManager",
+        "Connected",
+        "WaitConnected",
+        "Serve",
+        "Forward"
+      ],
+      "totalLines": 162,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/storage/storage_test.go": {
+      "filePath": "relay-server/internal/storage/storage_test.go",
+      "contentHash": "30ce519b2477dc83f9831257ba3f79a37c03bf8c4d318eeeb336e285d44b8241",
+      "functions": [
+        {
+          "name": "TestDeviceRoundTripsAcrossReopen",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "TestGetDeviceMissing",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "TestPairingSaveGetConsume",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "TestAuditAppendAssignsIncrementingIDsAndRecentTrims",
+          "params": [
+            "t"
+          ],
+          "exported": true,
+          "lineCount": 16
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "path/filepath",
+          "specifiers": [
+            "filepath"
+          ]
+        },
+        {
+          "source": "testing",
+          "specifiers": [
+            "testing"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        }
+      ],
+      "exports": [
+        "TestDeviceRoundTripsAcrossReopen",
+        "TestGetDeviceMissing",
+        "TestPairingSaveGetConsume",
+        "TestAuditAppendAssignsIncrementingIDsAndRecentTrims"
+      ],
+      "totalLines": 77,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/storage/storage.go": {
+      "filePath": "relay-server/internal/storage/storage.go",
+      "contentHash": "24f48d164eef08dfc7b7c868c85187c5220a980a6af0c7304939af674a3fd3dd",
+      "functions": [
+        {
+          "name": "Open",
+          "params": [
+            "path"
+          ],
+          "returnType": "(*JSONStore, error)",
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "SaveDevice",
+          "params": [
+            "d"
+          ],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "GetDevice",
+          "params": [],
+          "returnType": "(*Device, error)",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "TouchLastSeen",
+          "params": [
+            "t"
+          ],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "SavePairing",
+          "params": [
+            "p"
+          ],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "GetPairing",
+          "params": [
+            "code"
+          ],
+          "returnType": "(*PairingRequest, error)",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "ConsumePairing",
+          "params": [
+            "code",
+            "at"
+          ],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "AppendAudit",
+          "params": [
+            "a"
+          ],
+          "returnType": "(RelayAuditLog, error)",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "RecentAudit",
+          "params": [
+            "limit"
+          ],
+          "returnType": "([]RelayAuditLog, error)",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "persist",
+          "params": [],
+          "returnType": "error",
+          "exported": false,
+          "lineCount": 10
+        }
+      ],
+      "classes": [
+        {
+          "name": "Device",
+          "methods": [],
+          "properties": [
+            "DeviceName",
+            "FCMToken",
+            "PublicKey",
+            "Secret",
+            "PairedAt",
+            "LastSeen"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "PairingRequest",
+          "methods": [],
+          "properties": [
+            "Code",
+            "ExpiresAt",
+            "ConsumedAt"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "RelayAuditLog",
+          "methods": [],
+          "properties": [
+            "ID",
+            "OccurredAt",
+            "EventType",
+            "ToolName",
+            "Success",
+            "ErrorMessage"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "Store",
+          "methods": [
+            "SaveDevice",
+            "GetDevice",
+            "TouchLastSeen",
+            "SavePairing",
+            "GetPairing",
+            "ConsumePairing",
+            "AppendAudit",
+            "RecentAudit"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "state",
+          "methods": [],
+          "properties": [
+            "Device",
+            "Pairings",
+            "Audit",
+            "AuditSeq"
+          ],
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "JSONStore",
+          "methods": [
+            "SaveDevice",
+            "GetDevice",
+            "TouchLastSeen",
+            "SavePairing",
+            "GetPairing",
+            "ConsumePairing",
+            "AppendAudit",
+            "RecentAudit",
+            "persist"
+          ],
+          "properties": [
+            "mu",
+            "path",
+            "data"
+          ],
+          "exported": true,
+          "lineCount": 5
+        }
+      ],
+      "imports": [
+        {
+          "source": "encoding/json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "errors",
+          "specifiers": [
+            "errors"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sync",
+          "specifiers": [
+            "sync"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        }
+      ],
+      "exports": [
+        "Device",
+        "PairingRequest",
+        "RelayAuditLog",
+        "Store",
+        "JSONStore",
+        "Open",
+        "SaveDevice",
+        "GetDevice",
+        "TouchLastSeen",
+        "SavePairing",
+        "GetPairing",
+        "ConsumePairing",
+        "AppendAudit",
+        "RecentAudit"
+      ],
+      "totalLines": 192,
+      "hasStructuralAnalysis": true
+    },
+    "relay-server/internal/transport/waker.go": {
+      "filePath": "relay-server/internal/transport/waker.go",
+      "contentHash": "a8b0a3f53309970cb244a6c5e96260aa15e65ec40927e8531e6fea509379d50a",
+      "functions": [
+        {
+          "name": "Wake",
+          "params": [],
+          "returnType": "error",
+          "exported": true,
+          "lineCount": 1
+        }
+      ],
+      "classes": [
+        {
+          "name": "Waker",
+          "methods": [
+            "Wake"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "NoopWaker",
+          "methods": [
+            "Wake"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 1
+        }
+      ],
+      "imports": [
+        {
+          "source": "context",
+          "specifiers": [
+            "context"
+          ]
+        }
+      ],
+      "exports": [
+        "Waker",
+        "NoopWaker",
+        "Wake"
+      ],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    "temp-asset/launcher_crop.py": {
+      "filePath": "temp-asset/launcher_crop.py",
+      "contentHash": "40d4b8e432f2a7344836800c78b751f44cb651bad14c476ea3288f1a35815374",
+      "functions": [
+        {
+          "name": "subject_bbox",
+          "params": [
+            "img",
+            "ignore_top_frac",
+            "ignore_bottom_frac"
+          ],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "centre_in_canvas",
+          "params": [
+            "img",
+            "target_size",
+            "margin_frac"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "process",
+          "params": [
+            "src_name",
+            "out_name",
+            "hard_crop"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "knock_out",
+          "params": [
+            "img",
+            "threshold",
+            "soft_band"
+          ],
+          "exported": true,
+          "lineCount": 12
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "PIL",
+          "specifiers": [
+            "Image"
+          ]
+        }
+      ],
+      "exports": [
+        "subject_bbox",
+        "centre_in_canvas",
+        "process",
+        "knock_out"
+      ],
+      "totalLines": 134,
+      "hasStructuralAnalysis": true
+    },
+    "temp-asset/process.py": {
+      "filePath": "temp-asset/process.py",
+      "contentHash": "8b899f6a685b44eb75035eabeced3ada0c84f636749447c0e820235918bd0bd8",
+      "functions": [
+        {
+          "name": "knock_out_paper",
+          "params": [
+            "img",
+            "threshold",
+            "soft_band"
+          ],
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "auto_trim",
+          "params": [
+            "img",
+            "pad"
+          ],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "to_square",
+          "params": [
+            "img"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "save_webp",
+          "params": [
+            "img",
+            "name",
+            "max_dim",
+            "quality"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "process",
+          "params": [
+            "src",
+            "name",
+            "max_dim",
+            "quality"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "_knock_out_with_sampled_bg",
+          "params": [
+            "img",
+            "sample_box",
+            "threshold",
+            "soft_band"
+          ],
+          "exported": true,
+          "lineCount": 14
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "PIL",
+          "specifiers": [
+            "Image",
+            "ImageDraw",
+            "ImageFilter"
+          ]
+        }
+      ],
+      "exports": [
+        "knock_out_paper",
+        "auto_trim",
+        "to_square",
+        "save_webp",
+        "process",
+        "_knock_out_with_sampled_bg"
+      ],
+      "totalLines": 197,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

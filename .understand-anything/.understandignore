@@ -1,0 +1,47 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Syntax: same as .gitignore (globs, # comments, ! negation, trailing / for dirs)
+#
+# Built-in defaults already exclude: node_modules/, .git/, dist/, build/, obj/,
+# *.lock, *.min.js, images, fonts, etc. — but Android adds a lot more cache state
+# that the defaults don't know about. Tuned for this monorepo below.
+
+# --- Android / Gradle build state (filesystem walk picks these up) ---
+.gradle/
+.kotlin/
+**/.gradle/
+**/.kotlin/
+**/build/
+android/app/build/
+android/build/
+android/build-logic/.gradle/
+captures/
+release/
+*.apk
+*.aab
+*.ap_
+*.dex
+.cxx/
+
+# --- IDE noise (gitignored but may be present locally) ---
+.idea/
+.vscode/
+*.iws
+*.iml
+*.ipr
+
+# --- Raw 2048² Gemini PNGs — too big and not part of the shipping app ---
+temp-asset/*.png
+temp-asset/*.jpg
+temp-asset/*.jpeg
+
+# --- macOS turds ---
+.DS_Store
+
+# --- (Intentionally keep) ---
+# docs/                  — ARCHITECTURE / PROGRESS are essential context
+# spec/                  — pairing protocol + MCP tools are part of the design
+# temp-asset/process.py  — the illustration pipeline IS shippable knowledge
+# **/src/test/           — keep test files; they document expected behaviour
+# **/src/androidTest/    — same
+# Anything in android/{app,core,feature,data-source,build-logic}/src/
+# Anything in relay-server/{cmd,internal,deploy}/
