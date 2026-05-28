@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WalletTheme.colors.surfaceBase — the warm cream paper our whole UI sits on.
+     Used as the adaptive launcher icon's background layer so the seal-on-paper
+     composition reads continuously whether the launcher masks to a circle or squircle. -->
+<resources>
+    <color name="ic_launcher_background">#EFEAE0</color>
+</resources>
