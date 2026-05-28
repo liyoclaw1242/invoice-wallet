@@ -3,6 +3,7 @@ package tw.invoicewallet.feature.settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,17 +13,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,11 +34,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import tw.invoicewallet.core.designsystem.components.OutlinePill
+import tw.invoicewallet.core.designsystem.components.PillButton
+import tw.invoicewallet.core.designsystem.components.PillChip
+import tw.invoicewallet.core.designsystem.components.QuietPill
+import tw.invoicewallet.core.designsystem.components.SectionLabel
+import tw.invoicewallet.core.designsystem.theme.WalletTheme
 import tw.invoicewallet.feature.export.ExportFormat
 
 @Composable
@@ -134,204 +139,273 @@ fun SettingsScreen(
     onRemoteEnabledChange: (Boolean) -> Unit = {},
     onPairRelayClick: () -> Unit = {},
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = { Text("設定") },
-                navigationIcon = { TextButton(onClick = onBack) { Text("返回") } },
-            )
-        },
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-        ) {
-            Section("外觀主題") {
-                ChipRow(
-                    options = ThemeMode.entries,
-                    selected = uiState.themeMode,
-                    label = { it.displayName() },
-                    tag = { "theme-${it.name}" },
-                    onSelect = onThemeModeChange,
+    WalletTheme {
+        Scaffold(
+            modifier = modifier,
+            containerColor = WalletTheme.colors.surfaceBase,
+            topBar = {
+                TopAppBar(
+                    title = { Text("設定", style = WalletTheme.typography.title) },
+                    navigationIcon = {
+                        TextButton(onClick = onBack) {
+                            Text(
+                                "返回",
+                                style = WalletTheme.typography.pillLabel,
+                                color = WalletTheme.colors.inkSecondary,
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = WalletTheme.colors.surfaceBase,
+                    ),
                 )
-            }
-
-            Section("預設掃描方式") {
-                ChipRow(
-                    options = DefaultScanMode.entries,
-                    selected = uiState.defaultScanMode,
-                    label = { it.displayName() },
-                    tag = { "scan-${it.name}" },
-                    onSelect = onDefaultScanModeChange,
-                )
-            }
-
-            Section("手機條碼載具") {
-                var draft by remember(uiState.carrierCode) { mutableStateOf(uiState.carrierCode) }
-                OutlinedTextField(
-                    value = draft,
-                    onValueChange = { draft = it },
-                    label = { Text("載具條碼（加密儲存於本機）") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth().testTag("carrier-field"),
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = { onCarrierCodeSave(draft) },
-                        modifier = Modifier.testTag("carrier-save"),
-                    ) { Text("儲存") }
-                    OutlinedButton(
-                        onClick = {
-                            draft = ""
-                            onCarrierCodeClear()
-                        },
-                        modifier = Modifier.testTag("carrier-clear"),
-                    ) { Text("清除") }
+            },
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = WalletTheme.spacing.lg)
+                    .padding(bottom = WalletTheme.spacing.xxl),
+            ) {
+                SectionGroup(label = "外觀") {
+                    PillChipRow(
+                        options = ThemeMode.entries,
+                        selected = uiState.themeMode,
+                        label = { it.displayName() },
+                        tag = { "theme-${it.name}" },
+                        onSelect = onThemeModeChange,
+                    )
                 }
-            }
 
-            Section("關於 App") {
-                OutlinedButton(
-                    onClick = onReplayOnboarding,
-                    modifier = Modifier.testTag("replay-onboarding"),
-                ) { Text("重看引導") }
-            }
-
-            Section("匯入財政部載具 CSV") {
-                Text(
-                    "從財政部電子發票平台下載「手機條碼載具」明細 CSV 後匯入。已存在的發票會以 CSV 覆寫" +
-                        "（保留你的備註、標籤、對獎狀態）；品項會被替換為 CSV 內容。",
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                Button(
-                    onClick = onImportCarrierCsv,
-                    modifier = Modifier.testTag("carrier-import"),
-                ) { Text("選擇 CSV 檔案") }
-            }
-
-            Section("資料匯出") {
-                Text(
-                    "資料屬於你 — 隨時可帶走整個發票錢包。",
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = { onExport(ExportFormat.JSON) },
-                        modifier = Modifier.testTag("export-JSON"),
-                    ) { Text("匯出 JSON") }
-                    OutlinedButton(
-                        onClick = { onExport(ExportFormat.CSV) },
-                        modifier = Modifier.testTag("export-CSV"),
-                    ) { Text("匯出 CSV") }
+                SectionGroup(label = "預設掃描方式") {
+                    PillChipRow(
+                        options = DefaultScanMode.entries,
+                        selected = uiState.defaultScanMode,
+                        label = { it.displayName() },
+                        tag = { "scan-${it.name}" },
+                        onSelect = onDefaultScanModeChange,
+                    )
                 }
-            }
 
-            Section("AI 連線（本機 MCP）") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text("啟用本機 MCP 伺服器")
-                    Switch(
+                SectionGroup(label = "手機條碼載具") {
+                    var draft by remember(uiState.carrierCode) { mutableStateOf(uiState.carrierCode) }
+                    PaperField(
+                        value = draft,
+                        onValueChange = { draft = it },
+                        placeholder = "載具條碼（加密儲存於本機）",
+                        testTag = "carrier-field",
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(WalletTheme.spacing.xs)) {
+                        PillButton(
+                            text = "儲存",
+                            onClick = { onCarrierCodeSave(draft) },
+                            modifier = Modifier.testTag("carrier-save"),
+                        )
+                        QuietPill(
+                            text = "清除",
+                            onClick = {
+                                draft = ""
+                                onCarrierCodeClear()
+                            },
+                            modifier = Modifier.testTag("carrier-clear"),
+                        )
+                    }
+                }
+
+                SectionGroup(label = "匯入財政部載具 CSV") {
+                    HelperText(
+                        "從財政部電子發票平台下載「手機條碼載具」明細 CSV 後匯入。已存在的發票會以 CSV 覆寫" +
+                            "（保留你的備註、標籤、對獎狀態）；品項會被替換為 CSV 內容。",
+                    )
+                    PillButton(
+                        text = "選擇 CSV 檔案",
+                        onClick = onImportCarrierCsv,
+                        modifier = Modifier.testTag("carrier-import"),
+                    )
+                }
+
+                SectionGroup(label = "資料匯出") {
+                    HelperText("資料屬於你 — 隨時可帶走整個發票錢包。")
+                    Row(horizontalArrangement = Arrangement.spacedBy(WalletTheme.spacing.xs)) {
+                        PillButton(
+                            text = "匯出 JSON",
+                            onClick = { onExport(ExportFormat.JSON) },
+                            modifier = Modifier.testTag("export-JSON"),
+                        )
+                        OutlinePill(
+                            text = "匯出 CSV",
+                            onClick = { onExport(ExportFormat.CSV) },
+                            modifier = Modifier.testTag("export-CSV"),
+                        )
+                    }
+                }
+
+                SectionGroup(label = "AI 連線（本機 MCP）") {
+                    SwitchRow(
+                        label = "啟用本機 MCP 伺服器",
                         checked = uiState.mcpEnabled,
                         onCheckedChange = onMcpEnabledChange,
-                        modifier = Modifier.testTag("mcp-enable"),
+                        testTag = "mcp-enable",
                     )
-                }
-                if (uiState.mcpEnabled) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text("允許區域網路連線 (0.0.0.0)")
-                        Switch(
+                    if (uiState.mcpEnabled) {
+                        SwitchRow(
+                            label = "允許區域網路連線 (0.0.0.0)",
                             checked = uiState.mcpLanMode,
                             onCheckedChange = onMcpLanModeChange,
-                            modifier = Modifier.testTag("mcp-lan"),
+                            testTag = "mcp-lan",
+                        )
+                        HelperText("Bearer Token（複製到 Claude Desktop connector）")
+                        SelectionContainer {
+                            Text(
+                                uiState.mcpToken,
+                                style = WalletTheme.typography.mono,
+                                color = WalletTheme.colors.inkPrimary,
+                                modifier = Modifier.testTag("mcp-token"),
+                            )
+                        }
+                        OutlinePill(
+                            text = "重新產生 Token",
+                            onClick = onRegenerateToken,
+                            modifier = Modifier.testTag("mcp-regenerate"),
+                        )
+                        HelperText(
+                            "PC 連線：adb reverse tcp:7777 tcp:7777，再將 connector 指向 http://localhost:7777/mcp。" +
+                                "發票資料留在手機，僅在你授權的工具呼叫時被讀取。",
                         )
                     }
-                    Text("Bearer Token（複製到 Claude Desktop connector）", style = MaterialTheme.typography.bodySmall)
-                    SelectionContainer {
-                        Text(
-                            uiState.mcpToken,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.testTag("mcp-token"),
-                        )
-                    }
-                    OutlinedButton(
-                        onClick = onRegenerateToken,
-                        modifier = Modifier.testTag("mcp-regenerate"),
-                    ) { Text("重新產生 Token") }
-                    Text(
-                        "PC 連線：adb reverse tcp:7777 tcp:7777，再將 connector 指向 http://localhost:7777/mcp。" +
-                            "發票資料留在手機，僅在你授權的工具呼叫時被讀取。",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
                 }
-            }
 
-            Section("遠端 AI（Relay）") {
-                Text(
-                    if (uiState.relayPaired) "已配對 Relay。" else "尚未配對。先在 relay 端取得配對碼。",
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                OutlinedButton(
-                    onClick = onPairRelayClick,
-                    modifier = Modifier.testTag("pair-relay"),
-                ) { Text(if (uiState.relayPaired) "重新配對 Relay" else "配對 Relay") }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text("允許 AI 遠端查詢")
-                    Switch(
+                SectionGroup(label = "遠端 AI（Relay）") {
+                    HelperText(
+                        if (uiState.relayPaired) "已配對 Relay。" else "尚未配對。先在 relay 端取得配對碼。",
+                    )
+                    OutlinePill(
+                        text = if (uiState.relayPaired) "重新配對 Relay" else "配對 Relay",
+                        onClick = onPairRelayClick,
+                        modifier = Modifier.testTag("pair-relay"),
+                    )
+                    SwitchRow(
+                        label = "允許 AI 遠端查詢",
                         checked = uiState.remoteEnabled,
                         onCheckedChange = onRemoteEnabledChange,
                         enabled = uiState.relayPaired,
-                        modifier = Modifier.testTag("remote-enable"),
+                        testTag = "remote-enable",
+                    )
+                    HelperText(
+                        "開啟後手機會連到 relay；Claude 經 Cloudflare tunnel→relay→你的手機查詢。" +
+                            "發票資料不經過 relay，只在手機上產生回應。",
                     )
                 }
-                Text(
-                    "開啟後手機會連到 relay；Claude 經 Cloudflare tunnel→relay→你的手機查詢。" +
-                        "發票資料不經過 relay，只在手機上產生回應。",
-                    style = MaterialTheme.typography.bodySmall,
-                )
+
+                SectionGroup(label = "關於 App") {
+                    OutlinePill(
+                        text = "重看引導",
+                        onClick = onReplayOnboarding,
+                        modifier = Modifier.testTag("replay-onboarding"),
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun Section(title: String, content: @Composable () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(title, style = MaterialTheme.typography.titleMedium)
+private fun SectionGroup(label: String, content: @Composable () -> Unit) {
+    SectionLabel(text = label)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = WalletTheme.spacing.xs, bottom = WalletTheme.spacing.md)
+            .background(WalletTheme.colors.surfaceElevated, WalletTheme.shapes.card)
+            .padding(WalletTheme.spacing.md),
+        verticalArrangement = Arrangement.spacedBy(WalletTheme.spacing.sm),
+    ) {
         content()
     }
 }
 
+@Composable
+private fun HelperText(text: String) {
+    Text(
+        text,
+        style = WalletTheme.typography.caption,
+        color = WalletTheme.colors.inkSecondary,
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun <T> ChipRow(
+private fun PaperField(value: String, onValueChange: (String) -> Unit, placeholder: String, testTag: String) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = { Text(placeholder, style = WalletTheme.typography.bodyMd) },
+        singleLine = true,
+        shape = WalletTheme.shapes.card,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = WalletTheme.colors.surfaceBase,
+            unfocusedContainerColor = WalletTheme.colors.surfaceBase,
+            focusedIndicatorColor = WalletTheme.colors.accentTeal,
+            unfocusedIndicatorColor = WalletTheme.colors.divider,
+            focusedTextColor = WalletTheme.colors.inkPrimary,
+            unfocusedTextColor = WalletTheme.colors.inkPrimary,
+            focusedPlaceholderColor = WalletTheme.colors.inkTertiary,
+            unfocusedPlaceholderColor = WalletTheme.colors.inkTertiary,
+        ),
+        modifier = Modifier.fillMaxWidth().testTag(testTag),
+    )
+}
+
+@Composable
+private fun SwitchRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    testTag: String,
+    enabled: Boolean = true,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            label,
+            style = WalletTheme.typography.bodyLg,
+            color = if (enabled) WalletTheme.colors.inkPrimary else WalletTheme.colors.inkTertiary,
+        )
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            enabled = enabled,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = WalletTheme.colors.surfaceElevated,
+                checkedTrackColor = WalletTheme.colors.accentTeal,
+                uncheckedThumbColor = WalletTheme.colors.inkTertiary,
+                uncheckedTrackColor = WalletTheme.colors.surfaceTinted,
+                uncheckedBorderColor = WalletTheme.colors.divider,
+            ),
+            modifier = Modifier.testTag(testTag),
+        )
+    }
+}
+
+@Composable
+private fun <T> PillChipRow(
     options: List<T>,
     selected: T,
     label: (T) -> String,
     tag: (T) -> String,
     onSelect: (T) -> Unit,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(WalletTheme.spacing.xs)) {
         options.forEach { option ->
-            FilterChip(
+            PillChip(
+                label = label(option),
                 selected = option == selected,
                 onClick = { onSelect(option) },
-                label = { Text(label(option)) },
                 modifier = Modifier.testTag(tag(option)),
             )
         }

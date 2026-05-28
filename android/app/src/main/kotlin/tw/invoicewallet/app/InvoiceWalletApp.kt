@@ -35,6 +35,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import tw.invoicewallet.core.designsystem.theme.WalletTheme
 import tw.invoicewallet.feature.invoicedetail.InvoiceDetailRoute
 import tw.invoicewallet.feature.invoicelist.InvoiceListRoute
 import tw.invoicewallet.feature.lottery.LotteryRoute
@@ -145,38 +146,57 @@ private fun ScanRoute(onBack: () -> Unit, onEditInvoice: (String) -> Unit, defau
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(if (session.savedCount > 0) "已掃 ${session.savedCount} 張" else "掃描發票") },
-                navigationIcon = { TextButton(onClick = onBack) { Text("完成") } },
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
-        ScanScreen(
-            state = state,
-            onPickImage = {
-                imagePicker.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+    WalletTheme {
+        Scaffold(
+            containerColor = WalletTheme.colors.surfaceBase,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            if (session.savedCount > 0) "已掃 ${session.savedCount} 張" else "掃描發票",
+                            style = WalletTheme.typography.title,
+                        )
+                    },
+                    navigationIcon = {
+                        TextButton(onClick = onBack) {
+                            Text(
+                                "完成",
+                                style = WalletTheme.typography.pillLabel,
+                                color = WalletTheme.colors.accentTealDeep,
+                            )
+                        }
+                    },
+                    colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                        containerColor = WalletTheme.colors.surfaceBase,
+                    ),
                 )
             },
-            onConfirm = viewModel::onUserConfirm,
-            onCancel = viewModel::onCancel,
-            modifier = Modifier.padding(padding),
-            savedCount = session.savedCount,
-            cameraContent = {
-                if (hasCameraPermission) {
-                    CameraQrScanner(
-                        onInvoiceQr = { left, right -> viewModel.onQrDetected(left, right) },
-                        modifier = Modifier.fillMaxWidth().height(320.dp),
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        ) { padding ->
+            ScanScreen(
+                state = state,
+                onPickImage = {
+                    imagePicker.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
                     )
-                } else {
-                    Button(onClick = { cameraPermission.launch(Manifest.permission.CAMERA) }) {
-                        Text("授權相機以即時掃描")
+                },
+                onConfirm = viewModel::onUserConfirm,
+                onCancel = viewModel::onCancel,
+                modifier = Modifier.padding(padding),
+                savedCount = session.savedCount,
+                cameraContent = {
+                    if (hasCameraPermission) {
+                        CameraQrScanner(
+                            onInvoiceQr = { left, right -> viewModel.onQrDetected(left, right) },
+                            modifier = Modifier.fillMaxWidth().height(320.dp),
+                        )
+                    } else {
+                        Button(onClick = { cameraPermission.launch(Manifest.permission.CAMERA) }) {
+                            Text("授權相機以即時掃描")
+                        }
                     }
-                }
-            },
-        )
+                },
+            )
+        }
     }
 }

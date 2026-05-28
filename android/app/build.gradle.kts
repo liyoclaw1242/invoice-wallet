@@ -35,6 +35,8 @@ dependencies {
     // Carries the Hilt DatabaseModule (so Hilt can resolve the graph here) and
     // re-exports :core:model (Invoice) via `api`.
     implementation(project(":core:database"))
+    // ScanRoute composes the scan SnackbarHost + counter in WalletTheme tokens.
+    implementation(project(":core:design-system"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

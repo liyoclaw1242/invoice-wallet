@@ -1,21 +1,22 @@
 package tw.invoicewallet.feature.scan.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,15 +26,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
+import tw.invoicewallet.core.designsystem.components.CompactPill
+import tw.invoicewallet.core.designsystem.components.CompactPillTone
+import tw.invoicewallet.core.designsystem.components.PillButton
+import tw.invoicewallet.core.designsystem.components.QuietPill
+import tw.invoicewallet.core.designsystem.theme.WalletTheme
 import tw.invoicewallet.core.model.Invoice
 import tw.invoicewallet.core.model.formattedNumber
 import tw.invoicewallet.feature.scan.ScanState
 
 /**
- * Stateless scan screen. Renders the [ScanState] and hoists all actions to the caller.
- * The live camera preview is supplied by the app via [cameraContent]; QR codes are
- * detected in real time, so the user normally just points the camera and confirms.
+ * Stateless scan screen. Camera-first: the live preview fills most of the area, with a
+ * minimal counter pill at the top. Gallery picks divert into a focused "confirm" sheet
+ * (single-image flow); the [ScanRoute] in :app overlays a snackbar host on top of this
+ * so banner events for the camera path render above the camera.
  */
 @Composable
 fun ScanScreen(
@@ -45,26 +52,31 @@ fun ScanScreen(
     savedCount: Int = 0,
     cameraContent: @Composable () -> Unit = {},
 ) {
-    Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        when (state) {
-            ScanState.Idle -> IdleContent(savedCount, onPickImage, cameraContent)
-            ScanState.Recognizing -> RecognizingContent()
-            is ScanState.Detected -> ConfirmContent(state.draft, onConfirm, onCancel)
-            is ScanState.Saved -> ResultContent(
-                tag = "scan-saved",
-                title = "✅ 已儲存",
-                detail = "發票已存入加密錢包",
-                actionLabel = "再掃一張",
-                onAction = onCancel,
-            )
-
-            is ScanState.Error -> ResultContent(
-                tag = "scan-error",
-                title = "無法辨識",
-                detail = state.message,
-                actionLabel = "重試",
-                onAction = onCancel,
-            )
+    WalletTheme {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(WalletTheme.colors.surfaceBase),
+        ) {
+            when (state) {
+                ScanState.Idle -> IdleContent(savedCount, onPickImage, cameraContent)
+                ScanState.Recognizing -> RecognizingContent()
+                is ScanState.Detected -> ConfirmContent(state.draft, onConfirm, onCancel)
+                is ScanState.Saved -> ResultContent(
+                    tag = "scan-saved",
+                    title = "已儲存",
+                    detail = "發票已存入加密錢包。",
+                    actionLabel = "再掃一張",
+                    onAction = onCancel,
+                )
+                is ScanState.Error -> ResultContent(
+                    tag = "scan-error",
+                    title = "無法辨識",
+                    detail = state.message,
+                    actionLabel = "重試",
+                    onAction = onCancel,
+                )
+            }
         }
     }
 }
@@ -72,77 +84,96 @@ fun ScanScreen(
 @Composable
 private fun IdleContent(savedCount: Int, onPickImage: () -> Unit, cameraContent: @Composable () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState()).testTag("scan-idle"),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = WalletTheme.spacing.lg, vertical = WalletTheme.spacing.md)
+            .testTag("scan-idle"),
+        verticalArrangement = Arrangement.spacedBy(WalletTheme.spacing.md),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Headline adapts to the session: first scan is a how-to, subsequent ones cheer the count.
-        if (savedCount == 0) {
-            Text("把鏡頭對準發票的 QR code", style = MaterialTheme.typography.titleMedium)
-            Text(
-                "辨識後會自動存入錢包，可一張接一張掃，不用每張按確認。",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        } else {
-            Text(
-                "本次已存 $savedCount 張，繼續掃下一張。",
-                style = MaterialTheme.typography.titleMedium,
+        // Counter pill — quietly tracks the batch without dominating the screen.
+        if (savedCount > 0) {
+            CompactPill(
+                text = "本次已存 $savedCount 張",
+                tone = CompactPillTone.Teal,
                 modifier = Modifier.testTag("saved-count"),
             )
+        } else {
+            CompactPill(text = "對準發票上的 QR code", tone = CompactPillTone.Neutral)
         }
+
         cameraContent()
-        OutlinedButton(
+
+        // Gallery is the secondary path — quieter affordance.
+        QuietPill(
+            text = "改從相簿選擇照片",
             onClick = onPickImage,
-            modifier = Modifier.fillMaxWidth().testTag("pick-image-button"),
-        ) {
-            Text("改從相簿選擇照片")
-        }
+            modifier = Modifier.testTag("pick-image-button"),
+        )
     }
 }
 
 @Composable
 private fun RecognizingContent() {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).testTag("scan-recognizing"),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(WalletTheme.spacing.lg)
+            .testTag("scan-recognizing"),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CircularProgressIndicator()
-        Text("辨識中…", style = MaterialTheme.typography.bodyLarge)
+        CircularProgressIndicator(color = WalletTheme.colors.accentTealDeep)
+        Spacer(Modifier.height(WalletTheme.spacing.md))
+        Text(
+            "辨識中…",
+            style = WalletTheme.typography.bodyLg,
+            color = WalletTheme.colors.inkSecondary,
+        )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ConfirmContent(draft: Invoice, onConfirm: (Invoice) -> Unit, onCancel: () -> Unit) {
     var merchantName by remember(draft.id) { mutableStateOf(draft.merchantName) }
     var totalText by remember(draft.id) { mutableStateOf(draft.totalAmount.toString()) }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState())
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = WalletTheme.spacing.lg, vertical = WalletTheme.spacing.md)
             .testTag("scan-detected"),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(WalletTheme.spacing.md),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("確認發票資料", style = MaterialTheme.typography.headlineSmall)
-        OutlinedTextField(
+        Text(
+            "確認發票資料",
+            style = WalletTheme.typography.displaySm,
+            color = WalletTheme.colors.inkPrimary,
+        )
+
+        ScanField(
             value = merchantName,
             onValueChange = { merchantName = it },
-            label = { Text("商店名稱") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth().testTag("field-merchant"),
+            placeholder = "商店名稱",
+            testTag = "field-merchant",
         )
-        OutlinedTextField(
+        ScanField(
             value = totalText,
             onValueChange = { totalText = it.filter(Char::isDigit) },
-            label = { Text("總金額 (NT$)") },
-            singleLine = true,
+            placeholder = "總金額 (NT$)",
+            testTag = "field-total",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth().testTag("field-total"),
         )
-        ReadOnlyField("發票號碼", draft.formattedNumber())
-        ReadOnlyField("開立日期", draft.issueDate.toString())
-        ReadOnlyField("賣方統編", draft.merchantTaxId ?: "—")
-        Button(
+        ReadOnlyRow("發票號碼", draft.formattedNumber())
+        ReadOnlyRow("開立日期", draft.issueDate.toString())
+        ReadOnlyRow("賣方統編", draft.merchantTaxId ?: "—")
+
+        Spacer(Modifier.height(WalletTheme.spacing.md))
+        PillButton(
+            text = "確認儲存",
             onClick = {
                 onConfirm(
                     draft.copy(
@@ -151,38 +182,90 @@ private fun ConfirmContent(draft: Invoice, onConfirm: (Invoice) -> Unit, onCance
                     ),
                 )
             },
-            modifier = Modifier.fillMaxWidth().testTag("confirm-button"),
-        ) {
-            Text("確認儲存")
-        }
-        TextButton(
+            modifier = Modifier.fillMaxWidth(0.7f).testTag("confirm-button"),
+        )
+        QuietPill(
+            text = "取消",
             onClick = onCancel,
-            modifier = Modifier.fillMaxWidth().testTag("cancel-button"),
-        ) {
-            Text("取消")
-        }
+            modifier = Modifier.testTag("cancel-button"),
+        )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ReadOnlyField(label: String, value: String) {
-    Column {
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, style = MaterialTheme.typography.bodyLarge)
+private fun ScanField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    testTag: String,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = { Text(placeholder, style = WalletTheme.typography.bodyMd) },
+        singleLine = true,
+        keyboardOptions = keyboardOptions,
+        shape = WalletTheme.shapes.card,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = WalletTheme.colors.surfaceElevated,
+            unfocusedContainerColor = WalletTheme.colors.surfaceElevated,
+            focusedIndicatorColor = WalletTheme.colors.accentTeal,
+            unfocusedIndicatorColor = WalletTheme.colors.divider,
+            focusedTextColor = WalletTheme.colors.inkPrimary,
+            unfocusedTextColor = WalletTheme.colors.inkPrimary,
+            focusedPlaceholderColor = WalletTheme.colors.inkTertiary,
+            unfocusedPlaceholderColor = WalletTheme.colors.inkTertiary,
+        ),
+        modifier = Modifier.fillMaxWidth().testTag(testTag),
+    )
+}
+
+@Composable
+private fun ReadOnlyRow(label: String, value: String) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            label,
+            style = WalletTheme.typography.microCaps,
+            color = WalletTheme.colors.inkTertiary,
+        )
+        Text(
+            value,
+            style = WalletTheme.typography.bodyLg,
+            color = WalletTheme.colors.inkPrimary,
+        )
     }
 }
 
 @Composable
 private fun ResultContent(tag: String, title: String, detail: String, actionLabel: String, onAction: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).testTag(tag),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(WalletTheme.spacing.lg)
+            .testTag(tag),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(title, style = MaterialTheme.typography.headlineMedium)
-        Text(detail, style = MaterialTheme.typography.bodyMedium)
-        Button(onClick = onAction, modifier = Modifier.fillMaxWidth().testTag("result-action")) {
-            Text(actionLabel)
-        }
+        Text(
+            title,
+            style = WalletTheme.typography.displaySm,
+            color = WalletTheme.colors.inkPrimary,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(WalletTheme.spacing.sm))
+        Text(
+            detail,
+            style = WalletTheme.typography.bodyLg,
+            color = WalletTheme.colors.inkSecondary,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(WalletTheme.spacing.lg))
+        PillButton(
+            text = actionLabel,
+            onClick = onAction,
+            modifier = Modifier.testTag("result-action"),
+        )
     }
 }

@@ -27,6 +27,7 @@ dependencies {
     // Domain models + the InvoiceRepository interface (the impl is wired via DI at app level).
     implementation(project(":core:model"))
     implementation(project(":core:database"))
+    implementation(project(":core:design-system"))
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.kotlinx.coroutines.core)
