@@ -1,6 +1,5 @@
 package tw.invoicewallet.feature.invoicedetail
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -23,7 +22,8 @@ import tw.invoicewallet.core.model.LotteryStatus
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34])
+// Pixel-class viewport so the scrolling editor doesn't push actions out of reach.
+@Config(sdk = [34], qualifiers = "w411dp-h891dp")
 class InvoiceDetailScreenTest {
 
     @get:Rule
@@ -33,14 +33,12 @@ class InvoiceDetailScreenTest {
     fun shows_fields_and_save_reports_edited_note() {
         var savedNote: String? = null
         composeRule.setContent {
-            MaterialTheme {
-                InvoiceDetailScreen(
-                    state = InvoiceDetailState.Loaded(invoice()),
-                    onSave = { note, _ -> savedNote = note },
-                    onDelete = {},
-                    onBack = {},
-                )
-            }
+            InvoiceDetailScreen(
+                state = InvoiceDetailState.Loaded(invoice()),
+                onSave = { note, _ -> savedNote = note },
+                onDelete = {},
+                onBack = {},
+            )
         }
 
         composeRule.onNodeWithText("全聯福利中心").assertIsDisplayed()
@@ -54,14 +52,12 @@ class InvoiceDetailScreenTest {
     fun delete_requires_confirmation_then_reports() {
         var deleted = false
         composeRule.setContent {
-            MaterialTheme {
-                InvoiceDetailScreen(
-                    state = InvoiceDetailState.Loaded(invoice()),
-                    onSave = { _, _ -> },
-                    onDelete = { deleted = true },
-                    onBack = {},
-                )
-            }
+            InvoiceDetailScreen(
+                state = InvoiceDetailState.Loaded(invoice()),
+                onSave = { _, _ -> },
+                onDelete = { deleted = true },
+                onBack = {},
+            )
         }
 
         composeRule.onNodeWithTag("delete-button").performScrollTo().performClick()
@@ -73,14 +69,12 @@ class InvoiceDetailScreenTest {
     @Test
     fun shows_not_found_state() {
         composeRule.setContent {
-            MaterialTheme {
-                InvoiceDetailScreen(
-                    state = InvoiceDetailState.NotFound,
-                    onSave = { _, _ -> },
-                    onDelete = {},
-                    onBack = {},
-                )
-            }
+            InvoiceDetailScreen(
+                state = InvoiceDetailState.NotFound,
+                onSave = { _, _ -> },
+                onDelete = {},
+                onBack = {},
+            )
         }
 
         composeRule.onNodeWithTag("detail-not-found").assertIsDisplayed()
