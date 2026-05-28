@@ -12,6 +12,7 @@ import tw.invoicewallet.core.database.InvoiceWalletDatabase
 import tw.invoicewallet.core.database.buildEncryptedDatabase
 import tw.invoicewallet.core.database.dao.AuthGrantDao
 import tw.invoicewallet.core.database.dao.InvoiceDao
+import tw.invoicewallet.core.database.dao.InvoiceItemDao
 import tw.invoicewallet.core.database.dao.LotteryNumberDao
 import tw.invoicewallet.core.database.dao.QueryAuditLogDao
 import tw.invoicewallet.core.database.repository.AuthGrantRepository
@@ -43,6 +44,9 @@ object DatabaseModule {
     fun provideInvoiceDao(database: InvoiceWalletDatabase): InvoiceDao = database.invoiceDao()
 
     @Provides
+    fun provideInvoiceItemDao(database: InvoiceWalletDatabase): InvoiceItemDao = database.invoiceItemDao()
+
+    @Provides
     fun provideLotteryNumberDao(database: InvoiceWalletDatabase): LotteryNumberDao = database.lotteryNumberDao()
 
     @Provides
@@ -57,8 +61,11 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideInvoiceRepository(invoiceDao: InvoiceDao, clock: Clock): InvoiceRepository =
-        RoomInvoiceRepository(invoiceDao, clock)
+    fun provideInvoiceRepository(
+        invoiceDao: InvoiceDao,
+        invoiceItemDao: InvoiceItemDao,
+        clock: Clock,
+    ): InvoiceRepository = RoomInvoiceRepository(invoiceDao, invoiceItemDao, clock)
 
     @Provides
     @Singleton

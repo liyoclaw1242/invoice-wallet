@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import tw.invoicewallet.core.model.formattedNumber
 
 @Composable
@@ -74,7 +75,8 @@ fun InvoiceDetailScreen(
         },
     ) { padding ->
         when (state) {
-            is InvoiceDetailState.Loaded -> LoadedContent(state.invoice, onSave, onDelete, Modifier.padding(padding))
+            is InvoiceDetailState.Loaded ->
+                LoadedContent(state.invoice, state.items, onSave, onDelete, Modifier.padding(padding))
             InvoiceDetailState.Loading ->
                 CircularProgressIndicator(Modifier.padding(padding).padding(24.dp).testTag("detail-loading"))
             InvoiceDetailState.NotFound ->
@@ -87,6 +89,7 @@ fun InvoiceDetailScreen(
 @Composable
 private fun LoadedContent(
     invoice: Invoice,
+    items: List<InvoiceItem>,
     onSave: (String, List<String>) -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
@@ -136,10 +139,8 @@ private fun LoadedContent(
             }
         }
 
-        Text(
-            "品項明細尚未儲存（掃描目前僅保存發票表頭）。",
-            style = MaterialTheme.typography.bodySmall,
-        )
+        HorizontalDivider()
+        ItemsSection(items)
     }
 
     if (confirmingDelete) {
@@ -159,6 +160,37 @@ private fun LoadedContent(
             dismissButton = { TextButton(onClick = { confirmingDelete = false }) { Text("取消") } },
         )
     }
+}
+
+@Composable
+private fun ItemsSection(items: List<InvoiceItem>, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("品項明細", style = MaterialTheme.typography.titleMedium)
+        if (items.isEmpty()) {
+            Text(
+                "此發票沒有品項資料（部分商家的 QR 只帶發票表頭）。",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.testTag("items-empty"),
+            )
+            return@Column
+        }
+        items.forEach { item ->
+            Row(
+                modifier = Modifier.fillMaxWidth().testTag("item-row"),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                Text(quantityLabel(item), style = MaterialTheme.typography.bodyMedium)
+                Text("NT$${item.amount}", style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+    }
+}
+
+/** "× 2" for whole counts, "× 1.5" otherwise; trims the trailing ".0". */
+private fun quantityLabel(item: InvoiceItem): String {
+    val qty = if (item.quantity % 1.0 == 0.0) item.quantity.toInt().toString() else item.quantity.toString()
+    return "× $qty"
 }
 
 @Composable

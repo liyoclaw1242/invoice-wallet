@@ -10,6 +10,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import tw.invoicewallet.datasource.authz.QueryConstraints
 
 // --- argument parsing (tolerant: wrong/absent types read as null) ---
@@ -50,6 +51,15 @@ internal fun Invoice.toJson(): JsonObject = buildJsonObject {
     lotteryPrize?.let { put("lottery_prize", it) }
     userNote?.let { put("note", it) }
     if (userTags.isNotEmpty()) put("tags", buildJsonArray { userTags.forEach { add(it) } })
+}
+
+/** Projection of a line item for AI clients. */
+internal fun InvoiceItem.toJson(): JsonObject = buildJsonObject {
+    put("name", name)
+    put("quantity", quantity)
+    put("unit_price", unitPrice)
+    put("amount", amount)
+    category?.let { put("category", it) }
 }
 
 internal fun JsonObjectBuilder.stringProp(name: String, description: String) = putJsonObject(name) {

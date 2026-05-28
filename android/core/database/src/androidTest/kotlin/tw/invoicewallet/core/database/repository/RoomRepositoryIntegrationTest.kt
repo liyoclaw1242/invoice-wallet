@@ -39,7 +39,7 @@ class RoomRepositoryIntegrationTest {
 
     @Test
     fun invoice_repository_round_trips_over_real_room() = runTest {
-        val repository = RoomInvoiceRepository(db.invoiceDao())
+        val repository = RoomInvoiceRepository(db.invoiceDao(), db.invoiceItemDao())
         val invoice = sampleInvoice
 
         repository.upsert(invoice)

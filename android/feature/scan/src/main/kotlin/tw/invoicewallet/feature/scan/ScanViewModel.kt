@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import tw.invoicewallet.feature.scan.merchant.MerchantDirectory
 import tw.invoicewallet.feature.scan.ocr.InvoiceFieldExtractor
 import tw.invoicewallet.feature.scan.qr.EInvoiceQrException
@@ -39,8 +40,8 @@ class ScanViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = ScanState.Recognizing
             _state.value = try {
-                val draft = buildDraft(recognizer.recognize(image))?.let { withMerchantName(it) }
-                draft?.let { ScanState.Detected(it) }
+                val bundle = buildDraft(recognizer.recognize(image))
+                bundle?.let { ScanState.Detected(withMerchantName(it.invoice), it.items) }
                     ?: ScanState.Error("這張照片裡找不到發票資訊，可改用手動輸入。")
             } catch (e: Exception) {
                 ScanState.Error("辨識失敗：${e.message ?: "未知錯誤"}")
@@ -54,7 +55,8 @@ class ScanViewModel @Inject constructor(
             _state.value = ScanState.Recognizing
             _state.value = try {
                 val parsed = parseTolerant(leftQr, rightBytes)
-                ScanState.Detected(withMerchantName(parsed.toDraftInvoice(id = newId(), now = clock.now())))
+                val draft = parsed.toDraftInvoice(id = newId(), now = clock.now())
+                ScanState.Detected(withMerchantName(draft), parsed.toDraftItems(draft.id))
             } catch (e: EInvoiceQrException) {
                 ScanState.Error(e.message ?: "無法解析發票 QR code")
             }
@@ -68,10 +70,14 @@ class ScanViewModel @Inject constructor(
         runCatching { EInvoiceQrParser.parse(leftQr, rightBytes) }
             .getOrElse { EInvoiceQrParser.parse(leftQr, null) }
 
-    /** The user accepted (and possibly edited) the draft — persist it. */
+    /** The user accepted (and possibly edited) the draft — persist it with its items.
+     *  The header may have been edited but keeps the same id, so the items decoded into
+     *  [ScanState.Detected] still belong to it; re-key them in case the id was regenerated. */
     fun onUserConfirm(invoice: Invoice) {
+        val items = (_state.value as? ScanState.Detected)?.items.orEmpty()
+            .map { it.copy(invoiceId = invoice.id) }
         viewModelScope.launch {
-            val saved = invoiceRepository.upsert(invoice)
+            val saved = invoiceRepository.upsertWithItems(invoice, items)
             _state.value = ScanState.Saved(saved.id)
         }
     }
@@ -81,15 +87,22 @@ class ScanViewModel @Inject constructor(
         _state.value = ScanState.Idle
     }
 
+    /** A draft header plus the line items decoded with it. */
+    private data class DraftBundle(val invoice: Invoice, val items: List<InvoiceItem>)
+
     /** QR is authoritative; fall back to OCR-extracted fields when no QR is present. */
-    private fun buildDraft(result: RecognitionResult): Invoice? {
+    private fun buildDraft(result: RecognitionResult): DraftBundle? {
         val now = clock.now()
         result.qrLeft?.let { left ->
             runCatching { parseTolerant(left, result.qrRightBytes) }
                 .getOrNull()
-                ?.let { return it.toDraftInvoice(id = newId(), now = now) }
+                ?.let { parsed ->
+                    val id = newId()
+                    return DraftBundle(parsed.toDraftInvoice(id = id, now = now), parsed.toDraftItems(id))
+                }
         }
-        return fieldExtractor.extract(result.ocr).toDraftInvoice(id = newId(), now = now)
+        val ocr = fieldExtractor.extract(result.ocr).toDraftInvoice(id = newId(), now = now) ?: return null
+        return DraftBundle(ocr, emptyList())
     }
 
     /** Looks up the store name from the seller tax ID when the draft has no name yet. */

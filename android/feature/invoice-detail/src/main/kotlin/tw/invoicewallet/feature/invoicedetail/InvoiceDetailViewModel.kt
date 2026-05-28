@@ -11,11 +11,12 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import javax.inject.Inject
 
 sealed interface InvoiceDetailState {
     data object Loading : InvoiceDetailState
-    data class Loaded(val invoice: Invoice) : InvoiceDetailState
+    data class Loaded(val invoice: Invoice, val items: List<InvoiceItem> = emptyList()) : InvoiceDetailState
     data object NotFound : InvoiceDetailState
     data object Deleted : InvoiceDetailState
 }
@@ -37,23 +38,23 @@ class InvoiceDetailViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _state.value = repository.getById(invoiceId)
-                ?.let { InvoiceDetailState.Loaded(it) }
+                ?.let { InvoiceDetailState.Loaded(it, repository.getItems(invoiceId)) }
                 ?: InvoiceDetailState.NotFound
         }
     }
 
-    /** Persists edits to the user-owned fields (note + tags). */
+    /** Persists edits to the user-owned fields (note + tags). Header-only write — keeps items. */
     fun onSave(note: String, tags: List<String>) {
-        val current = (_state.value as? InvoiceDetailState.Loaded)?.invoice ?: return
+        val loaded = _state.value as? InvoiceDetailState.Loaded ?: return
         viewModelScope.launch {
             val updated = repository.upsert(
-                current.copy(
+                loaded.invoice.copy(
                     userNote = note.ifBlank { null },
                     userTags = tags,
                     updatedAt = clock.now(),
                 ),
             )
-            _state.value = InvoiceDetailState.Loaded(updated)
+            _state.value = InvoiceDetailState.Loaded(updated, loaded.items)
         }
     }
 

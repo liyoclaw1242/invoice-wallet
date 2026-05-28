@@ -5,10 +5,12 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.feature.scan.ocr.ExtractedFields
 import tw.invoicewallet.feature.scan.qr.ParsedInvoice
+import java.util.UUID
 
 /**
  * Builds an editable draft [Invoice] from a parsed QR code. Fields the QR cannot
@@ -38,6 +40,23 @@ internal fun ParsedInvoice.toDraftInvoice(id: String, now: Instant): Invoice = I
     updatedAt = now,
     deletedAt = null,
 )
+
+/**
+ * Builds draft line items for [invoiceId] from the items the QR carried. The QR gives a
+ * unit price and quantity; the line amount is their product (the format omits it).
+ */
+internal fun ParsedInvoice.toDraftItems(invoiceId: String): List<InvoiceItem> = items.mapIndexed { index, item ->
+    InvoiceItem(
+        id = UUID.randomUUID().toString(),
+        invoiceId = invoiceId,
+        name = item.name,
+        quantity = item.quantity.toDouble(),
+        unitPrice = item.unitPrice,
+        amount = item.quantity * item.unitPrice,
+        category = null,
+        sequence = index,
+    )
+}
 
 /**
  * Builds a draft from OCR-extracted fields (the fallback when no QR is present).

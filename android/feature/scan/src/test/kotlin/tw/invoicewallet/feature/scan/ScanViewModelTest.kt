@@ -55,6 +55,28 @@ class ScanViewModelTest {
     }
 
     @Test
+    fun `onQrDetected surfaces the decoded line items alongside the draft`() = runTest {
+        viewModel.onQrDetected(LEFT_QR_WITH_ITEMS, rightBytes = null)
+
+        val detected = viewModel.state.value
+        detected.shouldBeInstanceOf<ScanState.Detected>()
+        detected.items.map { it.name } shouldBe listOf("漢堡", "飲料")
+        detected.items.map { it.unitPrice } shouldBe listOf(85, 147)
+        detected.items.first().invoiceId shouldBe detected.draft.id
+    }
+
+    @Test
+    fun `onUserConfirm persists the detected line items with the invoice`() = runTest {
+        viewModel.onQrDetected(LEFT_QR_WITH_ITEMS, rightBytes = null)
+        val draft = (viewModel.state.value as ScanState.Detected).draft
+
+        viewModel.onUserConfirm(draft)
+
+        repository.getById(draft.id) shouldBe draft
+        repository.getItems(draft.id).map { it.name } shouldBe listOf("漢堡", "飲料")
+    }
+
+    @Test
     fun `onUserConfirm persists the invoice and emits Saved`() = runTest {
         val invoice = sampleInvoice("inv-1")
 
@@ -169,5 +191,9 @@ class ScanViewModelTest {
         // INV2 left QR from the real fixtures (B2C, no right code needed).
         const val VALID_LEFT_QR =
             "ZP4610585411504219684000000dd000000e80000000090650686uVRGyvkXO4arTAAHA722vQ==:**********:1:1:1:"
+
+        // Same header, but the detail section carries two UTF-8 line items (name:qty:price).
+        const val LEFT_QR_WITH_ITEMS =
+            "ZP4610585411504219684000000dd000000e80000000090650686uVRGyvkXO4arTAAHA722vQ==:**********:2:2:1:漢堡:1:85:飲料:1:147"
     }
 }

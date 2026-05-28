@@ -5,6 +5,7 @@ import kotlinx.datetime.LocalDate
 import tw.invoicewallet.core.model.AuthChannel
 import tw.invoicewallet.core.model.AuthGrant
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryNumber
 import tw.invoicewallet.core.model.LotteryStatus
@@ -40,6 +41,24 @@ internal fun invoice(
     createdAt = T0,
     updatedAt = T0,
     deletedAt = null,
+)
+
+internal fun invoiceItem(
+    id: String = "item-1",
+    invoiceId: String = "inv-1",
+    name: String = "超厚雞肉起司滿分堡",
+    quantity: Double = 1.0,
+    unitPrice: Int = 85,
+    sequence: Int = 0,
+) = InvoiceItem(
+    id = id,
+    invoiceId = invoiceId,
+    name = name,
+    quantity = quantity,
+    unitPrice = unitPrice,
+    amount = (quantity * unitPrice).toInt(),
+    category = null,
+    sequence = sequence,
 )
 
 internal fun lotteryNumber(period: String = "11502") = LotteryNumber(

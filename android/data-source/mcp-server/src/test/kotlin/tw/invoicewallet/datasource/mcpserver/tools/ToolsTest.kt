@@ -18,6 +18,7 @@ import kotlinx.serialization.json.put
 import org.junit.jupiter.api.Test
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.datasource.authz.QueryConstraints
@@ -38,6 +39,12 @@ class ToolsTest {
                 number = "CC00000004",
                 status = LotteryStatus.CHECKED_WON,
                 prize = 1000,
+            ),
+        ),
+        itemsByInvoice = mapOf(
+            "c" to listOf(
+                InvoiceItem("c-1", "c", "洗髮精", 1.0, 320, 320, null, 0),
+                InvoiceItem("c-2", "c", "牙膏", 2.0, 90, 180, null, 1),
             ),
         ),
     )
@@ -84,6 +91,27 @@ class ToolsTest {
         tool.call(buildJsonObject { put("invoice_id", "c") }, QueryConstraints())
             .jsonObject["merchant_name"]!!.jsonPrimitive.content shouldBe "屈臣氏"
         tool.call(buildJsonObject { put("invoice_id", "missing") }, QueryConstraints()) shouldBe JsonNull
+    }
+
+    @Test
+    fun `get_invoice_detail embeds the invoice's line items`() = runTest {
+        val result = GetInvoiceDetailTool(repo)
+            .call(buildJsonObject { put("invoice_id", "c") }, QueryConstraints())
+            .jsonObject
+
+        val items = result["items"]!!.jsonArray
+        items.size shouldBe 2
+        items.first().jsonObject["name"]!!.jsonPrimitive.content shouldBe "洗髮精"
+        items.first().jsonObject["amount"]!!.jsonPrimitive.int shouldBe 320
+    }
+
+    @Test
+    fun `get_invoice_detail returns an empty items array when there are none`() = runTest {
+        val result = GetInvoiceDetailTool(repo)
+            .call(buildJsonObject { put("invoice_id", "a") }, QueryConstraints())
+            .jsonObject
+
+        result["items"]!!.jsonArray.size shouldBe 0
     }
 
     @Test
@@ -200,8 +228,12 @@ class ToolsTest {
     )
 }
 
-private class FakeInvoiceRepository(private val data: List<Invoice>) : InvoiceRepository {
+private class FakeInvoiceRepository(
+    private val data: List<Invoice>,
+    private val itemsByInvoice: Map<String, List<InvoiceItem>> = emptyMap(),
+) : InvoiceRepository {
     override suspend fun upsert(invoice: Invoice): Invoice = invoice
+    override suspend fun getItems(invoiceId: String): List<InvoiceItem> = itemsByInvoice[invoiceId].orEmpty()
     override suspend fun getById(id: String): Invoice? = data.firstOrNull { it.id == id }
     override fun observeAll(): Flow<List<Invoice>> = flowOf(data)
     override fun queryByDateRange(from: LocalDate, to: LocalDate): Flow<List<Invoice>> =

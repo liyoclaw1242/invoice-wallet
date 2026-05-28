@@ -7,10 +7,12 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import tw.invoicewallet.core.database.dao.AuthGrantDao
 import tw.invoicewallet.core.database.dao.InvoiceDao
+import tw.invoicewallet.core.database.dao.InvoiceItemDao
 import tw.invoicewallet.core.database.dao.LotteryNumberDao
 import tw.invoicewallet.core.database.dao.QueryAuditLogDao
 import tw.invoicewallet.core.database.entity.AuthGrantEntity
 import tw.invoicewallet.core.database.entity.InvoiceEntity
+import tw.invoicewallet.core.database.entity.InvoiceItemEntity
 import tw.invoicewallet.core.database.entity.LotteryNumberEntity
 import tw.invoicewallet.core.database.entity.QueryAuditLogEntity
 
@@ -58,6 +60,24 @@ class FakeInvoiceDao : InvoiceDao {
         state.value = state.value.map {
             if (it.id == id) it.copy(deletedAt = deletedAt, updatedAt = deletedAt) else it
         }
+    }
+}
+
+class FakeInvoiceItemDao : InvoiceItemDao {
+    private val state = MutableStateFlow<List<InvoiceItemEntity>>(emptyList())
+
+    override suspend fun insertAll(items: List<InvoiceItemEntity>) {
+        state.value = state.value + items
+    }
+
+    override suspend fun getByInvoiceId(invoiceId: String): List<InvoiceItemEntity> =
+        state.value.filter { it.invoiceId == invoiceId }.sortedBy { it.sequence }
+
+    override fun observeByInvoiceId(invoiceId: String): Flow<List<InvoiceItemEntity>> =
+        state.map { rows -> rows.filter { it.invoiceId == invoiceId }.sortedBy { it.sequence } }
+
+    override suspend fun deleteByInvoiceId(invoiceId: String) {
+        state.value = state.value.filterNot { it.invoiceId == invoiceId }
     }
 }
 

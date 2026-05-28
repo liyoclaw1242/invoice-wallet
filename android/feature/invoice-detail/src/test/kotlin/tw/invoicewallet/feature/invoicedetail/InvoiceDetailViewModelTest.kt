@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.core.testing.MainDispatcherExtension
@@ -37,6 +38,40 @@ class InvoiceDetailViewModelTest {
 
         state.shouldBeInstanceOf<InvoiceDetailState.Loaded>()
         state.invoice.id shouldBe "inv-1"
+    }
+
+    @Test
+    fun `loads the invoice's line items`() = runTest {
+        val repo = FakeRepo(invoice("inv-1")).apply {
+            seedItems(
+                "inv-1",
+                listOf(
+                    InvoiceItem("it-1", "inv-1", "漢堡", 1.0, 85, 85, null, 0),
+                    InvoiceItem("it-2", "inv-1", "奶茶", 2.0, 30, 60, null, 1),
+                ),
+            )
+        }
+        val viewModel = viewModel(repo, "inv-1")
+
+        val state = viewModel.state.first { it !is InvoiceDetailState.Loading }
+
+        state.shouldBeInstanceOf<InvoiceDetailState.Loaded>()
+        state.items.map { it.name } shouldBe listOf("漢堡", "奶茶")
+    }
+
+    @Test
+    fun `keeps the line items after saving note and tags`() = runTest {
+        val repo = FakeRepo(invoice("inv-1")).apply {
+            seedItems("inv-1", listOf(InvoiceItem("it-1", "inv-1", "漢堡", 1.0, 85, 85, null, 0)))
+        }
+        val viewModel = viewModel(repo, "inv-1")
+        viewModel.state.first { it is InvoiceDetailState.Loaded }
+
+        viewModel.onSave(note = "午餐", tags = emptyList())
+
+        val state = viewModel.state.value
+        state.shouldBeInstanceOf<InvoiceDetailState.Loaded>()
+        state.items.map { it.name } shouldBe listOf("漢堡")
     }
 
     @Test
@@ -81,11 +116,18 @@ class InvoiceDetailViewModelTest {
     private class FakeRepo(vararg seed: Invoice) : InvoiceRepository {
         private val all = MutableStateFlow(seed.toList())
         val deletedIds = mutableListOf<String>()
+        private val itemsByInvoice = mutableMapOf<String, List<InvoiceItem>>()
+
+        fun seedItems(invoiceId: String, items: List<InvoiceItem>) {
+            itemsByInvoice[invoiceId] = items
+        }
 
         override suspend fun upsert(invoice: Invoice): Invoice {
             all.value = all.value.filterNot { it.id == invoice.id } + invoice
             return invoice
         }
+
+        override suspend fun getItems(invoiceId: String): List<InvoiceItem> = itemsByInvoice[invoiceId].orEmpty()
 
         override suspend fun getById(id: String): Invoice? = all.value.find { it.id == id }
         override fun observeAll(): Flow<List<Invoice>> = all

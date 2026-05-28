@@ -58,10 +58,10 @@ class ListInvoicesTool(private val invoices: InvoiceRepository) : McpTool {
     }
 }
 
-/** `get_invoice_detail` — one invoice by id, or null if missing / outside the grant. */
+/** `get_invoice_detail` — one invoice by id (with its line items), or null if missing / outside the grant. */
 class GetInvoiceDetailTool(private val invoices: InvoiceRepository) : McpTool {
     override val name = "get_invoice_detail"
-    override val description = "依發票 id 取得單張發票明細。"
+    override val description = "依發票 id 取得單張發票明細，含逐項品名／數量／金額。"
     override val inputSchema: JsonObject = buildJsonObject {
         put("type", "object")
         putJsonObject("properties") { stringProp("invoice_id", "發票 id") }
@@ -72,6 +72,10 @@ class GetInvoiceDetailTool(private val invoices: InvoiceRepository) : McpTool {
         val id = arguments.string("invoice_id") ?: return JsonNull
         val invoice = invoices.getById(id) ?: return JsonNull
         if (listOf(invoice).applyConstraints(constraints).isEmpty()) return JsonNull
-        return invoice.toJson()
+        val items = invoices.getItems(id)
+        return buildJsonObject {
+            invoice.toJson().forEach { (key, value) -> put(key, value) }
+            put("items", buildJsonArray { items.forEach { add(it.toJson()) } })
+        }
     }
 }
