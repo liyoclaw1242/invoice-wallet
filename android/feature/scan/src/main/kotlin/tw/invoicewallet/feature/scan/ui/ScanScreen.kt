@@ -42,11 +42,12 @@ fun ScanScreen(
     onConfirm: (Invoice) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    savedCount: Int = 0,
     cameraContent: @Composable () -> Unit = {},
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         when (state) {
-            ScanState.Idle -> IdleContent(onPickImage, cameraContent)
+            ScanState.Idle -> IdleContent(savedCount, onPickImage, cameraContent)
             ScanState.Recognizing -> RecognizingContent()
             is ScanState.Detected -> ConfirmContent(state.draft, onConfirm, onCancel)
             is ScanState.Saved -> ResultContent(
@@ -69,18 +70,27 @@ fun ScanScreen(
 }
 
 @Composable
-private fun IdleContent(onPickImage: () -> Unit, cameraContent: @Composable () -> Unit) {
+private fun IdleContent(savedCount: Int, onPickImage: () -> Unit, cameraContent: @Composable () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState()).testTag("scan-idle"),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("把鏡頭對準發票的 QR code", style = MaterialTheme.typography.titleMedium)
-        Text(
-            "對準後會自動辨識，店名也會自動帶入。",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        // Headline adapts to the session: first scan is a how-to, subsequent ones cheer the count.
+        if (savedCount == 0) {
+            Text("把鏡頭對準發票的 QR code", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "辨識後會自動存入錢包，可一張接一張掃，不用每張按確認。",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            Text(
+                "本次已存 $savedCount 張，繼續掃下一張。",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.testTag("saved-count"),
+            )
+        }
         cameraContent()
         OutlinedButton(
             onClick = onPickImage,

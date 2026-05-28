@@ -27,6 +27,9 @@ class FakeInvoiceRepository : InvoiceRepository {
 
     override suspend fun getById(id: String): Invoice? = state.value.find { it.id == id }
 
+    override suspend fun getByInvoiceNumber(invoiceNumber: String): Invoice? =
+        state.value.find { it.invoiceNumber == invoiceNumber }
+
     override fun observeAll(): Flow<List<Invoice>> = state
 
     override fun queryByDateRange(from: LocalDate, to: LocalDate): Flow<List<Invoice>> =

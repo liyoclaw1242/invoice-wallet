@@ -11,6 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -35,6 +39,7 @@ import tw.invoicewallet.feature.invoicedetail.InvoiceDetailRoute
 import tw.invoicewallet.feature.invoicelist.InvoiceListRoute
 import tw.invoicewallet.feature.lottery.LotteryRoute
 import tw.invoicewallet.feature.pairing.PairingRoute
+import tw.invoicewallet.feature.scan.ScanEvent
 import tw.invoicewallet.feature.scan.ScanViewModel
 import tw.invoicewallet.feature.scan.camera.CameraQrScanner
 import tw.invoicewallet.feature.scan.ui.ScanScreen
@@ -54,7 +59,11 @@ fun InvoiceWalletApp(defaultScanMode: DefaultScanMode = DefaultScanMode.CAMERA) 
             )
         }
         composable(Routes.SCAN) {
-            ScanRoute(onBack = { navController.popBackStack() }, defaultScanMode = defaultScanMode)
+            ScanRoute(
+                onBack = { navController.popBackStack() },
+                onEditInvoice = { id -> navController.navigate(Routes.detail(id)) },
+                defaultScanMode = defaultScanMode,
+            )
         }
         composable(
             route = Routes.DETAIL,
@@ -90,10 +99,12 @@ private object Routes {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ScanRoute(onBack: () -> Unit, defaultScanMode: DefaultScanMode) {
+private fun ScanRoute(onBack: () -> Unit, onEditInvoice: (String) -> Unit, defaultScanMode: DefaultScanMode) {
     val viewModel: ScanViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
+    val session by viewModel.session.collectAsState()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val imagePicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia(),
@@ -117,13 +128,31 @@ private fun ScanRoute(onBack: () -> Unit, defaultScanMode: DefaultScanMode) {
         }
     }
 
+    // Each scan emits a transient event → snackbar (3 s, action "編輯" jumps to detail).
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            val (msg, action) = when (event) {
+                is ScanEvent.Saved -> "已存 ${event.label}" to event.invoiceId
+                is ScanEvent.Duplicate -> "已存在 ${event.label}" to null
+                is ScanEvent.Failed -> "無法辨識：${event.message}" to null
+            }
+            val result = snackbarHostState.showSnackbar(
+                message = msg,
+                actionLabel = action?.let { "編輯" },
+                duration = SnackbarDuration.Short,
+            )
+            if (result == SnackbarResult.ActionPerformed && action != null) onEditInvoice(action)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("掃描發票") },
-                navigationIcon = { TextButton(onClick = onBack) { Text("返回") } },
+                title = { Text(if (session.savedCount > 0) "已掃 ${session.savedCount} 張" else "掃描發票") },
+                navigationIcon = { TextButton(onClick = onBack) { Text("完成") } },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         ScanScreen(
             state = state,
@@ -135,6 +164,7 @@ private fun ScanRoute(onBack: () -> Unit, defaultScanMode: DefaultScanMode) {
             onConfirm = viewModel::onUserConfirm,
             onCancel = viewModel::onCancel,
             modifier = Modifier.padding(padding),
+            savedCount = session.savedCount,
             cameraContent = {
                 if (hasCameraPermission) {
                     CameraQrScanner(

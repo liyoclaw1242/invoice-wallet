@@ -4,9 +4,13 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import tw.invoicewallet.core.database.repository.InvoiceRepository
@@ -32,8 +36,22 @@ class ScanViewModel @Inject constructor(
 
     private val fieldExtractor = InvoiceFieldExtractor()
 
+    // The gallery-picker path keeps its modal Idle→Recognizing→Detected→Saved/Error flow,
+    // because a single picked image really does warrant a check before persisting.
     private val _state = MutableStateFlow<ScanState>(ScanState.Idle)
     val state: StateFlow<ScanState> = _state.asStateFlow()
+
+    // The live-camera path runs continuously: no page transitions, just a saved-count chip
+    // and transient banner events. Closer to other invoice apps' batch-scan UX.
+    private val _session = MutableStateFlow(ScanSessionState())
+    val session: StateFlow<ScanSessionState> = _session.asStateFlow()
+
+    private val _events = MutableSharedFlow<ScanEvent>(extraBufferCapacity = EVENT_BUFFER)
+    val events: SharedFlow<ScanEvent> = _events.asSharedFlow()
+
+    // The same QR stays in frame for many consecutive frames; the dedup window keeps us
+    // from double-saving (or spamming "已存在" banners) for the same invoice within DEDUP_WINDOW_MS.
+    private val recentNumbers = mutableMapOf<String, Long>()
 
     /** An image was picked — recognise it on-device, then build a draft. */
     fun onImageSelected(image: Uri) {
@@ -49,17 +67,51 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    /** A QR string was entered/detected directly; parse it into an editable draft. */
+    /**
+     * Live-camera path: parse, dedup within a short window, auto-save (or report duplicate),
+     * and emit a banner event. **No** state transition — the camera keeps rolling.
+     */
     fun onQrDetected(leftQr: String, rightBytes: ByteArray?) {
         viewModelScope.launch {
-            _state.value = ScanState.Recognizing
-            _state.value = try {
-                val parsed = parseTolerant(leftQr, rightBytes)
-                val draft = parsed.toDraftInvoice(id = newId(), now = clock.now())
-                ScanState.Detected(withMerchantName(draft), parsed.toDraftItems(draft.id))
+            val parsed = try {
+                parseTolerant(leftQr, rightBytes)
             } catch (e: EInvoiceQrException) {
-                ScanState.Error(e.message ?: "無法解析發票 QR code")
+                _events.tryEmit(ScanEvent.Failed(e.message ?: "無法解析發票 QR code"))
+                return@launch
             }
+
+            val nowMs = System.currentTimeMillis()
+            val lastSeenMs = recentNumbers[parsed.invoiceNumber]
+            if (lastSeenMs != null && nowMs - lastSeenMs < DEDUP_WINDOW_MS) return@launch
+            recentNumbers[parsed.invoiceNumber] = nowMs
+
+            val existing = invoiceRepository.getByInvoiceNumber(parsed.invoiceNumber)
+            val merchantName = (
+                existing?.merchantName?.takeIf { it.isNotBlank() }
+                    ?: merchantDirectory.nameFor(parsed.sellerTaxId)
+                    ?: parsed.sellerTaxId
+                )
+            val label = "$merchantName · NT$${parsed.totalAmount}"
+
+            if (existing != null) {
+                // Already in the wallet — don't overwrite the user's notes/tags/lottery state.
+                _events.tryEmit(ScanEvent.Duplicate(label = label))
+                return@launch
+            }
+
+            val draft = parsed.toDraftInvoice(id = newId(), now = clock.now()).copy(merchantName = merchantName)
+            val items = parsed.toDraftItems(draft.id)
+            invoiceRepository.upsertWithItems(draft, items)
+            _session.update { it.copy(savedCount = it.savedCount + 1) }
+            _events.tryEmit(ScanEvent.Saved(invoiceId = draft.id, label = label, itemCount = items.size))
+        }
+    }
+
+    /** Snackbar action: undo the most recently auto-saved invoice. */
+    fun undoSavedInvoice(invoiceId: String) {
+        viewModelScope.launch {
+            invoiceRepository.softDelete(invoiceId)
+            _session.update { it.copy(savedCount = (it.savedCount - 1).coerceAtLeast(0)) }
         }
     }
 
@@ -114,4 +166,19 @@ class ScanViewModel @Inject constructor(
     }
 
     private fun newId(): String = UUID.randomUUID().toString()
+
+    private companion object {
+        const val DEDUP_WINDOW_MS = 3_000L
+        const val EVENT_BUFFER = 4
+    }
+}
+
+/** Long-lived continuous-scan state — just a chip on the camera. */
+data class ScanSessionState(val savedCount: Int = 0)
+
+/** Transient banner event from the continuous-scan path. */
+sealed interface ScanEvent {
+    data class Saved(val invoiceId: String, val label: String, val itemCount: Int) : ScanEvent
+    data class Duplicate(val label: String) : ScanEvent
+    data class Failed(val message: String) : ScanEvent
 }

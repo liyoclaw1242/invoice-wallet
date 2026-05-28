@@ -40,34 +40,87 @@ class ScanViewModelTest {
     )
 
     @Test
-    fun `onQrDetected with a valid QR moves to Detected with a QR-sourced draft`() = runTest {
+    fun `onQrDetected auto-saves a new invoice, emits Saved, and increments the session count`() = runTest {
+        viewModel.events.test {
+            viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null)
+
+            val saved = awaitItem().shouldBeInstanceOf<ScanEvent.Saved>()
+            // The merchant tax id resolves via the directory → 瑪可希維; banner reads naturally.
+            saved.label shouldBe "瑪可希維 · NT$232"
+        }
+        viewModel.session.value.savedCount shouldBe 1
+        val stored = repository.getByInvoiceNumber("ZP46105854")!!
+        stored.merchantName shouldBe "瑪可希維"
+        stored.totalAmount shouldBe 232
+        stored.source shouldBe InvoiceSource.QR_CODE
+    }
+
+    @Test
+    fun `onQrDetected persists the line items the QR carried`() = runTest {
+        viewModel.onQrDetected(LEFT_QR_WITH_ITEMS, rightBytes = null)
+
+        val stored = repository.getByInvoiceNumber("ZP46105854")!!
+        repository.getItems(stored.id).map { it.name } shouldBe listOf("漢堡", "飲料")
+    }
+
+    @Test
+    fun `onQrDetected dedups the same invoice number within the rapid-frame window`() = runTest {
         viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null)
+        viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null) // same code still in frame
 
-        val detected = viewModel.state.value
-        detected.shouldBeInstanceOf<ScanState.Detected>()
-        detected.draft.id.isNotBlank() shouldBe true
-        detected.draft.invoiceNumber shouldBe "ZP46105854"
-        detected.draft.totalAmount shouldBe 232
-        detected.draft.merchantTaxId shouldBe "90650686"
-        // store name auto-filled from the seller tax ID via the directory
-        detected.draft.merchantName shouldBe "瑪可希維"
-        detected.draft.source shouldBe InvoiceSource.QR_CODE
+        viewModel.session.value.savedCount shouldBe 1
     }
 
     @Test
-    fun `onQrDetected surfaces the decoded line items alongside the draft`() = runTest {
-        viewModel.onQrDetected(LEFT_QR_WITH_ITEMS, rightBytes = null)
+    fun `onQrDetected on an already-stored invoice emits Duplicate and does not overwrite`() = runTest {
+        // User had already scanned this invoice and added a note; re-scanning must not clobber it.
+        repository.upsert(sampleInvoice(id = "old").copy(userNote = "上次的午餐"))
 
-        val detected = viewModel.state.value
-        detected.shouldBeInstanceOf<ScanState.Detected>()
-        detected.items.map { it.name } shouldBe listOf("漢堡", "飲料")
-        detected.items.map { it.unitPrice } shouldBe listOf(85, 147)
-        detected.items.first().invoiceId shouldBe detected.draft.id
+        viewModel.events.test {
+            viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null)
+            awaitItem().shouldBeInstanceOf<ScanEvent.Duplicate>()
+        }
+        repository.getById("old")!!.userNote shouldBe "上次的午餐"
+        viewModel.session.value.savedCount shouldBe 0 // duplicates don't count toward this session
     }
 
     @Test
-    fun `onUserConfirm persists the detected line items with the invoice`() = runTest {
-        viewModel.onQrDetected(LEFT_QR_WITH_ITEMS, rightBytes = null)
+    fun `onQrDetected with valid left and unreadable right still saves the invoice`() = runTest {
+        // ** prefix + an invalid UTF-8 byte → strict right-code decode fails; the
+        // invoice must still be recognised from the left code alone.
+        val badRight = byteArrayOf(0x2A, 0x2A, 0xFF.toByte())
+
+        viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = badRight)
+
+        val stored = repository.getByInvoiceNumber("ZP46105854")
+        stored?.invoiceNumber shouldBe "ZP46105854"
+    }
+
+    @Test
+    fun `onQrDetected with a malformed QR emits Failed and does not save`() = runTest {
+        viewModel.events.test {
+            viewModel.onQrDetected("too-short", rightBytes = null)
+            awaitItem().shouldBeInstanceOf<ScanEvent.Failed>()
+        }
+        viewModel.session.value.savedCount shouldBe 0
+    }
+
+    @Test
+    fun `undoSavedInvoice soft-deletes the invoice and decrements savedCount`() = runTest {
+        viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null)
+        val saved = repository.getByInvoiceNumber("ZP46105854")!!
+
+        viewModel.undoSavedInvoice(saved.id)
+
+        repository.getById(saved.id) shouldBe null
+        viewModel.session.value.savedCount shouldBe 0
+    }
+
+    @Test
+    fun `onImageSelected with QR carrying items keeps the existing Detected-then-confirm gallery flow`() = runTest {
+        recognizer.result = RecognitionResult(qrLeft = LEFT_QR_WITH_ITEMS)
+
+        viewModel.onImageSelected(mockk())
         val draft = (viewModel.state.value as ScanState.Detected).draft
 
         viewModel.onUserConfirm(draft)
@@ -91,28 +144,10 @@ class ScanViewModelTest {
     }
 
     @Test
-    fun `onQrDetected with a malformed QR moves to Error`() = runTest {
-        viewModel.onQrDetected("too-short", rightBytes = null)
-
+    fun `onCancel returns the gallery flow to Idle`() = runTest {
+        recognizer.result = RecognitionResult(ocr = RecognizedText.of("謝謝光臨")) // nothing recognised
+        viewModel.onImageSelected(mockk())
         viewModel.state.value.shouldBeInstanceOf<ScanState.Error>()
-    }
-
-    @Test
-    fun `onQrDetected with a valid left but unreadable right falls back to the left code`() = runTest {
-        // ** prefix + an invalid UTF-8 byte → strict right-code decode fails; the
-        // invoice must still be recognised from the left code alone.
-        val badRight = byteArrayOf(0x2A, 0x2A, 0xFF.toByte())
-
-        viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = badRight)
-
-        val state = viewModel.state.value
-        state.shouldBeInstanceOf<ScanState.Detected>()
-        state.draft.invoiceNumber shouldBe "ZP46105854"
-    }
-
-    @Test
-    fun `onCancel returns to Idle`() = runTest {
-        viewModel.onQrDetected("too-short", rightBytes = null)
 
         viewModel.onCancel()
 
