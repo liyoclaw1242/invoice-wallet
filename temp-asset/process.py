@@ -155,15 +155,39 @@ CATEGORIES = [
     ("clothing",  1, 2),
     ("home",      2, 2),
 ]
+# Each cell has its own cream tone — the watercolour paper subtly drifts from the
+# canvas-wide BG, so we sample THIS cell's corner-pixel cream and knock that out
+# instead of relying on the global constant. 9 % inset trims the pencil rectangle
+# drawn around each tile; bottom 32 % drops the Chinese caption.
+def _knock_out_with_sampled_bg(img, sample_box, threshold=22, soft_band=18):
+    """Like knock_out_paper but uses the median colour of [sample_box] as BG.
+    sample_box = (left, top, right, bottom) in img coords."""
+    arr = np.array(img.convert("RGBA"), dtype=np.int32)
+    sample = arr[sample_box[1]:sample_box[3], sample_box[0]:sample_box[2], :3]
+    bg = np.median(sample.reshape(-1, 3), axis=0)
+    dist = np.sqrt(((arr[..., :3] - bg) ** 2).sum(axis=-1))
+    alpha = np.where(
+        dist < threshold,
+        0.0,
+        np.where(dist < threshold + soft_band, (dist - threshold) / soft_band * 255.0, 255.0),
+    )
+    arr[..., 3] = np.clip(alpha, 0, 255).astype(np.uint8)
+    return Image.fromarray(arr.astype(np.uint8), "RGBA")
+
+
 for slug, cx, cy in CATEGORIES:
     x0 = gx0 + cx * cell_w
     y0 = gy0 + cy * cell_h
     cell = grid.crop((x0, y0, x0 + cell_w, y0 + cell_h))
-    # Drop the bottom 25 % where the Chinese label sits — labels are drawn in Compose.
     cw, ch = cell.size
-    illust = cell.crop((0, 0, cw, int(ch * 0.75)))
-    illust = to_square(auto_trim(knock_out_paper(illust)))
-    save_webp(illust, f"ic_category_{slug}", max_dim=256, quality=88)
+    inset_x = int(cw * 0.09)
+    inset_y = int(ch * 0.09)
+    illust = cell.crop((inset_x, inset_y, cw - inset_x, int(ch * 0.68)))
+    iw, ih = illust.size
+    # Sample a corner patch — corners reliably contain only the cell's cream paper.
+    sample_box = (0, 0, max(10, iw // 12), max(10, ih // 12))
+    transparent = _knock_out_with_sampled_bg(illust, sample_box, threshold=22, soft_band=18)
+    save_webp(to_square(auto_trim(transparent)), f"ic_category_{slug}", max_dim=256, quality=88)
 
 # Silence the unused-import warnings — these are kept available for ad-hoc
 # label cleanup runs (see README for the pairing-image scenario).
