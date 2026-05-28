@@ -101,6 +101,25 @@ class EInvoiceQrParserTest {
     }
 
     @Test
+    fun `Gregorian YYYYMMDD date variant parses (real KFC invoice)`() {
+        // KFC's POS emits the issue date as Gregorian 20260422 (8 chars) instead of the
+        // spec's ROC 1150422 (7 chars). Whole fixed prefix shifts +1 char as a result.
+        // Detected by year prefix "20" (ROC year is 1xx, never starts with 19/20).
+        // Header reconstructed: ZD97984811 + 20260422 + 2630 + 00000042 (untaxed=66)
+        //                      + 00000045 (total=69) + 00000000 (no buyer) + 16092461.
+        val left = "ZD9798481120260422263000000042000000450000000016092461" +
+            "abcdefghijklmnopqrstuv==:**********:1:1:1:"
+
+        val parsed = EInvoiceQrParser.parse(left, rightBytes = null)
+
+        parsed.invoiceNumber shouldBe "ZD97984811"
+        parsed.issueDate shouldBe LocalDate(2026, 4, 22)
+        parsed.randomCode shouldBe "2630"
+        parsed.totalAmount shouldBe 69
+        parsed.sellerTaxId shouldBe "16092461"
+    }
+
+    @Test
     fun `decimal qty and price (gas-station litres) survive the item parser`() {
         // Standalone right-code parse — 95Plus 無鉛 (lead-free), 30.32 L × NT$33.9.
         val rightBytes = "**95Plus無鉛:30.32:33.9:".toByteArray(Charsets.UTF_8)

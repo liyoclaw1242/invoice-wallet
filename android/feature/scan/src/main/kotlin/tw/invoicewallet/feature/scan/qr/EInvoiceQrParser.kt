@@ -21,25 +21,49 @@ import java.nio.charset.CodingErrorAction
  */
 object EInvoiceQrParser {
 
-    private const val FIXED_PREFIX_LENGTH = 53
+    private const val FIXED_PREFIX_LENGTH_ROC = 53
     private val RIGHT_PREFIX = byteArrayOf(0x2A, 0x2A)
 
     fun parseLeft(leftQr: String): LeftCode {
-        if (leftQr.length < FIXED_PREFIX_LENGTH) {
+        if (leftQr.length < FIXED_PREFIX_LENGTH_ROC) {
             throw EInvoiceQrException.MalformedLeftCode(
-                "left code length ${leftQr.length} < required $FIXED_PREFIX_LENGTH fixed chars",
+                "left code length ${leftQr.length} < required $FIXED_PREFIX_LENGTH_ROC fixed chars",
             )
         }
 
         val invoiceNumber = leftQr.substring(0, 10)
-        val issueDate = parseRocDate(leftQr.substring(10, 17))
-        val randomCode = leftQr.substring(17, 21)
-        val untaxedAmount = parseHexAmount(leftQr.substring(21, 29), "untaxed amount")
-        val totalAmount = parseHexAmount(leftQr.substring(29, 37), "total amount")
-        val buyerTaxId = leftQr.substring(37, 45).takeUnless { it == "00000000" }
-        val sellerTaxId = leftQr.substring(45, 53)
 
-        val rest = leftQr.substring(FIXED_PREFIX_LENGTH)
+        // Date encoding split: the spec says 7-char ROC YYYMMDD (e.g. 1150421 = 民國 115
+        // 年 04/21 = 2026-04-21), but some POS (KFC, 瑪可希維) emit 8-char Gregorian
+        // YYYYMMDD instead, shifting every subsequent fixed-field position by +1. Detect
+        // by the year prefix: ROC year is always 1xx (100–139 covers 2011–2050 — way past
+        // any realistic invoice lifetime), so a leading "19" / "20" can only be Gregorian.
+        val isGregorianDate = leftQr.length >= 18 &&
+            (leftQr.startsWith("19", 10) || leftQr.startsWith("20", 10))
+        val dateEnd: Int
+        val issueDate: kotlinx.datetime.LocalDate
+        if (isGregorianDate) {
+            dateEnd = 18
+            issueDate = parseGregorianDate(leftQr.substring(10, 18))
+        } else {
+            dateEnd = 17
+            issueDate = parseRocDate(leftQr.substring(10, 17))
+        }
+
+        val fixedPrefixLen = dateEnd + 36 // randomCode(4) + untaxed(8) + total(8) + buyer(8) + seller(8)
+        if (leftQr.length < fixedPrefixLen) {
+            throw EInvoiceQrException.MalformedLeftCode(
+                "left code length ${leftQr.length} < required $fixedPrefixLen fixed chars",
+            )
+        }
+
+        val randomCode = leftQr.substring(dateEnd, dateEnd + 4)
+        val untaxedAmount = parseHexAmount(leftQr.substring(dateEnd + 4, dateEnd + 12), "untaxed amount")
+        val totalAmount = parseHexAmount(leftQr.substring(dateEnd + 12, dateEnd + 20), "total amount")
+        val buyerTaxId = leftQr.substring(dateEnd + 20, dateEnd + 28).takeUnless { it == "00000000" }
+        val sellerTaxId = leftQr.substring(dateEnd + 28, dateEnd + 36)
+
+        val rest = leftQr.substring(fixedPrefixLen)
         val starStart = rest.indexOf('*')
         // Some POS (notably gas-station 自助加油機) emit a short left QR — fixed prefix
         // + AES only, no `*` 自定區 and no item detail. All items live in the right code
@@ -129,6 +153,21 @@ object EInvoiceQrParser {
             LocalDate(year + 1911, month, day)
         } catch (e: IllegalArgumentException) {
             throw EInvoiceQrException.MalformedLeftCode("invalid ROC date '$field': ${e.message}")
+        }
+    }
+
+    /** Non-spec Gregorian YYYYMMDD variant used by some POS (KFC, 瑪可希維). */
+    private fun parseGregorianDate(field: String): LocalDate {
+        val year = field.substring(0, 4).toIntOrNull()
+        val month = field.substring(4, 6).toIntOrNull()
+        val day = field.substring(6, 8).toIntOrNull()
+        if (year == null || month == null || day == null) {
+            throw EInvoiceQrException.MalformedLeftCode("invalid Gregorian date '$field'")
+        }
+        return try {
+            LocalDate(year, month, day)
+        } catch (e: IllegalArgumentException) {
+            throw EInvoiceQrException.MalformedLeftCode("invalid Gregorian date '$field': ${e.message}")
         }
     }
 
