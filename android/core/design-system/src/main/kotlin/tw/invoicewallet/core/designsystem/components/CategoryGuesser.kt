@@ -1,7 +1,7 @@
-package tw.invoicewallet.feature.invoicelist
+package tw.invoicewallet.core.designsystem.components
 
 import androidx.annotation.DrawableRes
-import tw.invoicewallet.core.designsystem.R as DsR
+import tw.invoicewallet.core.designsystem.R
 
 /**
  * Heuristic merchant-name → category slug. Slugs match `ic_category_*` drawable names so
@@ -46,14 +46,14 @@ object CategoryGuesser {
 
     @DrawableRes
     fun iconRes(slug: String): Int? = when (slug) {
-        "food" -> DsR.drawable.ic_category_food
-        "drink" -> DsR.drawable.ic_category_drink
-        "convstore" -> DsR.drawable.ic_category_convstore
-        "tech" -> DsR.drawable.ic_category_tech
-        "medical" -> DsR.drawable.ic_category_medical
-        "transit" -> DsR.drawable.ic_category_transit
-        "clothing" -> DsR.drawable.ic_category_clothing
-        "home" -> DsR.drawable.ic_category_home
+        "food" -> R.drawable.ic_category_food
+        "drink" -> R.drawable.ic_category_drink
+        "convstore" -> R.drawable.ic_category_convstore
+        "tech" -> R.drawable.ic_category_tech
+        "medical" -> R.drawable.ic_category_medical
+        "transit" -> R.drawable.ic_category_transit
+        "clothing" -> R.drawable.ic_category_clothing
+        "home" -> R.drawable.ic_category_home
         else -> null
     }
 

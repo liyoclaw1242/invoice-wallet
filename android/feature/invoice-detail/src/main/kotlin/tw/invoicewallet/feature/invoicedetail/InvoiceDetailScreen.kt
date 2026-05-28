@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import tw.invoicewallet.core.designsystem.components.CategoryBadge
+import tw.invoicewallet.core.designsystem.components.CategoryGuesser
 import tw.invoicewallet.core.designsystem.components.CompactPill
 import tw.invoicewallet.core.designsystem.components.CompactPillTone
 import tw.invoicewallet.core.designsystem.components.PillButton
@@ -213,11 +215,21 @@ private fun LoadedContent(
 
 @Composable
 private fun Hero(invoice: Invoice) {
+    // Explicit invoice.category wins; otherwise heuristic-guess from the merchant name —
+    // same rule as the home page's chip filter, so a row labelled 「食」 on home opens to
+    // a detail page stamped with the food badge.
+    val categorySlug = invoice.category
+        ?.takeIf { it.isNotBlank() }
+        ?: CategoryGuesser.guess(invoice.merchantName)
+
     Column(
-        modifier = Modifier.fillMaxWidth().padding(top = WalletTheme.spacing.xl),
+        modifier = Modifier.fillMaxWidth().padding(top = WalletTheme.spacing.lg),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(WalletTheme.spacing.sm),
     ) {
+        // The badge composes nothing when there's no resolved category — no awkward empty
+        // circle on unknown merchants.
+        CategoryBadge(slug = categorySlug)
         Text(
             text = invoice.merchantName.ifBlank { "(未填商店)" },
             style = WalletTheme.typography.displayLg,
