@@ -67,6 +67,28 @@ fun SettingsRoute(
         ActivityResultContracts.CreateDocument(ExportFormat.CSV.mimeType),
     ) { uri -> uri?.let { writeExport(it, ExportFormat.CSV) } }
 
+    val carrierImportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        scope.launch {
+            val text = withContext(Dispatchers.IO) {
+                context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+            }
+            if (text.isNullOrBlank()) {
+                Toast.makeText(context, "讀不到 CSV 內容", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            val summary = viewModel.importCarrierCsv(text)
+            val msg = buildString {
+                append("新增 ${summary.added}，更新 ${summary.updated}")
+                if (summary.skippedRows > 0) append("，略過 ${summary.skippedRows}")
+                if (summary.errors.isNotEmpty()) append("，錯誤 ${summary.errors.size}")
+            }
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+        }
+    }
+
     SettingsScreen(
         uiState = uiState,
         onThemeModeChange = viewModel::setThemeMode,
@@ -78,6 +100,9 @@ fun SettingsRoute(
                 ExportFormat.JSON -> jsonLauncher.launch("invoices.${format.extension}")
                 ExportFormat.CSV -> csvLauncher.launch("invoices.${format.extension}")
             }
+        },
+        onImportCarrierCsv = {
+            carrierImportLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "*/*"))
         },
         onMcpEnabledChange = viewModel::setMcpEnabled,
         onMcpLanModeChange = viewModel::setMcpLanMode,
@@ -100,6 +125,7 @@ fun SettingsScreen(
     onExport: (ExportFormat) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onImportCarrierCsv: () -> Unit = {},
     onMcpEnabledChange: (Boolean) -> Unit = {},
     onMcpLanModeChange: (Boolean) -> Unit = {},
     onRegenerateToken: () -> Unit = {},
@@ -165,6 +191,18 @@ fun SettingsScreen(
                         modifier = Modifier.testTag("carrier-clear"),
                     ) { Text("清除") }
                 }
+            }
+
+            Section("匯入財政部載具 CSV") {
+                Text(
+                    "從財政部電子發票平台下載「手機條碼載具」明細 CSV 後匯入。已存在的發票會以 CSV 覆寫" +
+                        "（保留你的備註、標籤、對獎狀態）；品項會被替換為 CSV 內容。",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Button(
+                    onClick = onImportCarrierCsv,
+                    modifier = Modifier.testTag("carrier-import"),
+                ) { Text("選擇 CSV 檔案") }
             }
 
             Section("資料匯出") {

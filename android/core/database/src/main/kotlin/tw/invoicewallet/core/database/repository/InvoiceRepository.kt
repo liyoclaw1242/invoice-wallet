@@ -12,6 +12,9 @@ interface InvoiceRepository {
 
     suspend fun getById(id: String): Invoice?
 
+    /** Looks up an invoice by its 字軌號碼 — used by bulk importers to dedupe. */
+    suspend fun getByInvoiceNumber(invoiceNumber: String): Invoice? = null
+
     fun observeAll(): Flow<List<Invoice>>
 
     fun queryByDateRange(from: LocalDate, to: LocalDate): Flow<List<Invoice>>

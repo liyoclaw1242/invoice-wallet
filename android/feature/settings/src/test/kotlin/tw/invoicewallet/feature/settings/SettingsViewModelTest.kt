@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.core.model.Invoice
+import tw.invoicewallet.core.model.InvoiceItem
 import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.core.testing.MainDispatcherExtension
@@ -96,6 +97,31 @@ class SettingsViewModelTest {
             vm.regenerateMcpToken()
             awaitItem().mcpToken shouldBe "tok-2"
         }
+    }
+
+    @Test
+    fun `importCarrierCsv parses, persists and returns a summary`() = runTest {
+        val repo = FakeInvoiceRepository()
+        val vm = SettingsViewModel(
+            FakeSettingsRepository(),
+            FakeCarrierCodeStore(),
+            repo,
+            FakeMcpServerControls(),
+            FakeRelayDeviceStore(),
+        )
+        val csv = buildString {
+            append("\uFEFF") // 財政部 exports start with a UTF-8 BOM
+            append("a,b,c,d,e,f,g,h,i,j,k,l,m,n\n")
+            append("手機條碼,20260326,YT00000001,308,開立已確認,否,42467936,新東陽,某地址,,1,308,308,大心\n")
+            append("捐贈或作廢之發票，字軌號碼均會隱末3碼\n")
+        }
+
+        val summary = vm.importCarrierCsv(csv)
+
+        summary.added shouldBe 1
+        summary.updated shouldBe 0
+        summary.skippedRows shouldBe 1
+        repo.upsertedItemRows.single().first shouldBe "YT00000001"
     }
 
     @Test
@@ -184,7 +210,13 @@ private class FakeCarrierCodeStore(private var value: String? = null) : CarrierC
 }
 
 private class FakeInvoiceRepository(private val invoices: List<Invoice> = emptyList()) : InvoiceRepository {
+    val upsertedItemRows = mutableListOf<Pair<String, List<InvoiceItem>>>() // (invoiceNumber, items)
     override suspend fun upsert(invoice: Invoice): Invoice = invoice
+    override suspend fun upsertWithItems(invoice: Invoice, items: List<InvoiceItem>): Invoice {
+        upsertedItemRows += invoice.invoiceNumber to items
+        return invoice
+    }
+    override suspend fun getByInvoiceNumber(invoiceNumber: String): Invoice? = null
     override suspend fun getById(id: String): Invoice? = invoices.firstOrNull { it.id == id }
     override fun observeAll(): Flow<List<Invoice>> = flowOf(invoices)
     override fun queryByDateRange(from: LocalDate, to: LocalDate): Flow<List<Invoice>> = flowOf(invoices)

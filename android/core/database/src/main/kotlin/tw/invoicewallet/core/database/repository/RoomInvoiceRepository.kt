@@ -37,6 +37,9 @@ class RoomInvoiceRepository(
 
     override suspend fun getById(id: String): Invoice? = invoiceDao.getById(id)?.asExternalModel()
 
+    override suspend fun getByInvoiceNumber(invoiceNumber: String): Invoice? =
+        invoiceDao.findByInvoiceNumber(invoiceNumber)?.asExternalModel()
+
     override fun observeAll(): Flow<List<Invoice>> =
         invoiceDao.observeAll().map { rows -> rows.map { it.asExternalModel() } }
 

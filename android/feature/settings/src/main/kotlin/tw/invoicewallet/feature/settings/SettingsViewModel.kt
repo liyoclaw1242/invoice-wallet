@@ -10,11 +10,15 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import tw.invoicewallet.core.database.repository.InvoiceRepository
 import tw.invoicewallet.datasource.mcpserver.McpServerControls
 import tw.invoicewallet.datasource.relayclient.RelayDeviceStore
 import tw.invoicewallet.feature.export.ExportFormat
 import tw.invoicewallet.feature.export.InvoiceExporter
+import tw.invoicewallet.feature.settings.carrier.CarrierCsvImporter
+import tw.invoicewallet.feature.settings.carrier.CarrierCsvParser
+import tw.invoicewallet.feature.settings.carrier.ImportResult
 import javax.inject.Inject
 
 data class SettingsUiState(
@@ -41,6 +45,10 @@ class SettingsViewModel @Inject constructor(
     // into a StateFlow and keep it in sync on writes.
     private val carrierCode = MutableStateFlow(carrierCodeStore.get().orEmpty())
     private val mcpToken = MutableStateFlow(mcpServer.token())
+
+    // Importer is stateless; constructed inline so its dependency isn't a Hilt ctor param
+    // for the VM (keeps existing tests' ctor calls unchanged).
+    private val carrierCsvImporter = CarrierCsvImporter(invoiceRepository, Clock.System)
 
     val uiState: StateFlow<SettingsUiState> =
         combine(settingsRepository.settings, carrierCode, mcpToken) { settings, carrier, token ->
@@ -85,4 +93,22 @@ class SettingsViewModel @Inject constructor(
     /** Serialises every invoice in the wallet to [format]; the caller writes it to a chosen file. */
     suspend fun buildExport(format: ExportFormat): String =
         InvoiceExporter.export(invoiceRepository.observeAll().first(), format)
+
+    /**
+     * Parses a 財政部 carrier CSV export and persists it. CSV is authoritative for the
+     * header fields it carries; user-edited fields (note/tags/lottery state) survive.
+     */
+    suspend fun importCarrierCsv(text: String): CarrierImportSummary {
+        val parsed = CarrierCsvParser.parse(text)
+        val result: ImportResult = carrierCsvImporter.import(parsed.invoices)
+        return CarrierImportSummary(
+            added = result.added,
+            updated = result.updated,
+            skippedRows = parsed.skippedRows,
+            errors = parsed.errors,
+        )
+    }
 }
+
+/** UI-facing summary of an import; rolls the parser's skips into the result. */
+data class CarrierImportSummary(val added: Int, val updated: Int, val skippedRows: Int, val errors: List<String>)
