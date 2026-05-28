@@ -176,12 +176,6 @@
       "reason": "右碼未以 ** (0x2A2A) 開頭。右碼必須以續接標記 ** 起始，否則應視為非右碼或毀損，不可直接當品項串解析。"
     },
     {
-      "id": "bad-03-missing-detail-sections",
-      "leftQr": "AB123456781150101123400000064000000690000000012345678AAAAAAAAAAAAAAAAAAAAAA==",
-      "rightQrHex": null,
-      "reason": "77 字元固定欄位之後完全缺少 :品目筆數:總筆數:中文編碼: 區段。解析器取編碼旗標/品項時會越界，須先判斷分隔欄位是否存在。"
-    },
-    {
       "id": "bad-04-nonhex-amount-field",
       "leftQr": "AB12345678115010112340000XYZW000000690000000012345678AAAAAAAAAAAAAAAAAAAAAA==:**********:1:1:1:",
       "rightQrHex": null,

@@ -5,8 +5,10 @@ import kotlinx.datetime.LocalDate
 /** Text encoding declared by the left QR's flag (0 = Big5, 1 = UTF-8). */
 enum class InvoiceTextEncoding { UTF8, BIG5 }
 
-/** One line item decoded from a QR code. */
-data class ParsedItem(val name: String, val quantity: Int, val unitPrice: Int)
+/** One line item decoded from a QR code. Quantity is [Double] because gas-station
+ *  invoices sell by litres (e.g. 30.32 L × NT$33.9). Unit price stays Int — receipt
+ *  items round to the nearest dollar, the < NT$1 precision loss is acceptable. */
+data class ParsedItem(val name: String, val quantity: Double, val unitPrice: Int)
 
 /** The fixed + delimited fields decoded from the LEFT QR code. */
 data class LeftCode(

@@ -41,8 +41,22 @@ object EInvoiceQrParser {
 
         val rest = leftQr.substring(FIXED_PREFIX_LENGTH)
         val starStart = rest.indexOf('*')
+        // Some POS (notably gas-station 自助加油機) emit a short left QR — fixed prefix
+        // + AES only, no `*` 自定區 and no item detail. All items live in the right code
+        // there. Treat that as a valid header-only invoice rather than refusing the whole
+        // scan; the right-code parser uses [InvoiceTextEncoding.UTF8] as the default.
         if (starStart < 0) {
-            throw EInvoiceQrException.MalformedLeftCode("missing 營業人自定區 / delimited detail sections")
+            return LeftCode(
+                invoiceNumber = invoiceNumber,
+                issueDate = issueDate,
+                randomCode = randomCode,
+                untaxedAmount = untaxedAmount,
+                totalAmount = totalAmount,
+                buyerTaxId = buyerTaxId,
+                sellerTaxId = sellerTaxId,
+                encoding = InvoiceTextEncoding.UTF8,
+                items = emptyList(),
+            )
         }
         var starEnd = starStart
         while (starEnd < rest.length && rest[starEnd] == '*') starEnd++
@@ -51,7 +65,10 @@ object EInvoiceQrParser {
         if (tail.size < 3) {
             throw EInvoiceQrException.MalformedLeftCode("missing 品目筆數/總筆數/編碼 sections")
         }
-        val encoding = when (tail[2]) {
+        // The right code is space-padded to a fixed length; that padding bleeds into the
+        // left's encoding flag when the two are concatenated/decoded as one string, so
+        // trim before the strict match.
+        val encoding = when (tail[2].trim()) {
             "0" -> InvoiceTextEncoding.BIG5
             "1" -> InvoiceTextEncoding.UTF8
             else -> throw EInvoiceQrException.MalformedLeftCode("unknown encoding flag '${tail[2]}'")
@@ -118,17 +135,26 @@ object EInvoiceQrParser {
     private fun parseHexAmount(field: String, label: String): Int = field.toLongOrNull(radix = 16)?.toInt()
         ?: throw EInvoiceQrException.MalformedLeftCode("invalid hex $label '$field'")
 
-    /** Groups a flat `name:qty:price:name:qty:price...` token list into items. The
-     *  right code is space-padded to a fixed length, so qty/price carry trailing
-     *  whitespace — trim them before parsing (names keep their own spacing). */
+    /** Groups a flat `name:qty:price:name:qty:price...` token list into items.
+     *
+     *  - Right code is space-padded to a fixed length → trim qty/price.
+     *  - Gas-station invoices carry **decimal qty AND decimal price** (30.32 L × NT$33.9),
+     *    so both go through Double parsing first. Unit-price rounds to the nearest dollar
+     *    to fit the InvoiceItem.unitPrice: Int contract — < NT$1 precision loss is fine
+     *    for receipt items; the invoice header's totalAmount is the source of truth for
+     *    money totals anyway. */
     private fun groupItems(tokens: List<String>): List<ParsedItem> {
         val items = mutableListOf<ParsedItem>()
         var i = 0
         while (i + 2 < tokens.size) {
-            val quantity = tokens[i + 1].trim().toIntOrNull()
-            val unitPrice = tokens[i + 2].trim().toIntOrNull()
+            val quantity = tokens[i + 1].trim().toDoubleOrNull()
+            val unitPrice = tokens[i + 2].trim().toDoubleOrNull()
             if (quantity == null || unitPrice == null) break
-            items += ParsedItem(name = tokens[i], quantity = quantity, unitPrice = unitPrice)
+            items += ParsedItem(
+                name = tokens[i],
+                quantity = quantity,
+                unitPrice = kotlin.math.round(unitPrice).toInt(),
+            )
             i += 3
         }
         return items

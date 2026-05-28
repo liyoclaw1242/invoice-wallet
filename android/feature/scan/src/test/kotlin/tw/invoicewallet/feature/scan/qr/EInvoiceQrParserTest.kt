@@ -42,7 +42,7 @@ class EInvoiceQrParserTest {
                 withClue(f.id) {
                     val parsed = EInvoiceQrParser.parse(f.leftQr, f.rightQrHex!!.hexToBytes())
                     parsed.items shouldBe f.expected.items.map {
-                        ParsedItem(it.name!!, it.quantity!!, it.unitPrice!!)
+                        ParsedItem(it.name!!, it.quantity!!.toDouble(), it.unitPrice!!)
                     }
                 }
             }
@@ -62,8 +62,53 @@ class EInvoiceQrParserTest {
         parsed.totalAmount shouldBe 85
         parsed.sellerTaxId shouldBe "98952903"
         parsed.items shouldBe listOf(
-            ParsedItem("超厚雞肉起司滿分堡", 1, 60),
-            ParsedItem("奶茶(M)(熱)", 1, 25),
+            ParsedItem("超厚雞肉起司滿分堡", 1.0, 60),
+            ParsedItem("奶茶(M)(熱)", 1.0, 25),
+        )
+    }
+
+    @Test
+    fun `encoding flag padded by right-code trailing spaces still parses (real 魯魯札札 invoice)`() {
+        // Real cafe receipt — the left's encoding flag arrives as "0  " (Big5 + the right
+        // QR's trailing whitespace padding). Strict equality used to throw 'unknown
+        // encoding flag'.
+        val left = "ZD05155535115041761580000013A0000014A0000000092318193" +
+            "CEF9Ji/8LlRNvIY2nGVqLw==:**********:2:2:0  "
+
+        val parsed = EInvoiceQrParser.parse(left, rightBytes = null)
+
+        parsed.invoiceNumber shouldBe "ZD05155535"
+        parsed.totalAmount shouldBe 330
+        parsed.encoding shouldBe InvoiceTextEncoding.BIG5
+    }
+
+    @Test
+    fun `header-only left QR (gas-station 自助加油) is accepted with empty items`() {
+        // Real 福懋加油站 receipt — the left QR has no `*` 自定區 / detail section at all;
+        // all items live in the right code. Previously threw 'missing 營業人自定區'.
+        val left = "YX1488236711504189559000003B6000003E60000000060912553" +
+            "i+Zgta+pNhR9vEF4oC4vWQ=="
+
+        val parsed = EInvoiceQrParser.parse(left, rightBytes = null)
+
+        parsed.invoiceNumber shouldBe "YX14882367"
+        parsed.totalAmount shouldBe 998
+        parsed.sellerTaxId shouldBe "60912553"
+        parsed.items shouldBe emptyList()
+        // Header-only left → default to UTF-8; the right code (when present) is decoded
+        // with this fallback rather than throwing.
+        parsed.encoding shouldBe InvoiceTextEncoding.UTF8
+    }
+
+    @Test
+    fun `decimal qty and price (gas-station litres) survive the item parser`() {
+        // Standalone right-code parse — 95Plus 無鉛 (lead-free), 30.32 L × NT$33.9.
+        val rightBytes = "**95Plus無鉛:30.32:33.9:".toByteArray(Charsets.UTF_8)
+
+        val items = EInvoiceQrParser.parseRightItems(rightBytes, InvoiceTextEncoding.UTF8)
+
+        items shouldBe listOf(
+            ParsedItem(name = "95Plus無鉛", quantity = 30.32, unitPrice = 34),
         )
     }
 

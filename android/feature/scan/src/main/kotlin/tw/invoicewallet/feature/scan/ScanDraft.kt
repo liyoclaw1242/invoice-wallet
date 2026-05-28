@@ -10,7 +10,9 @@ import tw.invoicewallet.core.model.InvoiceSource
 import tw.invoicewallet.core.model.LotteryStatus
 import tw.invoicewallet.feature.scan.ocr.ExtractedFields
 import tw.invoicewallet.feature.scan.qr.ParsedInvoice
+import tw.invoicewallet.feature.scan.qr.ParsedItem
 import java.util.UUID
+import kotlin.math.roundToInt
 
 /**
  * Builds an editable draft [Invoice] from a parsed QR code. Fields the QR cannot
@@ -45,18 +47,19 @@ internal fun ParsedInvoice.toDraftInvoice(id: String, now: Instant): Invoice = I
  * Builds draft line items for [invoiceId] from the items the QR carried. The QR gives a
  * unit price and quantity; the line amount is their product (the format omits it).
  */
-internal fun ParsedInvoice.toDraftItems(invoiceId: String): List<InvoiceItem> = items.mapIndexed { index, item ->
-    InvoiceItem(
-        id = UUID.randomUUID().toString(),
-        invoiceId = invoiceId,
-        name = item.name,
-        quantity = item.quantity.toDouble(),
-        unitPrice = item.unitPrice,
-        amount = item.quantity * item.unitPrice,
-        category = null,
-        sequence = index,
-    )
-}
+internal fun ParsedItem.toDraftItem(invoiceId: String, sequence: Int): InvoiceItem = InvoiceItem(
+    id = UUID.randomUUID().toString(),
+    invoiceId = invoiceId,
+    name = name,
+    quantity = quantity,
+    unitPrice = unitPrice,
+    amount = (quantity * unitPrice).roundToInt(),
+    category = null,
+    sequence = sequence,
+)
+
+internal fun ParsedInvoice.toDraftItems(invoiceId: String): List<InvoiceItem> =
+    items.mapIndexed { index, item -> item.toDraftItem(invoiceId, index) }
 
 /**
  * Builds a draft from OCR-extracted fields (the fallback when no QR is present).
