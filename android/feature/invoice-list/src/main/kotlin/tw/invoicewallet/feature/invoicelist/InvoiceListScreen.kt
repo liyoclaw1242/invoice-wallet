@@ -18,7 +18,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -83,15 +82,9 @@ fun InvoiceListScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = WalletTheme.colors.surfaceBase,
                     ),
-                    actions = {
-                        TextButton(onClick = onSettingsClick, modifier = Modifier.testTag("settings-action")) {
-                            Text(
-                                "設定",
-                                style = WalletTheme.typography.pillLabel,
-                                color = WalletTheme.colors.inkSecondary,
-                            )
-                        }
-                    },
+                    // The 設定 action used to live here; the bottom nav bar replaces it.
+                    // onSettingsClick stays in the signature for the test surface and any
+                    // future re-introduction (e.g. a quick-settings sheet).
                 )
             },
             floatingActionButton = {

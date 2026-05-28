@@ -35,11 +35,18 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import tw.invoicewallet.core.designsystem.components.IconCog
+import tw.invoicewallet.core.designsystem.components.IconReceipt
+import tw.invoicewallet.core.designsystem.components.IconTicket
+import tw.invoicewallet.core.designsystem.components.WalletNavBar
+import tw.invoicewallet.core.designsystem.components.WalletNavItem
 import tw.invoicewallet.core.designsystem.theme.WalletTheme
 import tw.invoicewallet.feature.invoicedetail.InvoiceDetailRoute
 import tw.invoicewallet.feature.invoicelist.InvoiceListRoute
@@ -55,42 +62,80 @@ import tw.invoicewallet.feature.settings.SettingsRoute
 @Composable
 fun InvoiceWalletApp(defaultScanMode: DefaultScanMode = DefaultScanMode.CAMERA) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Routes.LIST) {
-        composable(Routes.LIST) {
-            InvoiceListRoute(
-                onScanClick = { navController.navigate(Routes.SCAN) },
-                onInvoiceClick = { id -> navController.navigate(Routes.detail(id)) },
-                onLotteryClick = { navController.navigate(Routes.LOTTERY) },
-                onSettingsClick = { navController.navigate(Routes.SETTINGS) },
-            )
-        }
-        composable(Routes.SCAN) {
-            ScanRoute(
-                onBack = { navController.popBackStack() },
-                onEditInvoice = { id -> navController.navigate(Routes.detail(id)) },
-                defaultScanMode = defaultScanMode,
-            )
-        }
-        composable(
-            route = Routes.DETAIL,
-            arguments = listOf(navArgument(Routes.INVOICE_ID) { type = NavType.StringType }),
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStack?.destination?.route
+
+    // The bar shows only on the three top-level pages. Sub-pages (detail / pairing) and
+    // full-screen camera flows hide it for focus + safe-area on small phones.
+    val showBar = currentRoute in setOf(Routes.LIST, Routes.LOTTERY, Routes.SETTINGS)
+
+    androidx.compose.material3.Scaffold(
+        containerColor = WalletTheme.colors.surfaceBase,
+        bottomBar = {
+            if (showBar) {
+                WalletNavBar(
+                    items = NavTabs,
+                    selectedRoute = currentRoute,
+                    onSelect = { route ->
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                )
+            }
+        },
+    ) { padding ->
+        NavHost(
+            navController = navController,
+            startDestination = Routes.LIST,
+            modifier = Modifier.padding(padding),
         ) {
-            InvoiceDetailRoute(onBack = { navController.popBackStack() })
-        }
-        composable(Routes.LOTTERY) {
-            LotteryRoute(onBack = { navController.popBackStack() })
-        }
-        composable(Routes.SETTINGS) {
-            SettingsRoute(
-                onBack = { navController.popBackStack() },
-                onPairRelayClick = { navController.navigate(Routes.PAIRING) },
-            )
-        }
-        composable(Routes.PAIRING) {
-            PairingRoute(onBack = { navController.popBackStack() })
+            composable(Routes.LIST) {
+                InvoiceListRoute(
+                    onScanClick = { navController.navigate(Routes.SCAN) },
+                    onInvoiceClick = { id -> navController.navigate(Routes.detail(id)) },
+                    onLotteryClick = { navController.navigate(Routes.LOTTERY) },
+                    onSettingsClick = { navController.navigate(Routes.SETTINGS) },
+                )
+            }
+            composable(Routes.SCAN) {
+                ScanRoute(
+                    onBack = { navController.popBackStack() },
+                    onEditInvoice = { id -> navController.navigate(Routes.detail(id)) },
+                    defaultScanMode = defaultScanMode,
+                )
+            }
+            composable(
+                route = Routes.DETAIL,
+                arguments = listOf(navArgument(Routes.INVOICE_ID) { type = NavType.StringType }),
+            ) {
+                InvoiceDetailRoute(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.LOTTERY) {
+                LotteryRoute(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.SETTINGS) {
+                SettingsRoute(
+                    onBack = { navController.popBackStack() },
+                    onPairRelayClick = { navController.navigate(Routes.PAIRING) },
+                )
+            }
+            composable(Routes.PAIRING) {
+                PairingRoute(onBack = { navController.popBackStack() })
+            }
         }
     }
 }
+
+private val NavTabs = listOf(
+    WalletNavItem(route = Routes.LIST, label = "發票", icon = IconReceipt, testTag = "nav-list"),
+    WalletNavItem(route = Routes.LOTTERY, label = "對獎", icon = IconTicket, testTag = "nav-lottery"),
+    WalletNavItem(route = Routes.SETTINGS, label = "設定", icon = IconCog, testTag = "nav-settings"),
+)
 
 private object Routes {
     const val LIST = "list"
