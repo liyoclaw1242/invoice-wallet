@@ -104,6 +104,7 @@ fun SettingsRoute(
         onImportCarrierCsv = {
             carrierImportLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "*/*"))
         },
+        onReplayOnboarding = viewModel::replayOnboarding,
         onMcpEnabledChange = viewModel::setMcpEnabled,
         onMcpLanModeChange = viewModel::setMcpLanMode,
         onRegenerateToken = viewModel::regenerateMcpToken,
@@ -126,6 +127,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     onImportCarrierCsv: () -> Unit = {},
+    onReplayOnboarding: () -> Unit = {},
     onMcpEnabledChange: (Boolean) -> Unit = {},
     onMcpLanModeChange: (Boolean) -> Unit = {},
     onRegenerateToken: () -> Unit = {},
@@ -191,6 +193,13 @@ fun SettingsScreen(
                         modifier = Modifier.testTag("carrier-clear"),
                     ) { Text("清除") }
                 }
+            }
+
+            Section("關於 App") {
+                OutlinedButton(
+                    onClick = onReplayOnboarding,
+                    modifier = Modifier.testTag("replay-onboarding"),
+                ) { Text("重看引導") }
             }
 
             Section("匯入財政部載具 CSV") {

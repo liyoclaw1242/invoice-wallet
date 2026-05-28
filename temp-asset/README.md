@@ -1,8 +1,9 @@
 # temp-asset/
 
 Source PNGs from Gemini's image generator. **Big** (≈7 MB × 11) — `.gitignore`'d.
-The processed WebPs in `android/app/src/main/res/drawable-nodpi/` are what
-actually ships.
+The processed WebPs in `android/core/design-system/src/main/res/drawable-nodpi/`
+are what actually ships — they live in the design-system module so any feature
+can `import tw.invoicewallet.core.designsystem.R`.
 
 ## Re-running
 

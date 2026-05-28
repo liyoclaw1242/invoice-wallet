@@ -14,7 +14,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 ROOT = "/Users/liyoclaw/Projects/invoice-app"
 SRC = f"{ROOT}/temp-asset"
-DST = f"{ROOT}/android/app/src/main/res/drawable-nodpi"
+DST = f"{ROOT}/android/core/design-system/src/main/res/drawable-nodpi"
 os.makedirs(DST, exist_ok=True)
 
 # Mean paper-cream colour of the canvas — close to #F4EEE0 but the watercolour

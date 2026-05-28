@@ -86,6 +86,9 @@ class SettingsViewModel @Inject constructor(
 
     fun setRemoteEnabled(enabled: Boolean) = viewModelScope.launch { settingsRepository.setRemoteEnabled(enabled) }
 
+    /** Flips the onboarding flag back to false so MainActivity shows the intro flow again. */
+    fun replayOnboarding() = viewModelScope.launch { settingsRepository.setOnboardingCompleted(false) }
+
     fun regenerateMcpToken() {
         mcpToken.value = mcpServer.regenerateToken()
     }

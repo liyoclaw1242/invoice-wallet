@@ -13,6 +13,7 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:database"))
+    implementation(project(":core:design-system"))
     implementation(project(":feature:export"))
     implementation(project(":data-source:mcp-server"))
     implementation(project(":data-source:relay-client"))

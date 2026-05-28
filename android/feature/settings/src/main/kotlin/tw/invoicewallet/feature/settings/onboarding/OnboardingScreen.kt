@@ -1,16 +1,18 @@
 package tw.invoicewallet.feature.settings.onboarding
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -18,71 +20,155 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import tw.invoicewallet.core.designsystem.R
+import tw.invoicewallet.core.designsystem.components.PillButton
+import tw.invoicewallet.core.designsystem.components.QuietPill
+import tw.invoicewallet.core.designsystem.theme.WalletTheme
 
-/** A single onboarding page. */
-data class OnboardingPage(val title: String, val body: String)
+/** A single onboarding page: an illustration up top, then the editorial pitch. */
+data class OnboardingPage(val title: String, val body: String, @DrawableRes val illustration: Int)
 
-/** The privacy-first introduction shown once, on first launch (ARCHITECTURE: 資料屬於使用者). */
+/** The four-step privacy + utility introduction shown once on first launch. */
 val onboardingPages: List<OnboardingPage> = listOf(
     OnboardingPage(
-        title = "你的發票，只屬於你",
-        body = "這是一個本機優先的發票錢包。沒有帳號、沒有雲端同步，資料不會離開這支手機。",
+        title = "你的發票，鎖在你手上",
+        body = "沒有帳號、沒有雲端同步、沒有遠端備份。所有資料用 SQLCipher 加密存在這支手機上，連我們也讀不到。",
+        illustration = R.drawable.illust_onboarding_local,
     ),
     OnboardingPage(
-        title = "本機加密保存",
-        body = "所有發票都存在裝置上、以 SQLCipher 加密；金鑰鎖在 Android Keystore，預設不上傳任何伺服器。",
+        title = "對準就掃，掃完就存",
+        body = "相機常駐，連續掃一疊不用每張按確認。歪斜、淡墨、熱感紙的發票都能辨識。",
+        illustration = R.drawable.illust_onboarding_scan,
     ),
     OnboardingPage(
-        title = "對外連線透明",
-        body = "只有在你查詢店名或對獎時，App 才會連到公開資料（財政部 / 商業登記）。你的購買明細永遠不外流。",
+        title = "載具發票一鍵歸戶",
+        body = "從財政部下載手機條碼載具 CSV，匯入後自動補齊既有發票；你已經編輯過的備註、標籤、對獎狀態都會留著。",
+        illustration = R.drawable.illust_onboarding_csv,
     ),
     OnboardingPage(
-        title = "開始使用",
-        body = "掃描你的第一張發票，建立屬於自己的發票錢包吧。",
+        title = "AI 想幫你查？要先拿到你的鑰匙",
+        body = "電腦上、手機上的 Claude 都可以查詢你的發票，但每一條通道都得你手動授權；隨時撤銷。",
+        illustration = R.drawable.illust_onboarding_ai,
     ),
 )
 
 @Composable
 fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
-    var page by remember { mutableIntStateOf(0) }
-    val current = onboardingPages[page]
-    val isLast = page == onboardingPages.lastIndex
+    WalletTheme {
+        var pageIndex by remember { mutableIntStateOf(0) }
+        val current = onboardingPages[pageIndex]
+        val isLast = pageIndex == onboardingPages.lastIndex
 
-    Scaffold(modifier = modifier) { padding ->
-        Column(
-            modifier = Modifier
+        Box(
+            modifier = modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+                .background(WalletTheme.colors.surfaceBase)
+                .testTag("onboarding-root"),
         ) {
-            Text(
-                text = current.title,
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = current.body,
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(32.dp))
-            Text(
-                text = "${page + 1} / ${onboardingPages.size}",
-                style = MaterialTheme.typography.labelMedium,
-            )
-            Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = { if (isLast) onFinish() else page++ },
-                modifier = Modifier.fillMaxWidth().testTag("onboarding-next"),
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = WalletTheme.spacing.lg)
+                    .padding(top = 56.dp, bottom = WalletTheme.spacing.xl),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(if (isLast) "開始使用" else "下一步")
+                DotsIndicator(pageCount = onboardingPages.size, currentIndex = pageIndex)
+
+                PageContent(current)
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    PillButton(
+                        text = if (isLast) "開始使用" else "下一步",
+                        onClick = { if (isLast) onFinish() else pageIndex++ },
+                        modifier = Modifier
+                            .fillMaxWidth(0.85f)
+                            .testTag("onboarding-next"),
+                    )
+                    if (!isLast) {
+                        QuietPill(
+                            text = "略過",
+                            onClick = onFinish,
+                            modifier = Modifier.testTag("onboarding-skip"),
+                        )
+                    } else {
+                        // Reserve the same vertical space so the button doesn't jump on the last page.
+                        Spacer(Modifier.height(48.dp))
+                    }
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun PageContent(page: OnboardingPage) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("onboarding-page-${page.illustration}"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(WalletTheme.spacing.lg),
+    ) {
+        Image(
+            painter = painterResource(page.illustration),
+            contentDescription = null, // decorative; the heading carries the meaning
+            modifier = Modifier
+                .size(280.dp)
+                .clip(WalletTheme.shapes.card),
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(WalletTheme.spacing.sm),
+        ) {
+            androidx.compose.material3.Text(
+                text = page.title,
+                style = WalletTheme.typography.displaySm.copy(fontWeight = FontWeight.SemiBold),
+                color = WalletTheme.colors.inkPrimary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = WalletTheme.spacing.sm),
+            )
+            androidx.compose.material3.Text(
+                text = page.body,
+                style = WalletTheme.typography.bodyLg,
+                color = WalletTheme.colors.inkSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = WalletTheme.spacing.md),
+            )
+        }
+    }
+}
+
+@Composable
+private fun DotsIndicator(pageCount: Int, currentIndex: Int, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(pageCount) { i ->
+            val active = i == currentIndex
+            Box(
+                modifier = Modifier
+                    .size(if (active) 10.dp else 6.dp)
+                    .clip(WalletTheme.shapes.pill)
+                    .background(
+                        if (active) {
+                            WalletTheme.colors.accentTealDeep
+                        } else {
+                            WalletTheme.colors.inkTertiary.copy(alpha = 0.5f)
+                        },
+                    ),
+            )
         }
     }
 }
