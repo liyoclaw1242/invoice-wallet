@@ -1,6 +1,5 @@
 package tw.invoicewallet.feature.invoicelist
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -21,24 +20,23 @@ import tw.invoicewallet.core.model.LotteryStatus
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34])
+// Pixel-class viewport so the bottom scan pill stays clickable in tests.
+@Config(sdk = [34], qualifiers = "w411dp-h891dp")
 class InvoiceListScreenTest {
 
     @get:Rule
     val composeRule = createComposeRule()
 
     @Test
-    fun shows_invoices_and_a_card_tap_reports_the_id() {
+    fun shows_invoices_and_a_row_tap_reports_the_id() {
         var clicked: String? = null
         composeRule.setContent {
-            MaterialTheme {
-                InvoiceListScreen(
-                    uiState = InvoiceListUiState(invoices = listOf(invoice("a", merchant = "全聯福利中心"))),
-                    onQueryChange = {},
-                    onScanClick = {},
-                    onInvoiceClick = { clicked = it },
-                )
-            }
+            InvoiceListScreen(
+                uiState = InvoiceListUiState(invoices = listOf(invoice("a", merchant = "全聯福利中心"))),
+                onQueryChange = {},
+                onScanClick = {},
+                onInvoiceClick = { clicked = it },
+            )
         }
 
         composeRule.onNodeWithText("全聯福利中心").assertIsDisplayed()
@@ -47,37 +45,57 @@ class InvoiceListScreenTest {
     }
 
     @Test
-    fun shows_empty_state_when_there_are_no_invoices() {
+    fun shows_empty_state_with_its_scan_cta_when_there_are_no_invoices() {
+        var scanned = false
         composeRule.setContent {
-            MaterialTheme {
-                InvoiceListScreen(
-                    uiState = InvoiceListUiState(),
-                    onQueryChange = {},
-                    onScanClick = {},
-                    onInvoiceClick = {},
-                )
-            }
+            InvoiceListScreen(
+                uiState = InvoiceListUiState(),
+                onQueryChange = {},
+                onScanClick = { scanned = true },
+                onInvoiceClick = {},
+            )
         }
 
         composeRule.onNodeWithTag("empty-state").assertIsDisplayed()
+        composeRule.onNodeWithText("開始掃描").performClick()
+        scanned shouldBe true
     }
 
     @Test
-    fun fab_tap_triggers_scan() {
+    fun scan_pill_triggers_scan_when_invoices_exist() {
         var scanned = false
         composeRule.setContent {
-            MaterialTheme {
-                InvoiceListScreen(
-                    uiState = InvoiceListUiState(),
-                    onQueryChange = {},
-                    onScanClick = { scanned = true },
-                    onInvoiceClick = {},
-                )
-            }
+            InvoiceListScreen(
+                uiState = InvoiceListUiState(invoices = listOf(invoice("a", "全聯"))),
+                onQueryChange = {},
+                onScanClick = { scanned = true },
+                onInvoiceClick = {},
+            )
         }
 
+        // The floating pill keeps the legacy "scan-fab" testTag so calling code stays unchanged.
         composeRule.onNodeWithTag("scan-fab").performClick()
         scanned shouldBe true
+    }
+
+    @Test
+    fun lottery_pill_routes_to_lottery() {
+        var lottery = false
+        composeRule.setContent {
+            InvoiceListScreen(
+                uiState = InvoiceListUiState(
+                    invoices = listOf(invoice("a", "全聯")),
+                    summary = InvoiceSummary(year = 2026, month = 5, monthCount = 1, totalCount = 1),
+                ),
+                onQueryChange = {},
+                onScanClick = {},
+                onInvoiceClick = {},
+                onLotteryClick = { lottery = true },
+            )
+        }
+
+        composeRule.onNodeWithTag("lottery-action").performClick()
+        lottery shouldBe true
     }
 
     private fun invoice(id: String, merchant: String) = Invoice(

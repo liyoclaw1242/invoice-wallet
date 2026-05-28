@@ -22,7 +22,7 @@ class HomeScreenSmokeTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun home_screen_shows_app_title() {
+    fun home_screen_renders_the_empty_state_when_the_wallet_has_no_invoices() {
         composeRule.setContent {
             InvoiceWalletTheme {
                 InvoiceListScreen(
@@ -34,6 +34,6 @@ class HomeScreenSmokeTest {
             }
         }
 
-        composeRule.onNodeWithText("發票錢包").assertIsDisplayed()
+        composeRule.onNodeWithText("還沒有發票").assertIsDisplayed()
     }
 }

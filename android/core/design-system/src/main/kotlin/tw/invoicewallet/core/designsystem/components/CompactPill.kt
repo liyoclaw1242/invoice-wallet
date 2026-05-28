@@ -1,6 +1,7 @@
 package tw.invoicewallet.core.designsystem.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
@@ -9,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import tw.invoicewallet.core.designsystem.theme.WalletTheme
@@ -28,6 +30,7 @@ fun CompactPill(
     tone: CompactPillTone = CompactPillTone.Neutral,
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     val (bg, ink) = when (tone) {
         CompactPillTone.Neutral -> WalletTheme.colors.surfaceTinted to WalletTheme.colors.inkSecondary
@@ -38,7 +41,9 @@ fun CompactPill(
     Row(
         modifier = modifier
             .heightIn(min = 28.dp)
+            .clip(shape)
             .background(bg, shape)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 12.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),

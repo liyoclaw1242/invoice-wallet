@@ -22,7 +22,7 @@ class MainActivityTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun home_screen_shows_app_title() {
+    fun home_screen_renders_the_empty_state_when_the_wallet_has_no_invoices() {
         composeRule.setContent {
             InvoiceWalletTheme {
                 InvoiceListScreen(
@@ -34,6 +34,7 @@ class MainActivityTest {
             }
         }
 
-        composeRule.onNodeWithText("發票錢包").assertIsDisplayed()
+        // The redesigned home has no fixed title; the empty-state copy is what greets users.
+        composeRule.onNodeWithText("還沒有發票").assertIsDisplayed()
     }
 }
