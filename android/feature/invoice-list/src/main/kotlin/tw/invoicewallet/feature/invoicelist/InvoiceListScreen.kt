@@ -57,6 +57,7 @@ fun InvoiceListRoute(
         onInvoiceClick = onInvoiceClick,
         onLotteryClick = onLotteryClick,
         onSettingsClick = onSettingsClick,
+        onShiftMonth = viewModel::shiftFocusedMonth,
         modifier = modifier,
     )
 }
@@ -71,6 +72,7 @@ fun InvoiceListScreen(
     modifier: Modifier = Modifier,
     onLotteryClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
+    onShiftMonth: (Int) -> Unit = {},
 ) {
     WalletTheme {
         Scaffold(
@@ -121,7 +123,11 @@ fun InvoiceListScreen(
             ) {
                 if (uiState.summary.totalCount > 0) {
                     item(key = "hero") {
-                        HeroStats(summary = uiState.summary, onLotteryClick = onLotteryClick)
+                        HeroStats(
+                            summary = uiState.summary,
+                            onLotteryClick = onLotteryClick,
+                            onShiftMonth = onShiftMonth,
+                        )
                     }
                 }
                 item(key = "search") {
@@ -143,17 +149,18 @@ fun InvoiceListScreen(
 }
 
 @Composable
-private fun HeroStats(summary: InvoiceSummary, onLotteryClick: () -> Unit) {
+private fun HeroStats(summary: InvoiceSummary, onLotteryClick: () -> Unit, onShiftMonth: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = WalletTheme.spacing.md, bottom = WalletTheme.spacing.md),
         verticalArrangement = Arrangement.spacedBy(WalletTheme.spacing.xs),
     ) {
-        Text(
-            text = "${summary.month} 月花費".uppercase(),
-            style = WalletTheme.typography.microCaps,
-            color = WalletTheme.colors.inkTertiary,
+        MonthSwitcher(
+            label = summary.monthLabel,
+            canGoPrev = summary.canGoPrev,
+            canGoNext = summary.canGoNext,
+            onShiftMonth = onShiftMonth,
         )
         Text(
             text = money(summary.monthTotal),
@@ -186,6 +193,43 @@ private fun HeroStats(summary: InvoiceSummary, onLotteryClick: () -> Unit) {
             )
         }
     }
+}
+
+/** Tiny ‹ X 月花費 › row above the big number. Chevrons disable at the data bounds. */
+@Composable
+private fun MonthSwitcher(label: String, canGoPrev: Boolean, canGoNext: Boolean, onShiftMonth: (Int) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(WalletTheme.spacing.xs),
+    ) {
+        Chevron(
+            glyph = "‹",
+            enabled = canGoPrev,
+            onClick = { onShiftMonth(-1) },
+            testTag = "month-prev",
+        )
+        Text(
+            text = "$label 花費".uppercase(),
+            style = WalletTheme.typography.microCaps,
+            color = WalletTheme.colors.inkTertiary,
+        )
+        Chevron(
+            glyph = "›",
+            enabled = canGoNext,
+            onClick = { onShiftMonth(1) },
+            testTag = "month-next",
+        )
+    }
+}
+
+@Composable
+private fun Chevron(glyph: String, enabled: Boolean, onClick: () -> Unit, testTag: String) {
+    val color = if (enabled) WalletTheme.colors.inkSecondary else WalletTheme.colors.inkTertiary.copy(alpha = 0.35f)
+    val mod = Modifier
+        .padding(horizontal = 4.dp)
+        .testTag(testTag)
+        .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
+    Text(text = glyph, style = WalletTheme.typography.title, color = color, modifier = mod)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

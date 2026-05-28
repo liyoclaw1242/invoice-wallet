@@ -54,6 +54,51 @@ class InvoiceListViewModelTest {
     }
 
     @Test
+    fun `shiftFocusedMonth steps the hero summary back and forward, clamped to data bounds`() = runTest {
+        // Two months of data: Nov 2025 and Jan 2026 (skipping Dec for variety).
+        val viewModel = InvoiceListViewModel(
+            repositoryOf(
+                invoice("nov", amount = 500, on = LocalDate(2025, 11, 5)),
+                invoice("jan1", amount = 100, on = LocalDate(2026, 1, 10)),
+                invoice("jan2", amount = 250, on = LocalDate(2026, 1, 20)),
+            ),
+            clock,
+        )
+        // Focus defaults to today's month (Jan 2026).
+        viewModel.uiState.first { it.summary.totalCount > 0 }.summary.let { s ->
+            s.month shouldBe 1
+            s.year shouldBe 2026
+            s.monthTotal shouldBe 350
+            s.canGoPrev shouldBe true
+            s.canGoNext shouldBe false // already at today
+        }
+
+        // Step back to Dec 2025 — no invoices, totals zero, can still go back/forward.
+        viewModel.shiftFocusedMonth(-1)
+        viewModel.uiState.first { it.summary.month == 12 }.summary.let { s ->
+            s.year shouldBe 2025
+            s.monthTotal shouldBe 0
+            s.monthCount shouldBe 0
+            s.canGoPrev shouldBe true
+            s.canGoNext shouldBe true
+        }
+
+        // Step back again to Nov 2025 — the earliest invoice month, prev now disabled.
+        viewModel.shiftFocusedMonth(-1)
+        viewModel.uiState.first { it.summary.month == 11 }.summary.let { s ->
+            s.year shouldBe 2025
+            s.monthTotal shouldBe 500
+            s.canGoPrev shouldBe false
+            s.canGoNext shouldBe true
+            s.monthLabel shouldBe "2025 年 11 月"
+        }
+
+        // Further back is clamped — focus stays at Nov 2025.
+        viewModel.shiftFocusedMonth(-1)
+        viewModel.uiState.first().summary.month shouldBe 11
+    }
+
+    @Test
     fun `search filters by merchant name, invoice number or note`() = runTest {
         val viewModel = InvoiceListViewModel(
             repositoryOf(
@@ -84,10 +129,11 @@ class InvoiceListViewModelTest {
         merchant: String = "商店",
         amount: Int = 100,
         status: LotteryStatus = LotteryStatus.PENDING,
+        on: LocalDate = LocalDate(2026, 1, 15),
     ) = Invoice(
         id = id,
         invoiceNumber = "AB1234567$id",
-        issueDate = LocalDate(2026, 1, 15),
+        issueDate = on,
         issuePeriod = "11502",
         merchantName = merchant,
         merchantTaxId = "12345678",
