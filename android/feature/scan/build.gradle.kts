@@ -28,6 +28,8 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:database"))
     implementation(project(":core:design-system"))
+    // For the inline lottery match after each save (LotteryMatcher + LotteryPrize).
+    implementation(project(":feature:lottery"))
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.kotlinx.coroutines.core)

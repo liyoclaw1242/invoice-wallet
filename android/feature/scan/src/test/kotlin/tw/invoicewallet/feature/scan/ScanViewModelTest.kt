@@ -28,10 +28,12 @@ class ScanViewModelTest {
 
     private val fixedNow = Instant.parse("2026-05-27T00:00:00Z")
     private val repository = FakeInvoiceRepository()
+    private val lotteryRepository = FakeLotteryRepository()
     private val recognizer = FakeInvoiceRecognizer()
     private val merchantDirectory = FakeMerchantDirectory(mapOf("90650686" to "瑪可希維"))
     private val viewModel = ScanViewModel(
         invoiceRepository = repository,
+        lotteryRepository = lotteryRepository,
         recognizer = recognizer,
         merchantDirectory = merchantDirectory,
         clock = object : Clock {
@@ -103,6 +105,42 @@ class ScanViewModelTest {
             awaitItem().shouldBeInstanceOf<ScanEvent.Failed>()
         }
         viewModel.session.value.savedCount shouldBe 0
+    }
+
+    @Test
+    fun `onQrDetected runs the cached-numbers lottery match inline and reports the prize`() = runTest {
+        // VALID_LEFT_QR carries invoice number ZP46105854 → 8-digit suffix 46105854.
+        // Seed winning numbers for the same issuePeriod (11502 = ROC 115, period 02 / Mar–Apr)
+        // whose 特別獎 matches the full 8 digits → top prize.
+        lotteryRepository.seed(
+            tw.invoicewallet.core.model.LotteryNumber(
+                period = "11502",
+                specialPrize = "46105854",
+                grandPrize = "00000000",
+                firstPrize = emptyList(),
+                additionalSixth = emptyList(),
+                fetchedAt = fixedNow,
+            ),
+        )
+
+        viewModel.events.test {
+            viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null)
+
+            val saved = awaitItem().shouldBeInstanceOf<ScanEvent.Saved>()
+            saved.lotteryPrize shouldBe 10_000_000 // 特別獎
+        }
+        val stored = repository.getByInvoiceNumber("ZP46105854")!!
+        stored.lotteryStatus shouldBe LotteryStatus.CHECKED_WON
+        stored.lotteryPrize shouldBe 10_000_000
+    }
+
+    @Test
+    fun `onQrDetected leaves lotteryPrize null when no cached numbers exist`() = runTest {
+        viewModel.events.test {
+            viewModel.onQrDetected(VALID_LEFT_QR, rightBytes = null)
+            awaitItem().shouldBeInstanceOf<ScanEvent.Saved>().lotteryPrize shouldBe null
+        }
+        repository.getByInvoiceNumber("ZP46105854")!!.lotteryStatus shouldBe LotteryStatus.PENDING
     }
 
     @Test
@@ -220,6 +258,21 @@ class ScanViewModelTest {
 
     private class FakeMerchantDirectory(private val names: Map<String, String>) : MerchantDirectory {
         override suspend fun nameFor(taxId: String): String? = names[taxId]
+    }
+
+    /** Minimal LotteryRepository — only the methods ScanViewModel.checkLotteryInline uses. */
+    private class FakeLotteryRepository : tw.invoicewallet.core.database.repository.LotteryRepository {
+        private val byPeriod = mutableMapOf<String, tw.invoicewallet.core.model.LotteryNumber>()
+        fun seed(number: tw.invoicewallet.core.model.LotteryNumber) {
+            byPeriod[number.period] = number
+        }
+        override suspend fun upsert(number: tw.invoicewallet.core.model.LotteryNumber) {
+            byPeriod[number.period] = number
+        }
+        override suspend fun getByPeriod(period: String) = byPeriod[period]
+        override fun observeAll() =
+            kotlinx.coroutines.flow.flowOf(byPeriod.values.toList().sortedByDescending { it.period })
+        override suspend fun latest() = byPeriod.values.maxByOrNull { it.period }
     }
 
     private companion object {

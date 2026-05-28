@@ -2,6 +2,7 @@ package tw.invoicewallet.app
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.view.SoundEffectConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,7 +27,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -105,6 +109,8 @@ private fun ScanRoute(onBack: () -> Unit, onEditInvoice: (String) -> Unit, defau
     val state by viewModel.state.collectAsState()
     val session by viewModel.session.collectAsState()
     val context = LocalContext.current
+    val view = LocalView.current
+    val haptics = LocalHapticFeedback.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     val imagePicker = rememberLauncherForActivityResult(
@@ -130,10 +136,19 @@ private fun ScanRoute(onBack: () -> Unit, onEditInvoice: (String) -> Unit, defau
     }
 
     // Each scan emits a transient event → snackbar (3 s, action "編輯" jumps to detail).
+    // Saved also plays the system click + a light haptic so a quick batch scan is felt as
+    // well as seen; both honour system silent / vibrate settings. Lottery wins get a
+    // richer banner that announces the prize alongside the merchant.
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             val (msg, action) = when (event) {
-                is ScanEvent.Saved -> "已存 ${event.label}" to event.invoiceId
+                is ScanEvent.Saved -> {
+                    view.playSoundEffect(SoundEffectConstants.CLICK)
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    val base = "已存 ${event.label}"
+                    val msg = event.lotteryPrize?.let { "$base · 中獎 NT$%,d".format(it) } ?: base
+                    msg to event.invoiceId
+                }
                 is ScanEvent.Duplicate -> "已存在 ${event.label}" to null
                 is ScanEvent.Failed -> "無法辨識：${event.message}" to null
             }

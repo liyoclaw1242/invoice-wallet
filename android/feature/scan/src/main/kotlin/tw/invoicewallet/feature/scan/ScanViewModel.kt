@@ -14,8 +14,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import tw.invoicewallet.core.database.repository.InvoiceRepository
+import tw.invoicewallet.core.database.repository.LotteryRepository
 import tw.invoicewallet.core.model.Invoice
 import tw.invoicewallet.core.model.InvoiceItem
+import tw.invoicewallet.core.model.LotteryStatus
+import tw.invoicewallet.feature.lottery.LotteryMatcher
+import tw.invoicewallet.feature.lottery.LotteryResult
 import tw.invoicewallet.feature.scan.merchant.MerchantDirectory
 import tw.invoicewallet.feature.scan.ocr.InvoiceFieldExtractor
 import tw.invoicewallet.feature.scan.qr.EInvoiceQrException
@@ -29,6 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScanViewModel @Inject constructor(
     private val invoiceRepository: InvoiceRepository,
+    private val lotteryRepository: LotteryRepository,
     private val recognizer: InvoiceRecognizer,
     private val merchantDirectory: MerchantDirectory,
     private val clock: Clock,
@@ -102,10 +107,52 @@ class ScanViewModel @Inject constructor(
             val draft = parsed.toDraftInvoice(id = newId(), now = clock.now()).copy(merchantName = merchantName)
             val items = parsed.toDraftItems(draft.id)
             invoiceRepository.upsertWithItems(draft, items)
+
+            // If the period's winning numbers are already cached locally, run the match
+            // inline so the banner can announce a win in the same beat as the save.
+            // Cached-miss is silent — the lottery screen reconciles later.
+            val prizeAmount = checkLotteryInline(draft)
+
             _session.update { it.copy(savedCount = it.savedCount + 1) }
-            _events.tryEmit(ScanEvent.Saved(invoiceId = draft.id, label = label, itemCount = items.size))
+            _events.tryEmit(
+                ScanEvent.Saved(
+                    invoiceId = draft.id,
+                    label = label,
+                    itemCount = items.size,
+                    lotteryPrize = prizeAmount,
+                ),
+            )
         }
     }
+
+    /** Pulls cached winning numbers for [invoice]'s period and runs the matcher.
+     *  Returns the prize amount when a win is found (also writes it back to the invoice),
+     *  null otherwise. Errors degrade silently — auto-check is a nice-to-have, not core. */
+    private suspend fun checkLotteryInline(invoice: Invoice): Int? = runCatching {
+        val numbers = lotteryRepository.getByPeriod(invoice.issuePeriod) ?: return@runCatching null
+        when (val result = LotteryMatcher.match(invoice, numbers)) {
+            is LotteryResult.Won -> {
+                invoiceRepository.upsert(
+                    invoice.copy(
+                        lotteryStatus = LotteryStatus.CHECKED_WON,
+                        lotteryPrize = result.prize.amountTwd,
+                        updatedAt = clock.now(),
+                    ),
+                )
+                result.prize.amountTwd
+            }
+            LotteryResult.NoPrize -> {
+                invoiceRepository.upsert(
+                    invoice.copy(
+                        lotteryStatus = LotteryStatus.CHECKED_NO_PRIZE,
+                        updatedAt = clock.now(),
+                    ),
+                )
+                null
+            }
+            LotteryResult.NotApplicable -> null
+        }
+    }.getOrNull()
 
     /** Snackbar action: undo the most recently auto-saved invoice. */
     fun undoSavedInvoice(invoiceId: String) {
@@ -178,7 +225,9 @@ data class ScanSessionState(val savedCount: Int = 0)
 
 /** Transient banner event from the continuous-scan path. */
 sealed interface ScanEvent {
-    data class Saved(val invoiceId: String, val label: String, val itemCount: Int) : ScanEvent
+    /** Carries the prize amount when the cached lottery numbers say this invoice won. */
+    data class Saved(val invoiceId: String, val label: String, val itemCount: Int, val lotteryPrize: Int? = null) :
+        ScanEvent
     data class Duplicate(val label: String) : ScanEvent
     data class Failed(val message: String) : ScanEvent
 }
