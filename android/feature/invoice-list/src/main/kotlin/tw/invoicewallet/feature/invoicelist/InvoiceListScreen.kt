@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -58,6 +59,7 @@ fun InvoiceListRoute(
         onLotteryClick = onLotteryClick,
         onSettingsClick = onSettingsClick,
         onShiftMonth = viewModel::shiftFocusedMonth,
+        onCategoryChange = viewModel::onCategoryChange,
         modifier = modifier,
     )
 }
@@ -73,6 +75,7 @@ fun InvoiceListScreen(
     onLotteryClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     onShiftMonth: (Int) -> Unit = {},
+    onCategoryChange: (String?) -> Unit = {},
 ) {
     WalletTheme {
         Scaffold(
@@ -132,6 +135,15 @@ fun InvoiceListScreen(
                 }
                 item(key = "search") {
                     SearchField(query = uiState.query, onQueryChange = onQueryChange)
+                }
+                if (uiState.categories.isNotEmpty()) {
+                    item(key = "category-chips") {
+                        CategoryChips(
+                            facets = uiState.categories,
+                            selectedSlug = uiState.selectedCategory,
+                            onSelect = onCategoryChange,
+                        )
+                    }
                 }
                 if (uiState.invoices.isEmpty()) {
                     item(key = "no-match") { NoSearchMatchRow(uiState.query) }
@@ -219,6 +231,39 @@ private fun MonthSwitcher(label: String, canGoPrev: Boolean, canGoNext: Boolean,
             onClick = { onShiftMonth(1) },
             testTag = "month-next",
         )
+    }
+}
+
+/**
+ * Horizontal chip row. 「全部」 sits at the start, then one chip per category present
+ * in the wallet with its count. Selected chip uses the teal tone; the row stays neutral
+ * cream otherwise so the chips don't compete with the hero number.
+ */
+@Composable
+private fun CategoryChips(facets: List<CategoryFacet>, selectedSlug: String?, onSelect: (String?) -> Unit) {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = WalletTheme.spacing.xs)
+            .testTag("category-chips"),
+        horizontalArrangement = Arrangement.spacedBy(WalletTheme.spacing.xs),
+    ) {
+        item(key = "all") {
+            CompactPill(
+                text = "全部",
+                tone = if (selectedSlug == null) CompactPillTone.Teal else CompactPillTone.Neutral,
+                onClick = { onSelect(null) },
+                modifier = Modifier.testTag("category-all"),
+            )
+        }
+        items(facets, key = { it.slug }) { facet ->
+            CompactPill(
+                text = "${facet.label}  ${facet.count}",
+                tone = if (facet.slug == selectedSlug) CompactPillTone.Teal else CompactPillTone.Neutral,
+                onClick = { onSelect(facet.slug) },
+                modifier = Modifier.testTag("category-${facet.slug}"),
+            )
+        }
     }
 }
 

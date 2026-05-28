@@ -28,13 +28,35 @@ class InvoiceListViewModel @Inject constructor(repository: InvoiceRepository, pr
     private val today: LocalDate get() = clock.now().toLocalDateTime(timeZone).date
     private val focusedMonth = MutableStateFlow(YearMonth.of(today))
 
+    // null == "全部" (no category filter applied).
+    private val selectedCategory = MutableStateFlow<String?>(null)
+
     val uiState: StateFlow<InvoiceListUiState> =
-        combine(repository.observeAll(), query, focusedMonth) { invoices, q, focus ->
+        combine(
+            repository.observeAll(),
+            query,
+            focusedMonth,
+            selectedCategory,
+        ) { invoices, q, focus, category ->
             val bounds = invoiceMonthBounds(invoices)
+            // Counts per category facet — derived once over all invoices so chips show
+            // global totals (independent of search query / month focus).
+            val facets = invoices
+                .mapNotNull { categoryOf(it) }
+                .groupingBy { it }
+                .eachCount()
+                .map { (slug, count) -> CategoryFacet(slug, CategoryGuesser.label(slug), count) }
+                .sortedByDescending { it.count }
+            // Filter pipeline: query → category. Both axes intersect.
+            val visible = invoices
+                .filter { it.matches(q) }
+                .filter { category == null || categoryOf(it) == category }
             InvoiceListUiState(
-                invoices = invoices.filter { it.matches(q) },
+                invoices = visible,
                 query = q,
                 summary = summarize(invoices, focus, bounds),
+                categories = facets,
+                selectedCategory = category,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -45,6 +67,15 @@ class InvoiceListViewModel @Inject constructor(repository: InvoiceRepository, pr
     fun onQueryChange(value: String) {
         query.value = value
     }
+
+    /** Toggle a category chip: pass the slug to filter, or `null` for 「全部」. */
+    fun onCategoryChange(slug: String?) {
+        selectedCategory.value = slug
+    }
+
+    /** Explicit invoice.category wins; otherwise heuristic-guess from merchant name. */
+    private fun categoryOf(invoice: Invoice): String? =
+        invoice.category?.takeIf { it.isNotBlank() } ?: CategoryGuesser.guess(invoice.merchantName)
 
     /** Step the hero one month forward (+1) or back (-1), clamped to the data's bounds. */
     fun shiftFocusedMonth(delta: Int) {
@@ -141,8 +172,15 @@ data class InvoiceSummary(
     val canGoNext: Boolean = false,
 )
 
+/** One category chip — the slug feeds icon/label lookup, count drives the chip's badge. */
+data class CategoryFacet(val slug: String, val label: String, val count: Int)
+
 data class InvoiceListUiState(
     val invoices: List<Invoice> = emptyList(),
     val query: String = "",
     val summary: InvoiceSummary = InvoiceSummary(),
+    /** Categories actually present in the wallet, sorted by count descending. */
+    val categories: List<CategoryFacet> = emptyList(),
+    /** Currently selected category slug; null means 「全部」 is active. */
+    val selectedCategory: String? = null,
 )

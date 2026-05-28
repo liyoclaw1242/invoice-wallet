@@ -99,6 +99,36 @@ class InvoiceListViewModelTest {
     }
 
     @Test
+    fun `category facets count guessed categories and onCategoryChange filters the list`() = runTest {
+        val viewModel = InvoiceListViewModel(
+            repositoryOf(
+                invoice("a", merchant = "麥當勞"),
+                invoice("b", merchant = "肯德基"),
+                invoice("c", merchant = "全聯福利中心"),
+                invoice("d", merchant = "福懋加油站"),
+                invoice("e", merchant = "未知小店"),
+            ),
+            clock,
+        )
+
+        val initial = viewModel.uiState.first { it.invoices.size == 5 }
+        initial.categories.map { it.slug to it.count }.toSet() shouldBe setOf(
+            "food" to 2, // 麥當勞 + 肯德基
+            "convstore" to 1, // 全聯
+            "transit" to 1, // 加油站
+        )
+        initial.selectedCategory shouldBe null
+
+        viewModel.onCategoryChange("food")
+
+        val filtered = viewModel.uiState.first { it.selectedCategory == "food" }
+        filtered.invoices.map { it.id }.toSet() shouldBe setOf("a", "b")
+        // Switching back to 「全部」.
+        viewModel.onCategoryChange(null)
+        viewModel.uiState.first { it.selectedCategory == null }.invoices.size shouldBe 5
+    }
+
+    @Test
     fun `search filters by merchant name, invoice number or note`() = runTest {
         val viewModel = InvoiceListViewModel(
             repositoryOf(
